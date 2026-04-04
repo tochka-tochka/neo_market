@@ -1,0 +1,41 @@
+version: '3'
+services:
+  postgres:
+    image: postgres:18
+    container_name: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=neo_market
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5431:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d neo_market"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  django:
+    build: .
+    container_name: django
+    environment:
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=neo_market
+      - DB_USER=postgres
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - SECRET_KEY=${SECRET_KEY}
+    volumes:
+      - .:/app
+    ports:
+      - 8010:8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
