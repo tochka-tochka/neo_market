@@ -2,7 +2,7 @@ from django.db import models
 from uuid import uuid4
 
 class ProductStatus(models.TextChoices):
-    CREATED = 'created', 'Created'
+    CREATED = 'active', 'Active'
     ON_MODERATION = 'on_moderation', 'On moderation'
     ACCEPTED = 'accepted', 'Accepted'
     BLOCKED = 'blocked', 'Blocked'
@@ -19,7 +19,7 @@ class Product(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.DO_NOTHING, default=None)
-    characteristics = models.JSONField()
+    characteristics = models.JSONField(default=None, null=True, blank=True)
     status = models.CharField(
         max_length=20,
         choices=ProductStatus.choices,
@@ -35,18 +35,18 @@ class SKU(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='skus')
     name = models.CharField(max_length=255)
     price = models.IntegerField()
-    characteristics = models.JSONField()
+    characteristics = models.JSONField(default=None, null=True, blank=True)
     active_quantity = models.IntegerField()
 
     class Meta:
         db_table = 'skus'
 
-class Characteristic(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    sku = models.ForeignKey(SKU, on_delete=models.CASCADE, related_name='characteristics', null=True)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='characteristics', null=True)
-    name = models.CharField(max_length=255)
-    value = models.CharField(max_length=255)
+# class Characteristic(models.Model):
+#     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+#     sku = models.ForeignKey(SKU, on_delete=models.CASCADE, related_name='characteristics', null=True)
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='characteristics', null=True)
+#     name = models.CharField(max_length=255)
+#     value = models.CharField(max_length=255)
 
-    class Meta:
-        db_table = 'characteristics'
+#     class Meta:
+#         db_table = 'characteristics'

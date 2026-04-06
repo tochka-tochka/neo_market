@@ -1,9 +1,10 @@
 from typing import Dict, List
 import uuid
-from src.models.product import Product, ProductStatus, Characteristic, Category
+from src.models.product import Product, ProductStatus, Category
 from src.serializes import ProductSerializer
 from rest_framework import serializers
 from django.db import transaction
+import json
 
 def get_all_products() -> List[Product]:
     try:
@@ -15,7 +16,7 @@ def get_all_products() -> List[Product]:
 
 def get_product(id: str):
     try:
-        product = Product.objects.select_related('category').prefetch_related('characteristics').get(id=id)
+        product = Product.objects.select_related('category').get(id=id)
         
         serializer = ProductSerializer(product) 
         
@@ -35,30 +36,40 @@ def create_product(data: Dict[str, str], image: bytes) -> uuid:
             description=data["description"],
             category_id=data["category"],
             status=ProductStatus.CREATED,
+            characteristics=data["characteristics"]
         )
     except Exception as e:
         raise Exception(f"faield to create product: {e}")
     return id
 
-def create_char(data: Dict[str, str]) -> uuid:
-    id = uuid.uuid4
+def update_product(data: Dict[str, str], image: bytes = None):
+    print(f"DEBUG update_product data: {data}")
     try:
-        Characteristic.objects.create(
-            product_id = data["product"],
-            name = data["name"],
-            value = data["value"]
-        )
-    except Exception as e:
-        raise Exception(f"faield to create product: {e}")
-    return id
-
-def update_product(data: Dict[str, str], image: bytes):
-    try:
-        product = Product.objects.get(id=data["id"])
-        for key, value in data.items():
-            if value is not None and key != "id":
-                setattr(product, key, value)
+        product = Product.objects.get(id=data.get("id"))
+        
+        if data.get("title") is not None:
+            product.title = data["title"]
+        
+        if data.get("description") is not None:
+            product.description = data["description"]
+        
+        if data.get("category") is not None:
+            category_id = data["category"]
+            try:
+                product.category = Category.objects.get(id=category_id)
+            except Category.DoesNotExist:
+                product.category = Category.objects.get(value=category_id)
+        
+        # Для characteristics парсим JSON строку
+        if data.get("characteristics") is not None:
+            chars = data["characteristics"]
+            if isinstance(chars, str):
+                chars = json.loads(chars)
+            product.characteristics = chars
+        
         product.save()
+    except Product.DoesNotExist:
+        raise Exception(f"Product with id {data.get('id')} not found")
     except Exception as e:
         raise Exception(f"failed to update product: {e}")
     

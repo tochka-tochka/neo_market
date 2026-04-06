@@ -1,1 +1,1 @@
-from .product import Product, Category, SKU, Characteristic, ProductStatus
+from .product import Product, Category, SKU, ProductStatus
