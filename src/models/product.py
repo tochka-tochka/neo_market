@@ -25,7 +25,8 @@ class Product(models.Model):
         choices=ProductStatus.choices,
         default=ProductStatus.CREATED,
     )
-    image = models.URLField()
+    image = models.ImageField(upload_to='products/', null=True, blank=True)
+    seller = models.ForeignKey('Seller', on_delete=models.CASCADE, related_name='products')
 
     class Meta:
         db_table = 'products'
@@ -37,6 +38,7 @@ class SKU(models.Model):
     price = models.IntegerField()
     characteristics = models.JSONField(default=None, null=True, blank=True)
     active_quantity = models.IntegerField()
+    image = models.ImageField(upload_to='skus/', null=True, blank=True)
 
     class Meta:
         db_table = 'skus'

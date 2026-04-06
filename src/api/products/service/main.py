@@ -1,6 +1,7 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 import uuid
 from src.models.product import Product, ProductStatus, Category
+from django.core.files.uploadedfile import UploadedFile
 from src.serializes import ProductSerializer
 from rest_framework import serializers
 from django.db import transaction
@@ -27,22 +28,32 @@ def get_product(id: str):
         raise Exception(f"failed to get product: {e}")
 
 @transaction.atomic
-def create_product(data: Dict[str, str], image: bytes) -> uuid:
+def create_product(data: Dict[str, str], image: Union[UploadedFile, None]) -> uuid:
     id = uuid.uuid4()
+
+    chars = data["characteristics"]
+
+    if isinstance(chars, str):
+        try:
+            chars = json.loads(chars)
+        except json.JSONDecodeError:
+            chars = {}
     try:
         Product.objects.create(
             id=id,
             title=data["title"],
             description=data["description"],
+            image=image,
             category_id=data["category"],
             status=ProductStatus.CREATED,
-            characteristics=data["characteristics"]
+            characteristics=chars,
+            seller=data["seller"]
         )
     except Exception as e:
         raise Exception(f"faield to create product: {e}")
     return id
 
-def update_product(data: Dict[str, str], image: bytes = None):
+def update_product(data: Dict[str, str], image: Union[UploadedFile, None]):
     print(f"DEBUG update_product data: {data}")
     try:
         product = Product.objects.get(id=data.get("id"))
@@ -60,12 +71,17 @@ def update_product(data: Dict[str, str], image: bytes = None):
             except Category.DoesNotExist:
                 product.category = Category.objects.get(value=category_id)
         
-        # Для characteristics парсим JSON строку
         if data.get("characteristics") is not None:
             chars = data["characteristics"]
             if isinstance(chars, str):
                 chars = json.loads(chars)
             product.characteristics = chars
+
+        if image is not None:
+            try:
+                product.image = image
+            except Exception as e:
+                raise Exception(f"failed to update product image: {e}")
         
         product.save()
     except Product.DoesNotExist:

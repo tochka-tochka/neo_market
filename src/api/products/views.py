@@ -8,10 +8,13 @@ from django.http.request import HttpRequest
 from src.api.products.service.main import get_product, create_product, update_product, delete_product, get_all_products, get_categories
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.permissions import IsAuthenticated
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class ProductsView(APIView):
+    permission_classes = [IsAuthenticated]
+    
     parser_classes = [MultiPartParser, FormParser]
     
     def get(self, request: HttpRequest, id: str):
@@ -22,6 +25,7 @@ class ProductsView(APIView):
 
         if product is None:
             return JsonResponse({"message": "product not found"}, status=404)
+        
 
         return JsonResponse({ "product" : product })
     
@@ -30,13 +34,18 @@ class ProductsView(APIView):
         description = request.data.get('description')
         category = request.data.get('category')
         characteristics = request.data.get('characteristics')
+
+
         image = request.FILES.get('image')
+
+        print(image)
 
         data = {
             'title': title,
             'description': description,
             'category': category,
-            'characteristics': characteristics
+            'characteristics': characteristics,
+            'seller': request.user.id
         }
 
         try:
@@ -51,6 +60,8 @@ class ProductsView(APIView):
         description = request.data.get('description')
         category = request.data.get('category')
         characteristics = request.data.get('characteristics')
+
+
         image = request.FILES.get("image")
 
         data = {
@@ -79,6 +90,7 @@ class ProductsView(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AllProductsView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request: HttpRequest):
         try:
             products = get_all_products()
@@ -89,6 +101,7 @@ class AllProductsView(APIView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class CategoriesView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request: HttpRequest):
         try:
             categories = get_categories()

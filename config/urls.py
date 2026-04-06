@@ -17,9 +17,17 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from src.api.products.views import ProductsView, AllProductsView, CategoriesView
+from src.api.auth.views import RegisterView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
+    path('/api/v1/reg/', RegisterView.as_view(), name='register'),
+    path('/api/v1/auth/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('/api/v1/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+
     path('api/v1/products/', ProductsView.as_view()),
     path('api/v1/products/<uuid:id>/', ProductsView.as_view()),
     path('api/v1/products/my/', AllProductsView.as_view()),

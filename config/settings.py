@@ -42,6 +42,7 @@ CORS_ALLOWED_ORIGINS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'storages',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,9 +52,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework_simplejwt',
 
     'src.apps.SrcConfig'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -100,6 +108,36 @@ DATABASES = {
     }
 }
 
+#S3 Storage settings
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "access_key": os.environ.get('AWS_ACCESS_KEY_ID'),
+            "secret_key": os.environ.get('AWS_SECRET_ACCESS_KEY'),
+            "bucket_name": os.environ.get('AWS_STORAGE_BUCKET_NAME'),
+            "endpoint_url": os.environ.get('AWS_S3_ENDPOINT_URL'),
+            "region_name": "us-east-1",
+            "addressing_style": "path",
+            "signature_version": "s3v4",
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+AWS_S3_QUERYSTRING_AUTH = False
+AWS_S3_PUBLIC_ALL_USERS = True
+AWS_S3_ADDRESSING_STYLE = 'path'
+AWS_S3_ENDPOINT_URL = 'http://127.0.0.1:9000'
+AWS_S3_USE_SSL = False  # Важно для локальной разработки              
+AWS_S3_VERIFY = False
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+MEDIA_URL = f'{os.environ.get('AWS_S3_ENDPOINT_URL')}/{os.environ.get('AWS_S3_BUCKET_NAME')}/'
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
