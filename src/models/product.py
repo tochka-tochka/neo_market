@@ -7,10 +7,18 @@ class ProductStatus(models.TextChoices):
     ACCEPTED = 'accepted', 'Accepted'
     BLOCKED = 'blocked', 'Blocked'
 
+class Category(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    value = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'categories'
+
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     title = models.CharField(max_length=255)
     description = models.TextField()
+    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING, default=None)
     status = models.CharField(
         max_length=20,
         choices=ProductStatus.choices,
@@ -22,6 +30,7 @@ class Product(models.Model):
         db_table = 'products'
     
 class SKU(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='skus')
     name = models.CharField(max_length=255)
     price = models.IntegerField()
@@ -31,6 +40,7 @@ class SKU(models.Model):
         db_table = 'skus'
 
 class Characteristic(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     sku = models.ForeignKey(SKU, on_delete=models.CASCADE, related_name='characteristic')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='characteristic')
     name = models.CharField(max_length=255)
@@ -38,10 +48,3 @@ class Characteristic(models.Model):
 
     class Meta:
         db_table = 'characteristics'
-
-class Category(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='categories')
-    value = models.CharField(max_length=255)
-
-    class Meta:
-        db_table = 'categories'
