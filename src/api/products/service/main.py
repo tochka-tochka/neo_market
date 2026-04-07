@@ -1,21 +1,22 @@
 from typing import Dict, List, Union
 import uuid
 from src.models.product import Product, ProductStatus, Category
+from src.models.user import Seller
 from django.core.files.uploadedfile import UploadedFile
 from src.serializes import ProductSerializer
 from rest_framework import serializers
 from django.db import transaction
 import json
 
-def get_all_products() -> List[Product]:
+def get_all_products(seller: Seller) -> List[Product]:
     try:
-        products = Product.objects.select_related('category').all()
+        products = Product.objects.select_related('category').filter(seller=seller)
         serializer = ProductSerializer(products, many=True)
         return serializer.data
     except Exception as e:
         raise Exception(f"failed to get products: {e}")
 
-def get_product(id: str, seller: str = None):
+def get_product(id: str, seller: Seller):
     try:
         product = Product.objects.select_related('category').get(id=id)
         if product.seller != seller:
@@ -30,7 +31,7 @@ def get_product(id: str, seller: str = None):
         raise Exception(f"failed to get product: {e}")
 
 @transaction.atomic
-def create_product(data: Dict[str, str], image: Union[UploadedFile, None]) -> uuid:
+def create_product(data: Dict[str, str], image: Union[UploadedFile, None], seller: Seller) -> uuid:
     id = uuid.uuid4()
 
     chars = data["characteristics"]
@@ -49,13 +50,13 @@ def create_product(data: Dict[str, str], image: Union[UploadedFile, None]) -> uu
             category_id=data["category"],
             status=ProductStatus.CREATED,
             characteristics=chars,
-            seller=data["seller"]
+            seller=seller
         )
     except Exception as e:
         raise Exception(f"faield to create product: {e}")
     return id
 
-def update_product(data: Dict[str, str], image: Union[UploadedFile, None], seller: str = None):
+def update_product(data: Dict[str, str], image: Union[UploadedFile, None], seller: Seller):
     print(f"DEBUG update_product data: {data}")
     try:
         product = Product.objects.get(id=data.get("id"))
@@ -94,7 +95,7 @@ def update_product(data: Dict[str, str], image: Union[UploadedFile, None], selle
     except Exception as e:
         raise Exception(f"failed to update product: {e}")
     
-def delete_product(id: str, seller: str = None):
+def delete_product(id: str, seller: Seller):
     try:
         product = Product.objects.get(id=id)
         if product.seller != seller:

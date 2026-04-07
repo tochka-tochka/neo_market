@@ -17,9 +17,9 @@ class ProductsView(APIView):
     
     parser_classes = [MultiPartParser, FormParser]
     
-    def get(self, request: HttpRequest, id: str):
+    def get(self, request, id: str):
         try:
-            product = get_product(id)
+            product = get_product(id, request.user)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 
@@ -44,18 +44,17 @@ class ProductsView(APIView):
             'title': title,
             'description': description,
             'category': category,
-            'characteristics': characteristics,
-            'seller': request.user.id
+            'characteristics': characteristics
         }
 
         try:
-            id = create_product(data, image)
+            id = create_product(data, image, request.user)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
         
         return JsonResponse({"id": str(id)}, status=201)
     
-    def put(self, request: HttpRequest, id: str = None):
+    def put(self, request, id: str = None):
         title = request.data.get('title')
         description = request.data.get('description')
         category = request.data.get('category')
@@ -73,7 +72,7 @@ class ProductsView(APIView):
         }
 
         try:
-            update_product(data, image)
+            update_product(data, image, request.user)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
         
@@ -91,9 +90,9 @@ class ProductsView(APIView):
 @method_decorator(csrf_exempt, name='dispatch')
 class AllProductsView(APIView):
     permission_classes = [IsAuthenticated]
-    def get(self, request: HttpRequest):
+    def get(self, request):
         try:
-            products = get_all_products()
+            products = get_all_products(seller=request.user)
             return JsonResponse({ "products" : products }, status=200)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
