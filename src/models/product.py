@@ -1,5 +1,6 @@
 from django.db import models
 from uuid import uuid4
+from django.conf import settings
 
 class ProductStatus(models.TextChoices):
     CREATED = 'active', 'Active'
@@ -26,7 +27,7 @@ class Product(models.Model):
         default=ProductStatus.CREATED,
     )
     image = models.ImageField(upload_to='products/', null=True, blank=True)
-    seller = models.ForeignKey('Seller', on_delete=models.CASCADE, related_name='products')
+    seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'products'

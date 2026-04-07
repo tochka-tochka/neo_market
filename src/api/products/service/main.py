@@ -15,9 +15,11 @@ def get_all_products() -> List[Product]:
     except Exception as e:
         raise Exception(f"failed to get products: {e}")
 
-def get_product(id: str):
+def get_product(id: str, seller: str = None):
     try:
         product = Product.objects.select_related('category').get(id=id)
+        if product.seller != seller:
+            raise Exception("Access Denied")
         
         serializer = ProductSerializer(product) 
         
@@ -53,10 +55,13 @@ def create_product(data: Dict[str, str], image: Union[UploadedFile, None]) -> uu
         raise Exception(f"faield to create product: {e}")
     return id
 
-def update_product(data: Dict[str, str], image: Union[UploadedFile, None]):
+def update_product(data: Dict[str, str], image: Union[UploadedFile, None], seller: str = None):
     print(f"DEBUG update_product data: {data}")
     try:
         product = Product.objects.get(id=data.get("id"))
+
+        if product.seller != seller:
+            raise Exception("Access Denied")
         
         if data.get("title") is not None:
             product.title = data["title"]
@@ -89,9 +94,11 @@ def update_product(data: Dict[str, str], image: Union[UploadedFile, None]):
     except Exception as e:
         raise Exception(f"failed to update product: {e}")
     
-def delete_product(id: str):
+def delete_product(id: str, seller: str = None):
     try:
         product = Product.objects.get(id=id)
+        if product.seller != seller:
+            raise Exception("Access Denied")
         product.delete()
     except Exception as e:
         raise Exception(f"failed to delete product: {e}")

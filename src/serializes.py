@@ -29,7 +29,7 @@ class SellerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Seller
-        fields = ['id', 'login', 'password']
+        fields = ['id', 'username', 'password', 'products']
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -39,7 +39,6 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ('username', 'password')
 
     def create(self, validated_data):
-        # Используем create_user, чтобы пароль захешировался автоматически
         seller = Seller.objects.create_user(
             username=validated_data['username'],
             password=validated_data['password']
