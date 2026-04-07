@@ -118,6 +118,8 @@ STORAGES = {
             "secret_key": os.environ.get('AWS_SECRET_ACCESS_KEY'),
             "bucket_name": os.environ.get('AWS_STORAGE_BUCKET_NAME'),
             "endpoint_url": os.environ.get('AWS_S3_ENDPOINT_URL'),
+            "custom_domain": 'localhost:9000/media',
+            "url_protocol": "http:",
             "region_name": "us-east-1",
             "addressing_style": "path",
             "signature_version": "s3v4",
@@ -132,8 +134,10 @@ AWS_S3_QUERYSTRING_AUTH = False
 AWS_S3_PUBLIC_ALL_USERS = True
 AWS_S3_ADDRESSING_STYLE = 'path'
 AWS_S3_ENDPOINT_URL = 'http://127.0.0.1:9000'
+AWS_S3_CUSTOM_DOMAIN = 'localhost:9000/media'
 AWS_S3_USE_SSL = False  # Важно для локальной разработки              
 AWS_S3_VERIFY = False
+AWS_QUERYSTRING_AUTH = False
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
