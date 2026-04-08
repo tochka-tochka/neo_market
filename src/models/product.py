@@ -26,7 +26,6 @@ class Product(models.Model):
         choices=ProductStatus.choices,
         default=ProductStatus.CREATED,
     )
-    image = models.ImageField(upload_to='products/', null=True, blank=True)
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:
@@ -43,6 +42,18 @@ class SKU(models.Model):
 
     class Meta:
         db_table = 'skus'
+
+class Image(models.Model):
+    """Модель для хранения изображений товара"""
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    url = models.ImageField(upload_to='products/')
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'images'
+        ordering = ['order', 'created_at']
 
 # class Characteristic(models.Model):
 #     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)

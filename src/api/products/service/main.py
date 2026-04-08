@@ -1,6 +1,6 @@
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Any
 import uuid
-from src.models.product import Product, ProductStatus, Category
+from src.models.product import Product, ProductStatus, Category, Image
 from src.models.user import Seller
 from django.core.files.uploadedfile import UploadedFile
 from src.serializes import ProductSerializer
@@ -31,32 +31,50 @@ def get_product(id: str, seller: Seller):
         raise Exception(f"failed to get product: {e}")
 
 @transaction.atomic
-def create_product(data: Dict[str, str], image: Union[UploadedFile, None], seller: Seller) -> uuid:
-    id = uuid.uuid4()
+def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Seller) -> uuid.UUID:
+    # 1. Генерация ID (лучше позволить модели сделать это, но если нужно вручную):
+    product_id = uuid.uuid4()
 
-    chars = data["characteristics"]
-
+    # 2. Обработка характеристик
+    chars = data.get("characteristics", {})
     if isinstance(chars, str):
         try:
             chars = json.loads(chars)
         except json.JSONDecodeError:
             chars = {}
+
     try:
-        Product.objects.create(
-            id=id,
+        # 3. Создаем продукт
+        product = Product.objects.create(
+            id=product_id,
             title=data["title"],
             description=data["description"],
-            image=image,
-            category_id=data["category"],
+            category_id=data["category"], # Убедитесь, что здесь UUID категории
             status=ProductStatus.CREATED,
             characteristics=chars,
             seller=seller
         )
-    except Exception as e:
-        raise Exception(f"faield to create product: {e}")
-    return id
 
-def update_product(data: Dict[str, str], image: Union[UploadedFile, None], seller: Seller):
+        # 4. Создаем изображения
+        if images:
+            image_objects = []
+            for index, file in enumerate(images):
+                # Явно указываем именованные аргументы
+                image_objects.append(Image(
+                    product=product,
+                    url=file,
+                    order=index
+                ))
+            
+            Image.objects.bulk_create(image_objects)
+
+    except Exception as e:
+        raise Exception(f"failed to create product: {e}")
+        
+    return product_id
+
+@transaction.atomic
+def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Seller):
     print(f"DEBUG update_product data: {data}")
     try:
         product = Product.objects.get(id=data.get("id"))
@@ -83,9 +101,18 @@ def update_product(data: Dict[str, str], image: Union[UploadedFile, None], selle
                 chars = json.loads(chars)
             product.characteristics = chars
 
-        if image is not None:
+        if images is not None:
             try:
-                product.image = image
+                Image.objects.filter(product=product).delete()
+                image_objects = []
+                for index, file in enumerate(images):
+                    image_objects.append(Image(
+                        product=product,
+                        url=file,
+                        order=index
+                    ))
+                
+                Image.objects.bulk_create(image_objects)
             except Exception as e:
                 raise Exception(f"failed to update product image: {e}")
         

@@ -36,9 +36,9 @@ class ProductsView(APIView):
         characteristics = request.data.get('characteristics')
 
 
-        image = request.FILES.get('image')
+        images = request.FILES.getlist('images')
 
-        print(image)
+        print(images)
 
         data = {
             'title': title,
@@ -48,7 +48,7 @@ class ProductsView(APIView):
         }
 
         try:
-            id = create_product(data, image, request.user)
+            id = create_product(data, images, request.user)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
         
@@ -61,7 +61,7 @@ class ProductsView(APIView):
         characteristics = request.data.get('characteristics')
 
 
-        image = request.FILES.get("image")
+        images = request.FILES.getlist("images")
 
         data = {
             'id': id,
@@ -72,7 +72,7 @@ class ProductsView(APIView):
         }
 
         try:
-            update_product(data, image, request.user)
+            update_product(data, images, request.user)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
         
