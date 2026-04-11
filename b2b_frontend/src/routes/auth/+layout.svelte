@@ -9,6 +9,6 @@
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
-<main class="bg-neutral min-h-screen flex justify-center items-center">
+<main class="bg-gradient-to-b from-neutral-900 to-neutral-950 min-h-screen flex justify-center items-center">
 	{@render children()}
 </main>

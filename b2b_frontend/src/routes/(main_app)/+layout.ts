@@ -13,7 +13,7 @@ export const load: LayoutLoad = async ({ url }) => {
         }
 
         if (token && isPublicPage) {
-            throw redirect(307, '/my_products');
+            throw redirect(307, '/products');
         }
     }
 

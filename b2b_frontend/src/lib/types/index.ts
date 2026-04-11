@@ -14,7 +14,7 @@ export type SkuType = {
     name: string;
     price: number;
     quantity: number;
-    chars: Char[];
+    characteristics: Char[];
 }
 
 export type Char = {
@@ -31,4 +31,16 @@ export type Image = {
     id: string;
     url: string;
     order: number;
+}
+
+export type InvoiceItem = {
+    product: ProductType;
+    skuId: string;
+    quantity: number;
+}
+
+export type InvoiceType = {
+    id: string;
+    items: InvoiceItem[];
+    date: Date;
 }
