@@ -66,7 +66,7 @@
 
             <div>
                 <p class="font-Manrope font-light text-xl text-tx-secondary pb-2">Количество</p>
-                <p class="font-Manrope font-light text-2xl text-white">{sku.quantity}</p>
+                <p class="font-Manrope font-light text-2xl text-white">{sku.active_quantity}</p>
             </div>
         </div>
         <div>

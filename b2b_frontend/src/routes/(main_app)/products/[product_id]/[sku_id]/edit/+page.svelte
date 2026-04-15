@@ -1,5 +1,5 @@
 <script lang="ts">
-    import EditSkuForm from "$lib/components/product/sku/organisms/EditSkuForm.svelte";
+    import EditSkuForm from "$lib/components/organisms/EditSkuForm.svelte";
 
     let { data } = $props();
 
@@ -12,9 +12,9 @@
 
     let sku = data?.sku ?? {
         id: 101,
-        skuId: "IPH15P-BLK-128",
+        name: "IPH15P-BLK-128",
         price: 120000,
-        quantity: 4,
+        active_quantity: 4,
         status: "active",
         image: "/mock/iphone-black.jpg"
     };

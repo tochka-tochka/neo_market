@@ -13,7 +13,7 @@ export type SkuType = {
     id: string;
     name: string;
     price: number;
-    quantity: number;
+    active_quantity: number;
     characteristics: Char[];
 }
 

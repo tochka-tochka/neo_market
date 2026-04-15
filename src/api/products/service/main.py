@@ -32,10 +32,8 @@ def get_product(id: str, seller: Seller):
 
 @transaction.atomic
 def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Seller) -> uuid.UUID:
-    # 1. Генерация ID (лучше позволить модели сделать это, но если нужно вручную):
     product_id = uuid.uuid4()
 
-    # 2. Обработка характеристик
     chars = data.get("characteristics", {})
     if isinstance(chars, str):
         try:
@@ -44,22 +42,19 @@ def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Sel
             chars = {}
 
     try:
-        # 3. Создаем продукт
         product = Product.objects.create(
             id=product_id,
             title=data["title"],
             description=data["description"],
-            category_id=data["category"], # Убедитесь, что здесь UUID категории
+            category_id=data["category"],
             status=ProductStatus.CREATED,
             characteristics=chars,
             seller=seller
         )
-
-        # 4. Создаем изображения
+        
         if images:
             image_objects = []
             for index, file in enumerate(images):
-                # Явно указываем именованные аргументы
                 image_objects.append(Image(
                     product=product,
                     url=file,

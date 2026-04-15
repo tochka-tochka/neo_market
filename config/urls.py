@@ -34,5 +34,6 @@ urlpatterns = [
     path('api/v1/products/my/', AllProductsView.as_view()),
     path('api/v1/categories/', CategoriesView.as_view()),
 
-    path('api/v1/skus/', SkusView.as_view())
+    path('api/v1/skus/', SkusView.as_view()),
+    path('api/v1/skus/<uuid:id>/', SkusView.as_view())
 ]

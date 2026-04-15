@@ -11,6 +11,10 @@
         skus: SkuType[];
         productId: string;
     } = $props();
+
+    function handleDeleteSku(skuId: string) {
+        skus = skus.filter(sku => sku.id !== skuId);
+    }
 </script>
 
 <div class="pt-8">
@@ -37,7 +41,7 @@
 
         <tbody>
             {#each skus as sku}
-                <ProductSkuRow sku={sku} productId={productId} />
+                <ProductSkuRow sku={sku} productId={productId} onDelete={() => handleDeleteSku(sku.id)} />
             {/each}
         </tbody>
     </table>

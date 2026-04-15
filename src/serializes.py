@@ -14,11 +14,9 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class SKUSerializer(serializers.ModelSerializer):
 
-    images = ImageSerializer(many=True, read_only=True)
-
     class Meta:
         model = SKU
-        fields = ['id', 'name', 'price', 'active_quantity', 'characteristics', 'image']
+        fields = ['id', 'name', 'price', 'active_quantity', 'characteristics']
 
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)

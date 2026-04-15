@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
     import type { ProductType } from "$lib/types";
-    import Characteristics from "$lib/components/common/atoms/Characteristics.svelte";
+    import Characteristics from "$lib/components/atoms/Characteristics.svelte";
     import { API_URL } from "$lib";
     import Carousel from "$lib/components/shadcn/carousel/carousel.svelte";
     import CarouselContent from "$lib/components/shadcn/carousel/carousel-content.svelte";

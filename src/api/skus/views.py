@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from django.http.request import HttpRequest
-from src.api.skus.service.main import create_sku, update_sku
+from src.api.skus.service.main import create_sku, update_sku, delete_sku
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
@@ -30,14 +30,13 @@ class SkusView(APIView):
         }
 
         try:
-            id = create_sku(data)
+            id = create_sku(data, request.user)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
         
         return JsonResponse({"id": str(id)}, status=201)
     
-    def put(self, request):
-        id = request.data.get('id')
+    def put(self, request, id: str):
         name = request.data.get('name')
         price = request.data.get('price')
         active_quantity = request.data.get('active_quantity')
@@ -52,8 +51,16 @@ class SkusView(APIView):
         }
 
         try:
-            update_sku(data)
+            update_sku(data, request.user)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
+        
+        return JsonResponse({"message": "success"}, status=200)
+    
+    def delete(self, request, id: str):
+        try:
+            delete_sku(id, request.user)
+        except Exception as e:
+            return JsonResponse({"message" : str(e)}, status=500)
         
         return JsonResponse({"message": "success"}, status=200)

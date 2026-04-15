@@ -5,10 +5,12 @@
 
     let {
         sku,
-        productId
+        productId,
+        onDelete
     }: {
         sku: SkuType;
         productId: string;
+        onDelete: () => void;
     } = $props();
 </script>
 
@@ -22,7 +24,7 @@
     </td>
 
     <td class="text-center align-middle py-8 px-2 font-Manrope font-normal text-lg text-white">
-        {sku.quantity}
+        {sku.active_quantity}
     </td>
 
     <td>
@@ -39,12 +41,16 @@
         <button
             type="button"
             onclick={async () => {
-                await fetch(`${API_URL}/products/${productId}/skus/${sku.id}`, {
+                const response = await fetch(`${API_URL}/skus/${sku.id}/`, {
                     method: "DELETE",
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem("access_token")}`
+                        Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
-                })
+                });
+                
+                if (response.ok && onDelete) {
+                    onDelete();
+                }
             }}
             class="px-4 py-2 border border-red-500/50 text-red-400 cursor-pointer hover:bg-red-500/10"
             style="cursor: pointer;"

@@ -45,7 +45,7 @@ export const load: PageLoad = async ({ fetch }) => {
                                         { name: "Size", value: "M" },
                                     ],
                                     price: 100,
-                                    quantity: 10
+                                    active_quantity: 10
                                 }
                             ]
                         },
@@ -79,7 +79,7 @@ export const load: PageLoad = async ({ fetch }) => {
                                         { name: "Size", value: "M" },
                                     ],
                                     price: 100,
-                                    quantity: 10
+                                    active_quantity: 10
                                 }
                             ]
                         },

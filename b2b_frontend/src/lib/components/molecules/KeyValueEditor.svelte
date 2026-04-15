@@ -2,35 +2,35 @@
     import { fade } from 'svelte/transition';
     import type { Char } from "$lib/types";
     let {
-        chars = $bindable([]),
+        characteristics = $bindable([]),
         keyPlaceholder = "Ключ",
         valuePlaceholder = "Значение"
     }: {
-        chars?: Char[];
+        characteristics?: Char[];
         keyPlaceholder?: string;
         valuePlaceholder?: string;
     } = $props();
 
-    let entries = $state<Char[]>(chars ? [...chars] : []);
+    let entries = $state<Char[]>(characteristics ? [...characteristics] : []);
 
     $effect(() => {
-        if (chars) {
-            entries = [...chars];
+        if (characteristics) {
+            entries = [...characteristics];
         }
     });
 
     function addChar() {
         entries = [...entries, { name: "", value: "" }];
-        chars = entries;
+        characteristics = entries;
     }
 
     function removeChar(index: number) {
         entries = entries.filter((_, i) => i !== index);
-        chars = entries;
+        characteristics = entries;
     }
 
     function updateChar() {
-        chars = entries;
+        characteristics = entries;
     }
 </script>
 

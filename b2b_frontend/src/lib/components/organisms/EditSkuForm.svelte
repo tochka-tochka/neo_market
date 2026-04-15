@@ -14,18 +14,20 @@
 
     let SKU: string = $state(sku.name);
     let price: string = $state(String(sku.price));
-    let quantity: string = $state(String(sku.quantity));
+    let active_quantity: string = $state(String(sku.active_quantity));
     let characteristics: Char[] = $state(sku.characteristics || []);
 
     async function handleSubmit() {
         const formData = new FormData();
         formData.append("name", SKU);
         formData.append("price", price);
-        formData.append("quantity", quantity);
+        formData.append("active_quantity", active_quantity);
         formData.append("characteristics", JSON.stringify(characteristics));
+        formData.append("product_id", product.id)
 
-        await fetch(`${API_URL}/products/${product.id}/skus`, {
-            method: "POST",
+        await fetch(`${API_URL}/skus/${sku.id}/`, {
+            method: "PUT",
+            body: formData,
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem("token")}`,
             }
@@ -55,17 +57,31 @@
                 />
             </div>
 
-            <div class="flex flex-col col-span-3 gap-1">
-                <label class="font-Manrope font-light text-lg text-tx-secondary" for="price">
-                    Цена
-                </label>
-                <input
-                    id="price"
-                    type="number"
-                    bind:value={price}
-                    placeholder="Введите цену"
-                    class="w-full border-b border-white/20 px-4 py-4 text-white text-lg font-Manrope font-light outline-none placeholder:text-tx-secondary"
-                />
+            <div class="flex flex-row col-span-3 grid grid-cols-2 gap-6">
+                <div class="flex flex-col gap-1 col-span-1">
+                    <label class="font-Manrope font-light text-lg text-tx-secondary" for="price">
+                        Цена
+                    </label>
+                    <input
+                        id="price"
+                        type="number"
+                        bind:value={price}
+                        placeholder="Введите цену"
+                        class="w-full border-b border-white/20 px-4 py-4 text-white text-lg font-Manrope font-light outline-none placeholder:text-tx-secondary"
+                    />
+                </div>
+                <div class="flex flex-col gap-1 col-span-1">
+                    <label class="font-Manrope font-light text-lg text-tx-secondary" for="price">
+                        Количество
+                    </label>
+                    <input
+                        id="price"
+                        type="number"
+                        bind:value={active_quantity}
+                        placeholder="Введите количество товара"
+                        class="w-full border-b border-white/20 px-4 py-4  text-white text-lg font-Manrope font-light outline-none placeholder:text-tx-secondary"
+                    />
+                </div>
             </div>
 
             <div class="col-span-2">
