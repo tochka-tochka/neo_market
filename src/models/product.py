@@ -55,12 +55,14 @@ class Image(models.Model):
         db_table = 'images'
         ordering = ['order', 'created_at']
 
-# class Characteristic(models.Model):
-#     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-#     sku = models.ForeignKey(SKU, on_delete=models.CASCADE, related_name='characteristics', null=True)
-#     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='characteristics', null=True)
-#     name = models.CharField(max_length=255)
-#     value = models.CharField(max_length=255)
 
-#     class Meta:
-#         db_table = 'characteristics'
+class Invoice(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    date = models.DateField()
+
+class InvoiceItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    sku = models.ForeignKey(SKU, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)

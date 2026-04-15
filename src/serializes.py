@@ -1,4 +1,4 @@
-from src.models.product import Product, Category, SKU, Image
+from src.models.product import Product, Category, SKU, Image, InvoiceItem, Invoice
 from src.models.user import Seller
 from rest_framework import serializers
 
@@ -76,3 +76,21 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return seller
+    
+class InvoiceItemSerializer(serializers.ModelSerializer):
+
+    product = ProductSerializer()
+
+    sku = SKUSerializer()
+
+    class Meta:
+        model = InvoiceItem
+        fields = ['id', 'product', 'sku', 'quantity']
+
+class InvoiceSerializer(serializers.ModelSerializer):
+
+    items = InvoiceItemSerializer(many=True)
+
+    class Meta:
+        model = Invoice
+        fileds = ['id', 'date', 'items']
