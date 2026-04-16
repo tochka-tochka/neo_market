@@ -59,10 +59,15 @@ class Image(models.Model):
 class Invoice(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     date = models.DateField()
+    seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='invoices')
+    class Meta:
+        db_table = 'invoices'
 
 class InvoiceItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     sku = models.ForeignKey(SKU, on_delete=models.CASCADE)
     quantity = models.IntegerField()
-    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='items')
+    class Meta:
+        db_table = 'invoice_items'

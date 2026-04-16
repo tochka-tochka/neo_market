@@ -1,7 +1,8 @@
 <script lang="ts">
     import type { InvoiceType } from "$lib/types";
     import InvoiceRow from "$lib/components/atoms/InvoiceRow.svelte";
-    import InvoiveAcceptbutton from "$lib/components/atoms/InvoiveAcceptbutton.svelte";
+    import InvoiveAcceptButton from "$lib/components/atoms/InvoiceAcceptButton.svelte";
+    import InvoiveDeleteButton from "$lib/components/atoms/InvoiceDeleteButton.svelte";
     let { invoice } : { invoice: InvoiceType } = $props();
 
     let showDetails = $state(false);
@@ -13,7 +14,10 @@
     >
         {`Накладная #${invoice.id.slice(0, 8)} от ${new Date(invoice.date).toLocaleDateString()}`}
     </button>
-    <InvoiveAcceptbutton invoiceId={invoice.id} />
+    <div class="flex flex-row items-center">
+        <InvoiveAcceptButton invoiceId={invoice.id} />
+        <InvoiveDeleteButton invoiceId={invoice.id} />
+    </div>
 </div>
 <div
     class="overflow-hidden transition-all duration-300 ease-in-out"

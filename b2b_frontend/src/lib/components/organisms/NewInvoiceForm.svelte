@@ -22,18 +22,26 @@
         skus: []
     };
 
+    const dummySku: SkuType = {
+        id: "",
+        name: "",
+        price: 0,
+        active_quantity: 0,
+        characteristics: []
+    }
+
     async function submitForm(e: SubmitEvent) {
         e.preventDefault();
 
         const clippedFormItems = formItems.map(item => ({
-            product: item.product.id,
-            skuId: item.skuId,
+            product_id: item.product.id,
+            sku_id: item.sku.id,
             quantity: item.quantity
         }));
 
         console.log(clippedFormItems);
 
-        await fetch(`${API_URL}/products/`, {
+        await fetch(`${API_URL}/invoices/`, {
             method: 'POST',
             body: JSON.stringify(clippedFormItems),
             headers: {
@@ -64,7 +72,7 @@
 
         <button
             type="button"
-            onclick={() => formItems = [...formItems, { product: dummyProduct, skuId: "", quantity: 0 }]}
+            onclick={() => formItems = [...formItems, { product: dummyProduct, sku: dummySku, quantity: 0 }]}
             class="mt-3 text-lg text-tx-secondary hover:text-white transition-colors"
         >
             + Добавить запись в накладную

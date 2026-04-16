@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
+    import { goto, invalidate } from "$app/navigation";
     import { API_URL } from "$lib";
 
     let { 
@@ -10,7 +10,7 @@
 
     async function acceptInvoice() {
         try {
-            const response = await fetch(`${API_URL}/invoices/${invoiceId}/accept`, {
+            const response = await fetch(`${API_URL}/invoices/${invoiceId}/accept/`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -20,10 +20,9 @@
             if (!response.ok) {
                 throw new Error('Failed to accept invoice');
             }
-            goto("/invoices");
+            invalidate('invoices:accept')
         } catch (error) {
             console.error('Error accepting invoice:', error);
-            alert('Failed to accept invoice. Please try again.');
         }
     }
 

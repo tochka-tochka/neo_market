@@ -1,5 +1,3 @@
-import json
-import uuid
 from django.http import JsonResponse
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView

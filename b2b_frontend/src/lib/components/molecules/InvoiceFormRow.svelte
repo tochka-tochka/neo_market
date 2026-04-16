@@ -1,7 +1,6 @@
 <script lang="ts">
     import ProductSelect from "$lib/components/molecules/ProductSelect.svelte";
     import SkuSelect from "$lib/components/molecules/SkuSelect.svelte";
-    import type { ProductType, SkuType } from "$lib/types";
 
     let { 
         products, 

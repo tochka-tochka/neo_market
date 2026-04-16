@@ -35,7 +35,7 @@ export type Image = {
 
 export type InvoiceItem = {
     product: ProductType;
-    skuId: string;
+    sku: SkuType;
     quantity: number;
 }
 

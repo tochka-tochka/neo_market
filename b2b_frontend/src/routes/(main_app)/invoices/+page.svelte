@@ -3,7 +3,7 @@
     import InvoiceList from "$lib/components/organisms/InvoiceList.svelte";
     import type { InvoiceType } from "$lib/types";
     let { data } = $props();
-    let invoices :  InvoiceType[] = data.invoices;
+    let invoices :  InvoiceType[] = $derived(data.invoices);
 </script>
 
 <div class="min-h-screen bg-neutral">

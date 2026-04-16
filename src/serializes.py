@@ -54,10 +54,30 @@ class ProductCreateSerializer(serializers.ModelSerializer):
                 order=index,
             )
         return product
+    
+class InvoiceItemSerializer(serializers.ModelSerializer):
+
+    product = ProductSerializer()
+
+    sku = SKUSerializer()
+
+    class Meta:
+        model = InvoiceItem
+        fields = ['id', 'product', 'sku', 'quantity']
+
+class InvoiceSerializer(serializers.ModelSerializer):
+
+    items = InvoiceItemSerializer(many=True)
+
+    class Meta:
+        model = Invoice
+        fields = ['id', 'date', 'items']
 
 class SellerSerializer(serializers.ModelSerializer):
 
     products = ProductSerializer(many=True, read_only=True)
+
+    invoices = InvoiceSerializer(many=True, read_only=True)
 
     class Meta:
         model = Seller
@@ -76,21 +96,3 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return seller
-    
-class InvoiceItemSerializer(serializers.ModelSerializer):
-
-    product = ProductSerializer()
-
-    sku = SKUSerializer()
-
-    class Meta:
-        model = InvoiceItem
-        fields = ['id', 'product', 'sku', 'quantity']
-
-class InvoiceSerializer(serializers.ModelSerializer):
-
-    items = InvoiceItemSerializer(many=True)
-
-    class Meta:
-        model = Invoice
-        fileds = ['id', 'date', 'items']
