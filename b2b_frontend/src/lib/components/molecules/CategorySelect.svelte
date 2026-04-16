@@ -14,6 +14,7 @@
     let isOpen = $state(false);
     let searchText = $state("");
     let inputRef: HTMLInputElement;
+    let lastValidValue = $state("");
 
     let filteredOptions = $derived(
         searchText
@@ -26,6 +27,7 @@
     function handleSelect(option: Category) {
         value = option;
         searchText = option.value;
+        lastValidValue = option.value;
         isOpen = false;
     }
 
@@ -36,21 +38,28 @@
 
     function handleInputBlur() {
         setTimeout(() => {
+            const isValidOption = options.some(opt => opt.value === searchText);
+            
+            if (!isValidOption) {
+                searchText = lastValidValue || value?.value || "";
+            }
+            
             isOpen = false;
-        }, 200);
+        }, 50);
     }
 
     function handleKeydown(e: KeyboardEvent) {
         if (e.key === "Escape") {
             isOpen = false;
+            searchText = lastValidValue || value?.value || "";
             inputRef?.blur();
         }
     }
 
-    // Initialize search text with current value
     $effect(() => {
         if (value?.value) {
             searchText = value.value;
+            lastValidValue = value.value;
         }
     });
 </script>
@@ -67,6 +76,7 @@
             onfocus={handleInputFocus}
             onblur={handleInputBlur}
             onkeydown={handleKeydown}
+            autocomplete="off"
             id="category"
             type="text"
             {placeholder}

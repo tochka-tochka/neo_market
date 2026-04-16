@@ -2,7 +2,8 @@ import type { PageLoad } from "../$types";
 import { API_URL } from "$lib";
 import type { ProductType, Char, Image } from "$lib/types";
 
-export const load : PageLoad = async ({ params }) => {
+export const load : PageLoad = async ({ params, depends, fetch }) => {
+    depends('skus:update')
     try {
         const res = await fetch(`${API_URL}/products/${params.product_id}/`,{
             headers: {

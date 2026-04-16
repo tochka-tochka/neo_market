@@ -39,6 +39,9 @@
                     onclick={async () => {
                         await fetch(`${API_URL}/products/${product.id}/`, {
                             method: "DELETE",
+                            headers: {
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            }
                         })
                         goto("/products")
                     }}
@@ -50,17 +53,17 @@
         </div>
     </div>
 
-    <div class="flex gap-4 pb-8">
-        <div class="w-75 h-75 bg-neutral mx-5">
-            <Carousel class="relative w-full h-full">
+    <div class="flex flex-row items-center justify-center gap-4 pb-8">
+        <div class="mx-5 max-w-100">
+            <Carousel class="relative w-full">
                     <CarouselContent>
                         {#each product.images as image}
-                            <CarouselItem>
-                                <div class="relative w-full h-full">
+                            <CarouselItem class="content-center">
+                                <div class="relative w-100 h-100 flex items-center justify-center">
                                     <img 
                                         src={image.url} 
                                         alt="Preview" 
-                                        class="w-full h-full object-contain"
+                                        class="w-100 h-100 object-contain"
                                     />
                                 </div>
                             </CarouselItem>

@@ -7,7 +7,7 @@
 
     let { data } = $props();
 
-    let product : ProductType = data?.product ?? {
+    let product : ProductType = $derived(data?.product ?? {
         id: "0",
         title: "",
         description: "",
@@ -19,7 +19,7 @@
         images: [] as Image[],
         characteristics: [] as Char[],
         skus: [] as SkuType[],
-    };
+    })
     $effect(() => {
         currentProduct.set(product);
     });

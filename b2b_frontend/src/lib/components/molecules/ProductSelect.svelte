@@ -66,6 +66,7 @@
             onfocus={handleInputFocus}
             onblur={handleInputBlur}
             onkeydown={handleKeydown}
+            autocomplete="off"
             id="category"
             type="text"
             class="w-full border-b border-white/20 px-4 py-4 text-white text-lg font-Manrope font-light outline-none placeholder:text-tx-secondary"

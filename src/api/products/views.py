@@ -78,7 +78,7 @@ class ProductsView(APIView):
     
     def delete(self, request: HttpRequest, id: str):
         try:
-            delete_product(id)
+            delete_product(id, request.user)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
         

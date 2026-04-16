@@ -168,7 +168,7 @@
             <label class="font-Manrope font-light text-lg text-tx-secondar mb-2" for="image">
                 Свойства
             </label>
-            <KeyValueEditor bind:chars={characteristics} keyPlaceholder="Бренд" valuePlaceholder="Apple" />
+            <KeyValueEditor bind:characteristics={characteristics} keyPlaceholder="Бренд" valuePlaceholder="Apple" />
         </div>
     </div>
 

@@ -1,16 +1,14 @@
 <script lang="ts">
     import type { SkuType } from "$lib/types";
-    import { goto } from "$app/navigation";
+    import { goto, invalidate } from "$app/navigation";
     import { API_URL } from "$lib";
 
     let {
         sku,
         productId,
-        onDelete
     }: {
         sku: SkuType;
         productId: string;
-        onDelete: () => void;
     } = $props();
 </script>
 
@@ -48,9 +46,7 @@
                     }
                 });
                 
-                if (response.ok && onDelete) {
-                    onDelete();
-                }
+                invalidate('skus:update')
             }}
             class="px-4 py-2 border border-red-500/50 text-red-400 cursor-pointer hover:bg-red-500/10"
             style="cursor: pointer;"

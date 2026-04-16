@@ -2,6 +2,7 @@
     import type { ProductType, Char } from "$lib/types";
     import KeyValueEditor from "$lib/components/molecules/KeyValueEditor.svelte";
     import { API_URL } from "$lib";
+    import { goto } from "$app/navigation";
 
     let { product }: { product: ProductType } = $props();
 
@@ -26,6 +27,7 @@
             }
         }
         )
+        goto(`/products/${product.id}/`)
     }
 
     

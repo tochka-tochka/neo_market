@@ -24,6 +24,13 @@
     </div>
 
     <table class="w-full pt-6">
+        <colgroup>
+            <col class="w-1/4" />
+            <col class="w-1/4" />
+            <col class="w-1/4" />
+            <col class="w-1/6" />
+            <col class="w-1/6" />
+        </colgroup>
         <thead class="text-xl text-tx-secondary border-b border-white/20">
             <tr>
                 <th scope="col" class="py-4 px-2">
@@ -35,13 +42,13 @@
                 <th scope="col" class="py-4 px-2">
                     <p class="font-Manrope font-light">Количество</p>
                 </th>
-                <th></th>
+                <th scope="colgroup" colspan="2"></th>
             </tr>
         </thead>
 
         <tbody>
             {#each skus as sku}
-                <ProductSkuRow sku={sku} productId={productId} onDelete={() => handleDeleteSku(sku.id)} />
+                <ProductSkuRow sku={sku} productId={productId} />
             {/each}
         </tbody>
     </table>

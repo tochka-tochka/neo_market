@@ -50,7 +50,7 @@
             }
         });
 
-        goto('/products')
+        goto('/invoices')
     }
 </script>
 
