@@ -7,6 +7,7 @@ from src.api.products.service.main import get_product, create_product, update_pr
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
+from src.serializes import ProductSerializer
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -45,6 +46,10 @@ class ProductsView(APIView):
             'characteristics': characteristics
         }
 
+        serializer = ProductSerializer(data=data)
+        if not serializer.is_valid():
+            return JsonResponse({"errors": serializer.errors}, status=400)
+
         try:
             id = create_product(data, images, request.user)
         except Exception as e:
@@ -68,6 +73,10 @@ class ProductsView(APIView):
             'category': category,
             'characteristics': characteristics
         }
+
+        serializer = ProductSerializer(data=data)
+        if not serializer.is_valid():
+            return JsonResponse({"errors": serializer.errors}, status=400)
 
         try:
             update_product(data, images, request.user)

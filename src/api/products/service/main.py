@@ -47,7 +47,7 @@ def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Sel
             title=data["title"],
             description=data["description"],
             category_id=data["category"],
-            status=ProductStatus.CREATED,
+            status=ProductStatus.ON_MODERATION,
             characteristics=chars,
             seller=seller
         )

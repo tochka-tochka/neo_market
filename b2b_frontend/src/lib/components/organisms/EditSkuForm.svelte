@@ -33,6 +33,8 @@
             }
         }
         )
+
+        goto(`/products/${product.id}`);
     }
 </script>
 

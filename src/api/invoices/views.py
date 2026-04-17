@@ -8,6 +8,7 @@ from src.api.invoices.service.main import create_invoice, delete_invoice, accept
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
+from src.serializes import InvoiceSerializer
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -29,6 +30,7 @@ class InvoicesView(APIView):
         return JsonResponse({ "invoices" : invoices })
     
     def post(self, request: HttpRequest):
+        
         items = request.data
         if isinstance(items, str):
             try:

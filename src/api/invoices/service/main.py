@@ -26,12 +26,14 @@ def create_invoice(data, seller):
             if sku.product != product:
                 raise Exception("failed to create invoice: product's sku doesn't exist")
 
-            InvoiceItem.objects.create(
+            invoice_item = InvoiceItem(
                 product=product,
                 sku=sku,
                 quantity=item['quantity'],
                 invoice=invoice
             )
+            invoice_item.full_clean()
+            invoice_item.save()
         return invoice.id
     except Exception as e:
         raise Exception(f"failed to create invoice: {e}")

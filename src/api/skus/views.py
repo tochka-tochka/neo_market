@@ -3,6 +3,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from django.http.request import HttpRequest
 from src.api.skus.service.main import create_sku, update_sku, delete_sku
+from src.serializes import SKUSerializer
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
@@ -29,6 +30,10 @@ class SkusView(APIView):
             'product_id': product_id
         }
 
+        serializer = SKUSerializer(data=data)
+        if not serializer.is_valid():
+            return JsonResponse({"errors": serializer.errors}, status=400)
+
         try:
             id = create_sku(data, request.user)
         except Exception as e:
@@ -49,6 +54,10 @@ class SkusView(APIView):
             'active_quantity': active_quantity,
             'characteristics': characteristics
         }
+
+        serializer = SKUSerializer(data=data)
+        if not serializer.is_valid():
+            return JsonResponse({"errors": serializer.errors}, status=400)
 
         try:
             update_sku(data, request.user)
