@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
+import { goto } from "$app/navigation";
 
-    let {
-        productId,
-        skuId
-    }: {
-        productId: string | number;
-        skuId: string | number;
-    } = $props();
+let {
+	productId,
+	skuId,
+}: {
+	productId: string | number;
+	skuId: string | number;
+} = $props();
 </script>
 
 <div class="pt-8 flex flex-row gap-4">

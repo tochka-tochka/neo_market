@@ -1,67 +1,67 @@
 <script lang="ts">
-    import type { Category } from "$lib/types";
+import type { Category } from "$lib/types";
 
-    let {
-        options,
-        value = $bindable(),
-        placeholder = "Выберите категорию"
-    }: {
-        options: Category[];
-        value: Category;
-        placeholder?: string;
-    } = $props();
+let {
+	options,
+	value = $bindable(),
+	placeholder = "Выберите категорию",
+}: {
+	options: Category[];
+	value: Category;
+	placeholder?: string;
+} = $props();
 
-    let isOpen = $state(false);
-    let searchText = $state("");
-    let inputRef: HTMLInputElement;
-    let lastValidValue = $state("");
+let isOpen = $state(false);
+let searchText = $state("");
+let inputRef: HTMLInputElement;
+let lastValidValue = $state("");
 
-    let filteredOptions = $derived(
-        searchText
-            ? options.filter(opt => 
-                opt.value.toLowerCase().includes(searchText.toLowerCase())
-            )
-            : options
-    );
+let filteredOptions = $derived(
+	searchText
+		? options.filter((opt) =>
+				opt.value.toLowerCase().includes(searchText.toLowerCase()),
+			)
+		: options,
+);
 
-    function handleSelect(option: Category) {
-        value = option;
-        searchText = option.value;
-        lastValidValue = option.value;
-        isOpen = false;
-    }
+function handleSelect(option: Category) {
+	value = option;
+	searchText = option.value;
+	lastValidValue = option.value;
+	isOpen = false;
+}
 
-    function handleInputFocus() {
-        isOpen = true;
-        searchText = value?.value || "";
-    }
+function handleInputFocus() {
+	isOpen = true;
+	searchText = value?.value || "";
+}
 
-    function handleInputBlur() {
-        setTimeout(() => {
-            const isValidOption = options.some(opt => opt.value === searchText);
-            
-            if (!isValidOption) {
-                searchText = lastValidValue || value?.value || "";
-            }
-            
-            isOpen = false;
-        }, 50);
-    }
+function handleInputBlur() {
+	setTimeout(() => {
+		const isValidOption = options.some((opt) => opt.value === searchText);
 
-    function handleKeydown(e: KeyboardEvent) {
-        if (e.key === "Escape") {
-            isOpen = false;
-            searchText = lastValidValue || value?.value || "";
-            inputRef?.blur();
-        }
-    }
+		if (!isValidOption) {
+			searchText = lastValidValue || value?.value || "";
+		}
 
-    $effect(() => {
-        if (value?.value) {
-            searchText = value.value;
-            lastValidValue = value.value;
-        }
-    });
+		isOpen = false;
+	}, 50);
+}
+
+function handleKeydown(e: KeyboardEvent) {
+	if (e.key === "Escape") {
+		isOpen = false;
+		searchText = lastValidValue || value?.value || "";
+		inputRef?.blur();
+	}
+}
+
+$effect(() => {
+	if (value?.value) {
+		searchText = value.value;
+		lastValidValue = value.value;
+	}
+});
 </script>
 
 <div class="relative flex flex-col col-span-3 gap-1">

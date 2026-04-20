@@ -1,38 +1,38 @@
 <script lang="ts">
-    import { API_URL } from '$lib';
+import { API_URL } from "$lib";
 
-    let username = $state('');
-    let password = $state('');
-    let error = $state('');
-    let loading = $state(false);
+let username = $state("");
+let password = $state("");
+let error = $state("");
+let loading = $state(false);
 
-    async function handleSubmit(e: SubmitEvent) {
-        e.preventDefault();
-        error = '';
-        loading = true;
+async function handleSubmit(e: SubmitEvent) {
+	e.preventDefault();
+	error = "";
+	loading = true;
 
-        try {
-            const response = await fetch(`${API_URL}/login/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
+	try {
+		const response = await fetch(`${API_URL}/login/`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ username, password }),
+		});
 
-            if (!response.ok) {
-                const data = await response.json();
-                throw new Error(data.message || 'Ошибка входа');
-            }
+		if (!response.ok) {
+			const data = await response.json();
+			throw new Error(data.message || "Ошибка входа");
+		}
 
-            const data = await response.json();
-            // Сохраняем токен или перенаправляем
-            window.localStorage.setItem('token', data.access);
-            window.location.href = '/products';
-        } catch (err) {
-            error = err instanceof Error ? err.message : 'Ошибка входа';
-        } finally {
-            loading = false;
-        }
-    }
+		const data = await response.json();
+		// Сохраняем токен или перенаправляем
+		window.localStorage.setItem("token", data.access);
+		window.location.href = "/products";
+	} catch (err) {
+		error = err instanceof Error ? err.message : "Ошибка входа";
+	} finally {
+		loading = false;
+	}
+}
 </script>
 
 <div class="w-full max-w-md mx-auto p-6 bg-neutral-900">

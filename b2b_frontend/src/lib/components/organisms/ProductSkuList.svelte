@@ -1,20 +1,20 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
-    import ProductSkuRow from "$lib/components/molecules/ProductSkuRow.svelte";
-    import AddSkuButton from "$lib/components/atoms/AddSkuButton.svelte";
-    import type { SkuType } from "$lib/types";
+import { goto } from "$app/navigation";
+import AddSkuButton from "$lib/components/atoms/AddSkuButton.svelte";
+import ProductSkuRow from "$lib/components/molecules/ProductSkuRow.svelte";
+import type { SkuType } from "$lib/types";
 
-    let {
-        skus,
-        productId
-    }: {
-        skus: SkuType[];
-        productId: string;
-    } = $props();
+let {
+	skus,
+	productId,
+}: {
+	skus: SkuType[];
+	productId: string;
+} = $props();
 
-    function handleDeleteSku(skuId: string) {
-        skus = skus.filter(sku => sku.id !== skuId);
-    }
+function handleDeleteSku(skuId: string) {
+	skus = skus.filter((sku) => sku.id !== skuId);
+}
 </script>
 
 <div class="pt-8">

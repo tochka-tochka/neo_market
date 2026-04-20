@@ -1,15 +1,15 @@
 <script lang="ts">
-    import type { SkuType } from "$lib/types";
-    import { goto, invalidate } from "$app/navigation";
-    import { API_URL } from "$lib";
+import { goto, invalidate } from "$app/navigation";
+import { API_URL, authorized } from "$lib";
+import type { SkuType } from "$lib/types";
 
-    let {
-        sku,
-        productId,
-    }: {
-        sku: SkuType;
-        productId: string;
-    } = $props();
+let {
+	sku,
+	productId,
+}: {
+	sku: SkuType;
+	productId: string;
+} = $props();
 </script>
 
 <tr>
@@ -39,7 +39,7 @@
         <button
             type="button"
             onclick={async () => {
-                const response = await fetch(`${API_URL}/skus/${sku.id}/`, {
+                const response = await (authorized(fetch))(`${API_URL}/skus/${sku.id}/`, {
                     method: "DELETE",
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`

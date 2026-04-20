@@ -1,11 +1,12 @@
 <script lang="ts">
-    import type { InvoiceType } from "$lib/types";
-    import InvoiceRow from "$lib/components/atoms/InvoiceRow.svelte";
-    import InvoiveAcceptButton from "$lib/components/atoms/InvoiceAcceptButton.svelte";
-    import InvoiveDeleteButton from "$lib/components/atoms/InvoiceDeleteButton.svelte";
-    let { invoice } : { invoice: InvoiceType } = $props();
+import InvoiveAcceptButton from "$lib/components/atoms/InvoiceAcceptButton.svelte";
+import InvoiveDeleteButton from "$lib/components/atoms/InvoiceDeleteButton.svelte";
+import InvoiceRow from "$lib/components/atoms/InvoiceRow.svelte";
+import type { InvoiceType } from "$lib/types";
 
-    let showDetails = $state(false);
+let { invoice }: { invoice: InvoiceType } = $props();
+
+let showDetails = $state(false);
 </script>
 <div class="flex flex-row justify-between items-center mt-4">
     <button

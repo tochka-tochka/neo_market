@@ -1,6 +1,5 @@
 <script>
-    import { goto } from "$app/navigation";
-
+import { goto } from "$app/navigation";
 </script>
 <button 
     type="button"

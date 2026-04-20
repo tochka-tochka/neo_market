@@ -1,9 +1,10 @@
 <script lang="ts">
-    import AddInvoiceButton from "$lib/components/atoms/AddInvoiceButton.svelte";
-    import InvoiceList from "$lib/components/organisms/InvoiceList.svelte";
-    import type { InvoiceType } from "$lib/types";
-    let { data } = $props();
-    let invoices :  InvoiceType[] = $derived(data.invoices);
+import AddInvoiceButton from "$lib/components/atoms/AddInvoiceButton.svelte";
+import InvoiceList from "$lib/components/organisms/InvoiceList.svelte";
+import type { InvoiceType } from "$lib/types";
+
+let { data } = $props();
+let invoices: InvoiceType[] = $derived(data.invoices);
 </script>
 
 <div class="min-h-screen bg-neutral">

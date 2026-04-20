@@ -1,15 +1,15 @@
 <script lang="ts">
-    let {
-        product
-    }: {
-        product: {
-            id: number | string;
-            title: string;
-            description: string;
-            category: string;
-            image: string;
-        };
-    } = $props();
+let {
+	product,
+}: {
+	product: {
+		id: number | string;
+		title: string;
+		description: string;
+		category: string;
+		image: string;
+	};
+} = $props();
 </script>
 
 <div class="pt-8">

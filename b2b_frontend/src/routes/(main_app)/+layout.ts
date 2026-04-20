@@ -1,25 +1,26 @@
-import { redirect } from '@sveltejs/kit';
-import { browser } from '$app/environment';
-import type { LayoutLoad } from './$types';
+import { redirect } from "@sveltejs/kit";
+import { browser } from "$app/environment";
+import type { LayoutLoad } from "./$types";
 
 export const ssr = false;
 
 export const load: LayoutLoad = async ({ url }) => {
-   const token = browser ? localStorage.getItem('token') : null;
+	const token = browser ? localStorage.getItem("token") : null;
 
-    const isPublicPage = url.pathname === '/auth/login' || url.pathname === '/auth/reg';
-    
-    if (browser) {
-        if (!token && !isPublicPage) {
-            throw redirect(307, '/auth/login');
-        }
+	const isPublicPage =
+		url.pathname === "/auth/login" || url.pathname === "/auth/reg";
 
-        if (token && isPublicPage) {
-            throw redirect(307, '/products');
-        }
-    }
+	if (browser) {
+		if (!token && !isPublicPage) {
+			throw redirect(307, "/auth/login");
+		}
 
-    return {
-        token
-    };
+		if (token && isPublicPage) {
+			throw redirect(307, "/products");
+		}
+	}
+
+	return {
+		token,
+	};
 };

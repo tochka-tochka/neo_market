@@ -1,22 +1,22 @@
 <script lang="ts">
-    import { invalidate } from "$app/navigation";
-    import { API_URL } from "$lib";
-    let { invoiceId } : { invoiceId : string } = $props()
+import { invalidate } from "$app/navigation";
+import { API_URL, authorized } from "$lib";
 
-    async function deleteInvoice() {
-        try {
-            await fetch(`${API_URL}/invoices/${invoiceId}/`, {
-                method: "DELETE",
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem("token")}`
-                }
-            })
-            invalidate('invoices:delete')
-        } catch (error) {
-            console.error('Error accepting invoice:', error);
-        }
-    }
+let { invoiceId }: { invoiceId: string } = $props();
 
+async function deleteInvoice() {
+	try {
+		await authorized(fetch)(`${API_URL}/invoices/${invoiceId}/`, {
+			method: "DELETE",
+			headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		invalidate("invoices:delete");
+	} catch (error) {
+		console.error("Error accepting invoice:", error);
+	}
+}
 </script>
 <button
     type="button"

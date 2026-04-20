@@ -1,29 +1,31 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
-    import ProductDetailsCard from "$lib/components/organisms/ProductDetailCard.svelte";
-    import ProductSkuList from "$lib/components/organisms/ProductSkuList.svelte";
-    import type { ProductType, Image, Char, SkuType } from "$lib/types/index.js";
-    import { currentProduct } from "$lib/stores/productStore";
+import { goto } from "$app/navigation";
+import ProductDetailsCard from "$lib/components/organisms/ProductDetailCard.svelte";
+import ProductSkuList from "$lib/components/organisms/ProductSkuList.svelte";
+import { currentProduct } from "$lib/stores/productStore";
+import type { Char, Image, ProductType, SkuType } from "$lib/types/index.js";
 
-    let { data } = $props();
+let { data } = $props();
 
-    let product : ProductType = $derived(data?.product ?? {
-        id: "0",
-        title: "",
-        description: "",
-        status: "active",
-        category: {
-            id: "-" ,
-            value: "-",
-        },
-        images: [] as Image[],
-        characteristics: [] as Char[],
-        skus: [] as SkuType[],
-    })
-    $effect(() => {
-        currentProduct.set(product);
-    });
-    console.log(product)
+let product: ProductType = $derived(
+	data?.product ?? {
+		id: "0",
+		title: "",
+		description: "",
+		status: "active",
+		category: {
+			id: "-",
+			value: "-",
+		},
+		images: [] as Image[],
+		characteristics: [] as Char[],
+		skus: [] as SkuType[],
+	},
+);
+$effect(() => {
+	currentProduct.set(product);
+});
+console.log(product);
 </script>
 
 <div class="min-h-screen bg-neutral">

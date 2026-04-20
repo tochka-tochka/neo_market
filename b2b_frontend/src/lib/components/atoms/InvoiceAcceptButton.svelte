@@ -1,31 +1,33 @@
 <script lang="ts">
-    import { goto, invalidate } from "$app/navigation";
-    import { API_URL } from "$lib";
+import { goto, invalidate } from "$app/navigation";
+import { API_URL, authorized } from "$lib";
 
-    let { 
-        invoiceId
-    } : {
-        invoiceId: string;
-    } = $props();
+let {
+	invoiceId,
+}: {
+	invoiceId: string;
+} = $props();
 
-    async function acceptInvoice() {
-        try {
-            const response = await fetch(`${API_URL}/invoices/${invoiceId}/accept/`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+async function acceptInvoice() {
+	try {
+		const response = await authorized(fetch)(
+			`${API_URL}/invoices/${invoiceId}/accept/`,
+			{
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				},
+			},
+		);
 
-            if (!response.ok) {
-                throw new Error('Failed to accept invoice');
-            }
-            invalidate('invoices:accept')
-        } catch (error) {
-            console.error('Error accepting invoice:', error);
-        }
-    }
-
+		if (!response.ok) {
+			throw new Error("Failed to accept invoice");
+		}
+		invalidate("invoices:accept");
+	} catch (error) {
+		console.error("Error accepting invoice:", error);
+	}
+}
 </script>
 <button 
     type="button"

@@ -1,23 +1,23 @@
 <script lang="ts">
-    import EditSkuForm from "$lib/components/organisms/EditSkuForm.svelte";
+import EditSkuForm from "$lib/components/organisms/EditSkuForm.svelte";
 
-    let { data } = $props();
+let { data } = $props();
 
-    // mock, если серверные данные пока не приходят
-    let product = data?.product ?? {
-        id: 1,
-        title: "iPhone 15 Pro",
-        category: "Смартфоны"
-    };
+// mock, если серверные данные пока не приходят
+let product = data?.product ?? {
+	id: 1,
+	title: "iPhone 15 Pro",
+	category: "Смартфоны",
+};
 
-    let sku = data?.sku ?? {
-        id: 101,
-        name: "IPH15P-BLK-128",
-        price: 120000,
-        active_quantity: 4,
-        status: "active",
-        image: "/mock/iphone-black.jpg"
-    };
+let sku = data?.sku ?? {
+	id: 101,
+	name: "IPH15P-BLK-128",
+	price: 120000,
+	active_quantity: 4,
+	status: "active",
+	image: "/mock/iphone-black.jpg",
+};
 </script>
 
 <div class="min-h-screen bg-neutral">

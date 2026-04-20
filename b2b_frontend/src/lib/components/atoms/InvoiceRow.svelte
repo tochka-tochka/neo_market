@@ -1,12 +1,13 @@
 <script lang="ts">
-    import type { InvoiceItem } from "$lib/types";
-    let { 
-        item } 
-    : { 
-        item: InvoiceItem;
-    } = $props();
+import type { InvoiceItem } from "$lib/types";
 
-    const sku = item.product.skus.find((s: any) => s.id === item.sku.id);
+let {
+	item,
+}: {
+	item: InvoiceItem;
+} = $props();
+
+const sku = item.product.skus.find((s: any) => s.id === item.sku.id);
 </script>
 <tr class="text-center">
     <td class="text-center align-middle py-2 px-2 font-Manrope font-semibold text-lg">

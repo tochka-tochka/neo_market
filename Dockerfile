@@ -3,7 +3,7 @@ ENV PYTHONDONTWRITEBYTECODE 1
 
 ENV PYTHONUNBUFFERED 1
 
-WORKDIR /app
+WORKDIR /app/backend
 
 COPY requirements.txt .
 

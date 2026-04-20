@@ -1,8 +1,8 @@
 <script lang="ts">
-    import Product from "../atoms/Product.svelte";
-    import type { ProductType, SkuType } from "$lib/types";
+import type { ProductType, SkuType } from "$lib/types";
+import Product from "../atoms/Product.svelte";
 
-    let { products } : { products: ProductType[] } = $props();
+let { products }: { products: ProductType[] } = $props();
 </script>
 
 <table class="w-full">

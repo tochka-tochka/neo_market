@@ -1,41 +1,37 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
-    import type { ProductType, SkuType, Char } from "$lib/types";
-    import KeyValueEditor from "$lib/components/molecules/KeyValueEditor.svelte";
-    import { API_URL } from "$lib";
+import { goto } from "$app/navigation";
+import { API_URL, authorized } from "$lib";
+import KeyValueEditor from "$lib/components/molecules/KeyValueEditor.svelte";
+import type { Char, ProductType, SkuType } from "$lib/types";
 
-    let {
-        product,
-        sku
-    }: {
-        product: ProductType;
-        sku: SkuType;
-    } = $props();
+let {
+	product,
+	sku,
+}: {
+	product: ProductType;
+	sku: SkuType;
+} = $props();
 
-    let SKU: string = $state(sku.name);
-    let price: string = $state(String(sku.price));
-    let active_quantity: string = $state(String(sku.active_quantity));
-    let characteristics: Char[] = $state(sku.characteristics || []);
+let SKU: string = $state(sku.name);
+let price: string = $state(String(sku.price));
+let active_quantity: string = $state(String(sku.active_quantity));
+let characteristics: Char[] = $state(sku.characteristics || []);
 
-    async function handleSubmit() {
-        const formData = new FormData();
-        formData.append("name", SKU);
-        formData.append("price", price);
-        formData.append("active_quantity", active_quantity);
-        formData.append("characteristics", JSON.stringify(characteristics));
-        formData.append("product_id", product.id)
+async function handleSubmit() {
+	const formData = new FormData();
+	formData.append("name", SKU);
+	formData.append("price", price);
+	formData.append("active_quantity", active_quantity);
+	formData.append("characteristics", JSON.stringify(characteristics));
+	formData.append("product_id", product.id);
 
-        await fetch(`${API_URL}/skus/${sku.id}/`, {
-            method: "PUT",
-            body: formData,
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`,
-            }
-        }
-        )
+	await authorized(fetch)(`${API_URL}/skus/${sku.id}/`, {
+		method: "PUT",
+		body: formData,
+	});
 
-        goto(`/products/${product.id}`);
-    }
+	goto(`/products/${product.id}`);
+}
 </script>
 
 <div class="pt-8">

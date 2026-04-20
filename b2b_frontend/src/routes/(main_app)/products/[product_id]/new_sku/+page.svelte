@@ -1,21 +1,21 @@
 <script lang="ts">
-    import NewSkuForm from "$lib/components/organisms/NewSkuForm.svelte";
-    import type { ProductType, Image, Char, SkuType } from "$lib/types/index.js";
+import NewSkuForm from "$lib/components/organisms/NewSkuForm.svelte";
+import type { Char, Image, ProductType, SkuType } from "$lib/types/index.js";
 
-    let { data } = $props();
-    let product : ProductType = data?.product ?? {
-        id: "0",
-        title: "",
-        description: "",
-        status: "active",
-        category: {
-            id: "-" ,
-            value: "-",
-        },
-        images: [] as Image[],
-        characteristics: [] as Char[],
-        skus: [] as SkuType[],
-    };
+let { data } = $props();
+let product: ProductType = data?.product ?? {
+	id: "0",
+	title: "",
+	description: "",
+	status: "active",
+	category: {
+		id: "-",
+		value: "-",
+	},
+	images: [] as Image[],
+	characteristics: [] as Char[],
+	skus: [] as SkuType[],
+};
 </script>
 
 <div class="min-h-screen bg-neutral">

@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
+import { goto } from "$app/navigation";
 
-    let { productId } : { productId: string } = $props();
+let { productId }: { productId: string } = $props();
 </script>
 <button 
     type="button"

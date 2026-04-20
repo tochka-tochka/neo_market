@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { Char } from "$lib/types";
+import type { Char } from "$lib/types";
 
-    let { chars } : { chars: Char[] } = $props()
+let { chars }: { chars: Char[] } = $props();
 </script>
 
 <div class="flex flex-col gap-3">

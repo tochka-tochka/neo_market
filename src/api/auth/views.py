@@ -13,12 +13,16 @@ class RegisterView(APIView):
         if serializer.is_valid():
             seller = serializer.save()
             
-            # Сразу генерируем токены для нового пользователя
             refresh = RefreshToken.for_user(seller)
             return Response({
-                "seller": serializer.data,
-                "refresh": str(refresh),
-                "access": str(refresh.access_token),
-            }, status=status.HTTP_201_CREATED)
+                    "seller": serializer.data,
+                    "refresh": str(refresh),
+                    "access": str(refresh.access_token),
+                }, 
+                status=status.HTTP_201_CREATED,
+                headers= {
+                    'Set-Cookie': f"refresh={refresh}; HttpOnly; Path=/", 
+                }
+            )
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { ProductType, SkuType } from "$lib/types";
+import type { ProductType, SkuType } from "$lib/types";
 
-    let { product }: { product: ProductType } = $props();
+let { product }: { product: ProductType } = $props();
 </script>
 
 <div class="grid grid-cols-1 gap-6">

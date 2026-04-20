@@ -1,37 +1,38 @@
 <script lang="ts">
-    import { fade } from 'svelte/transition';
-    import type { Char } from "$lib/types";
-    let {
-        characteristics = $bindable([]),
-        keyPlaceholder = "Ключ",
-        valuePlaceholder = "Значение"
-    }: {
-        characteristics?: Char[];
-        keyPlaceholder?: string;
-        valuePlaceholder?: string;
-    } = $props();
+import { fade } from "svelte/transition";
+import type { Char } from "$lib/types";
 
-    let entries = $state<Char[]>(characteristics ? [...characteristics] : []);
+let {
+	characteristics = $bindable([]),
+	keyPlaceholder = "Ключ",
+	valuePlaceholder = "Значение",
+}: {
+	characteristics?: Char[];
+	keyPlaceholder?: string;
+	valuePlaceholder?: string;
+} = $props();
 
-    $effect(() => {
-        if (characteristics) {
-            entries = [...characteristics];
-        }
-    });
+let entries = $state<Char[]>(characteristics ? [...characteristics] : []);
 
-    function addChar() {
-        entries = [...entries, { name: "", value: "" }];
-        characteristics = entries;
-    }
+$effect(() => {
+	if (characteristics) {
+		entries = [...characteristics];
+	}
+});
 
-    function removeChar(index: number) {
-        entries = entries.filter((_, i) => i !== index);
-        characteristics = entries;
-    }
+function addChar() {
+	entries = [...entries, { name: "", value: "" }];
+	characteristics = entries;
+}
 
-    function updateChar() {
-        characteristics = entries;
-    }
+function removeChar(index: number) {
+	entries = entries.filter((_, i) => i !== index);
+	characteristics = entries;
+}
+
+function updateChar() {
+	characteristics = entries;
+}
 </script>
 
 <div class="flex flex-col gap-4">

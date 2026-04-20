@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { sidebarOpen } from '$lib/stores/sidebar';
+import { sidebarOpen } from "$lib/stores/sidebar";
 </script>
 <button
     onclick={() => $sidebarOpen = !$sidebarOpen}
@@ -34,5 +34,14 @@
         >
             Накладные
         </a>
+        <button
+            onclick={() => {
+                localStorage.removeItem('token');
+                window.location.href = '/auth/login';
+            }}
+            class="font-Manrope self-start font-light text-xl text-white/50 px-4 py-1 mt-10 duration-100 hover:text-white/30 cursor-pointer"
+        >
+            Выйти
+    </button>
     </nav>
 </aside>

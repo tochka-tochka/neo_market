@@ -1,9 +1,10 @@
 <script lang="ts">
-    import AddButton from "$lib/components/atoms/AddButton.svelte";
-    import ProductsList from "$lib/components/molecules/ProductsList.svelte";
-    import type { ProductType } from "$lib/types";
-    let { data } = $props();
-    let products :  ProductType[] = data.products;
+import AddButton from "$lib/components/atoms/AddButton.svelte";
+import ProductsList from "$lib/components/molecules/ProductsList.svelte";
+import type { ProductType } from "$lib/types";
+
+let { data } = $props();
+let products: ProductType[] = data.products;
 </script>
 
 <div class="min-h-screen bg-neutral">

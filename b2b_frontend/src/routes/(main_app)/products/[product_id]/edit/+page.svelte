@@ -1,32 +1,36 @@
 <script lang="ts">
-    import EditProductForm from "$lib/components/organisms/EditProductForm.svelte";
-    import { onMount } from 'svelte';
-    import { currentProduct } from "$lib/stores/productStore";
-    import { API_URL } from "$lib";
-    import type { ProductType, Char } from "$lib/types/index.js";
+import { onMount } from "svelte";
+import { API_URL, authorized } from "$lib";
+import EditProductForm from "$lib/components/organisms/EditProductForm.svelte";
+import { currentProduct } from "$lib/stores/productStore";
+import type { Char, ProductType } from "$lib/types/index.js";
 
-    let { data } = $props();
+let { data } = $props();
 
-    let categoryOptions = data.categories ?? [];
-    let product : ProductType | null = $state(null);
-    let isLoading = $state(true);
+let categoryOptions = data.categories ?? [];
+let product: ProductType | null = $state(null);
+let isLoading = $state(true);
 
-    let displayProduct = $derived($currentProduct ?? product);
+let displayProduct = $derived($currentProduct ?? product);
 
-    onMount(async () => {
-        if ($currentProduct) {
-            product = $currentProduct;
-            isLoading = false;
-            return;
-        }
+onMount(async () => {
+	if ($currentProduct) {
+		product = $currentProduct;
+		isLoading = false;
+		return;
+	}
 
-        const res = await fetch(`${API_URL}/products/${data.productId}/`).then(res => res.json());
-        const productData = res.product;
-        productData.characteristics = JSON.parse(productData.characteristics) as Char[]
-        product = productData
-        currentProduct.set(productData);
-        isLoading = false;
-    });
+	const res = await authorized(fetch)(
+		`${API_URL}/products/${data.productId}/`,
+	).then((res) => res.json());
+	const productData = res.product;
+	productData.characteristics = JSON.parse(
+		productData.characteristics,
+	) as Char[];
+	product = productData;
+	currentProduct.set(productData);
+	isLoading = false;
+});
 </script>
 
 <div class="min-h-screen bg-neutral">

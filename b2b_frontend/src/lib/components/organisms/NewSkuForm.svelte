@@ -1,36 +1,33 @@
 <script lang="ts">
-    import type { ProductType, Char } from "$lib/types";
-    import KeyValueEditor from "$lib/components/molecules/KeyValueEditor.svelte";
-    import { API_URL } from "$lib";
-    import { goto } from "$app/navigation";
+import { goto } from "$app/navigation";
+import { API_URL, authorized } from "$lib";
+import KeyValueEditor from "$lib/components/molecules/KeyValueEditor.svelte";
+import type { Char, ProductType } from "$lib/types";
 
-    let { product }: { product: ProductType } = $props();
+let { product }: { product: ProductType } = $props();
 
-    let SKU: string = $state("");
-    let price: string = $state("");
-    let active_quantity: string = $state("");
-    let characteristics : Char[] = $state([]);
+let SKU: string = $state("");
+let price: string = $state("");
+let active_quantity: string = $state("");
+let characteristics: Char[] = $state([]);
 
-    async function handleSubmit() {
-        const formData = new FormData();
-        formData.append("name", SKU);
-        formData.append("price", price);
-        formData.append("active_quantity", active_quantity);
-        formData.append("characteristics", JSON.stringify(characteristics));
-        formData.append("product_id", product.id);
+async function handleSubmit() {
+	const formData = new FormData();
+	formData.append("name", SKU);
+	formData.append("price", price);
+	formData.append("active_quantity", active_quantity);
+	formData.append("characteristics", JSON.stringify(characteristics));
+	formData.append("product_id", product.id);
 
-        await fetch(`${API_URL}/skus/`, {
-            method: "POST",
-            body: formData,
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`,
-            }
-        }
-        )
-        goto(`/products/${product.id}/`)
-    }
-
-    
+	await authorized(fetch)(`${API_URL}/skus/`, {
+		method: "POST",
+		body: formData,
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem("token")}`,
+		},
+	});
+	goto(`/products/${product.id}/`);
+}
 </script>
 
 <div class="pt-8">

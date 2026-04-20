@@ -1,11 +1,8 @@
 <script lang="ts">
-    import ProductSelect from "$lib/components/molecules/ProductSelect.svelte";
-    import SkuSelect from "$lib/components/molecules/SkuSelect.svelte";
+import ProductSelect from "$lib/components/molecules/ProductSelect.svelte";
+import SkuSelect from "$lib/components/molecules/SkuSelect.svelte";
 
-    let { 
-        products, 
-        item = $bindable() 
-    } = $props();
+let { products, item = $bindable() } = $props();
 </script>
 
 

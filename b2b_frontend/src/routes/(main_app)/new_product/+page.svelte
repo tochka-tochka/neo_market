@@ -1,7 +1,7 @@
 <script lang="ts">
-    import NewProductForm from "$lib/components/organisms/NewProductForm.svelte";
+import NewProductForm from "$lib/components/organisms/NewProductForm.svelte";
 
-    let { data } = $props();
+let { data } = $props();
 </script>
 
 <div class="min-h-screen bg-neutral">

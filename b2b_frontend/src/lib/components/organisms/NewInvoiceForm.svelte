@@ -1,57 +1,57 @@
 <script lang="ts">
-    import InvoiceFormRow from '../molecules/InvoiceFormRow.svelte';
-    import { API_URL } from '$lib';
-    import type { InvoiceItem, ProductType, SkuType } from "$lib/types";
-    import { goto } from "$app/navigation";
+import { goto } from "$app/navigation";
+import { API_URL, authorized } from "$lib";
+import type { InvoiceItem, ProductType, SkuType } from "$lib/types";
+import InvoiceFormRow from "../molecules/InvoiceFormRow.svelte";
 
-    let { products } = $props();
+let { products } = $props();
 
-    let formItems : InvoiceItem[] = $state([]);
+let formItems: InvoiceItem[] = $state([]);
 
-    const dummyProduct: ProductType = {
-        id: "",
-        title: "",
-        description: "",
-        category: {
-            id: "",
-            value: "Выберите категорию"
-        },
-        status: "inspection",
-        images: [],
-        characteristics: [],
-        skus: []
-    };
+const dummyProduct: ProductType = {
+	id: "",
+	title: "",
+	description: "",
+	category: {
+		id: "",
+		value: "Выберите категорию",
+	},
+	status: "inspection",
+	images: [],
+	characteristics: [],
+	skus: [],
+};
 
-    const dummySku: SkuType = {
-        id: "",
-        name: "",
-        price: 0,
-        active_quantity: 0,
-        characteristics: []
-    }
+const dummySku: SkuType = {
+	id: "",
+	name: "",
+	price: 0,
+	active_quantity: 0,
+	characteristics: [],
+};
 
-    async function submitForm(e: SubmitEvent) {
-        e.preventDefault();
+async function submitForm(e: SubmitEvent) {
+	e.preventDefault();
 
-        const clippedFormItems = formItems.map(item => ({
-            product_id: item.product.id,
-            sku_id: item.sku.id,
-            quantity: item.quantity
-        }));
+	const clippedFormItems = formItems.map((item) => ({
+		product_id: item.product.id,
+		sku_id: item.sku.id,
+		quantity: item.quantity,
+	}));
 
-        console.log(clippedFormItems);
+	console.log(clippedFormItems);
 
-        await fetch(`${API_URL}/invoices/`, {
-            method: 'POST',
-            body: JSON.stringify(clippedFormItems),
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem("token")}`,
-                'Content-Type': 'application/json'
-            }
-        });
+	await authorized(fetch)(`${API_URL}/invoices/`, {
+		method: "POST",
+		body: JSON.stringify(clippedFormItems),
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem("token")}`,
+			"Content-Type": "application/json",
+		},
+	});
 
-        goto('/invoices')
-    }
+	goto("/invoices");
+}
 </script>
 
 <div class="pt-8">

@@ -1,45 +1,45 @@
 <script lang="ts">
-    import { API_URL } from '$lib';
+import { API_URL, authorized } from "$lib";
 
-    let username = $state('');
-    let password = $state('');
-    let confirmPassword = $state('');
-    let error = $state('');
-    let loading = $state(false);
+let username = $state("");
+let password = $state("");
+let confirmPassword = $state("");
+let error = $state("");
+let loading = $state(false);
 
-    async function handleSubmit(e: SubmitEvent) {
-        e.preventDefault();
-        error = '';
+async function handleSubmit(e: SubmitEvent) {
+	e.preventDefault();
+	error = "";
 
-        if (password !== confirmPassword) {
-            error = 'Пароли не совпадают';
-            return;
-        }
+	if (password !== confirmPassword) {
+		error = "Пароли не совпадают";
+		return;
+	}
 
-        loading = true;
+	loading = true;
 
-        try {
-            const response = await fetch(`${API_URL}/reg/`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-            const data = await response.json();
+	try {
+		const response = await fetch(`${API_URL}/reg/`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ username, password }),
+		});
+		const data = await response.json();
 
-            if (!response.ok) {
-                throw new Error(data.message || 'Ошибка регистрации');
-            }
+		if (!response.ok) {
+			throw new Error(data.message || "Ошибка регистрации");
+		}
 
-            window.localStorage.setItem('token', data.access)
+		window.localStorage.setItem("token", data.access);
 
-            // Перенаправляем на страницу входа
-            window.location.href = '/products';
-        } catch (err) {
-            error = err instanceof Error ? err.message : 'Ошибка регистрации';
-        } finally {
-            loading = false;
-        }
-    }
+		// Перенаправляем на страницу входа
+		window.location.href = "/products";
+	} catch (err) {
+		error = err instanceof Error ? err.message : "Ошибка регистрации";
+	} finally {
+		loading = false;
+	}
+}
 </script>
 
 <div class="w-full max-w-md mx-auto p-6 bg-neutral-900">

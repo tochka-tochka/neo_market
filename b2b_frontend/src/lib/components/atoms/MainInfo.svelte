@@ -1,5 +1,5 @@
 <script lang="ts">
-    let { id, title, image } = $props()
+let { id, title, image } = $props();
 </script>
 <div class="flex flex-row items-center">
     <img class="size-20 mr-8" src={image} alt={title} />

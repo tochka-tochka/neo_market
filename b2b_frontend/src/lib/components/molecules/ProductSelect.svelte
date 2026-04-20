@@ -1,57 +1,57 @@
 <script lang="ts">
-    import type { ProductType } from "$lib/types";
+import type { ProductType } from "$lib/types";
 
-    let {
-        options,
-        value = $bindable()
-    }: {
-        options: ProductType[];
-        value: ProductType;
-        placeholder?: string;
-    } = $props();
+let {
+	options,
+	value = $bindable(),
+}: {
+	options: ProductType[];
+	value: ProductType;
+	placeholder?: string;
+} = $props();
 
-    let isOpen = $state(false);
-    let searchText = $state("");
-    let inputRef: HTMLInputElement;
+let isOpen = $state(false);
+let searchText = $state("");
+let inputRef: HTMLInputElement;
 
-    let filteredOptions = $derived(
-        searchText
-            ? options.filter(opt => 
-                opt.title.toLowerCase().includes(searchText.toLowerCase())
-            )
-            : options
-    );
+let filteredOptions = $derived(
+	searchText
+		? options.filter((opt) =>
+				opt.title.toLowerCase().includes(searchText.toLowerCase()),
+			)
+		: options,
+);
 
-    function handleSelect(option: ProductType) {
-        value = option;
-        searchText = option.title;
-        isOpen = false;
-    }
+function handleSelect(option: ProductType) {
+	value = option;
+	searchText = option.title;
+	isOpen = false;
+}
 
-    function handleInputFocus() {
-        isOpen = true;
-        searchText = value?.title || "";
-    }
+function handleInputFocus() {
+	isOpen = true;
+	searchText = value?.title || "";
+}
 
-    function handleInputBlur() {
-        setTimeout(() => {
-            isOpen = false;
-        }, 200);
-    }
+function handleInputBlur() {
+	setTimeout(() => {
+		isOpen = false;
+	}, 200);
+}
 
-    function handleKeydown(e: KeyboardEvent) {
-        if (e.key === "Escape") {
-            isOpen = false;
-            inputRef?.blur();
-        }
-    }
+function handleKeydown(e: KeyboardEvent) {
+	if (e.key === "Escape") {
+		isOpen = false;
+		inputRef?.blur();
+	}
+}
 
-    // Initialize search text with current value
-    $effect(() => {
-        if (value?.title) {
-            searchText = value.title;
-        }
-    });
+// Initialize search text with current value
+$effect(() => {
+	if (value?.title) {
+		searchText = value.title;
+	}
+});
 </script>
 
 <div class="relative flex flex-col col-span-3 gap-1">

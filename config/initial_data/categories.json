@@ -1,0 +1,702 @@
+[
+	{
+		"model": "src.Category",
+		"pk": "f2d6462b-73b3-4dcf-91c0-1f264297217e",
+		"fields": {
+			"value": "Смартфоны"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "de75318f-9c34-4760-9b89-d3cb0f229677",
+		"fields": {
+			"value": "Ноутбуки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "3193b7ff-584b-4fdf-85fb-ba9b68e5d7f7",
+		"fields": {
+			"value": "Наушники"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "a6935434-b0c6-4bc3-8fce-8a2245f3c0e1",
+		"fields": {
+			"value": "Часы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "28bc2f27-3e37-47d1-a1f0-6fce7603ffe8",
+		"fields": {
+			"value": "Планшеты"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "54d4f428-efd2-4670-8a16-37995bf1a405",
+		"fields": {
+			"value": "Клавиатуры"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "dc07d8b8-9689-4284-83ef-6e2cf323b3c2",
+		"fields": {
+			"value": "Мыши"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "62a15919-c85f-42e7-bf49-fe9454dba3da",
+		"fields": {
+			"value": "Мониторы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "ff30b783-08ae-4c72-88a2-4278722da35b",
+		"fields": {
+			"value": "Принтеры"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "717927cf-b6e7-4db0-aa53-f27e2bb10b2b",
+		"fields": {
+			"value": "Камеры"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "fde1c210-b97b-4e36-b796-c15bad63ebb0",
+		"fields": {
+			"value": "Объективы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "e20225b8-26c4-4850-8861-8f262b50c414",
+		"fields": {
+			"value": "Игровые приставки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "3e765f89-62a6-4c53-b05d-dc41c096f0ee",
+		"fields": {
+			"value": "Игры"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "db92513f-1ea1-44b7-a3f4-a001b0bb6643",
+		"fields": {
+			"value": "Телевизоры"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "70bbf8c1-a831-4e08-8247-e4c7837c8481",
+		"fields": {
+			"value": "Проекторы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "3d017804-2cb7-40f0-bb6e-5acdcacb079f",
+		"fields": {
+			"value": "Холодильники"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "bc34f50a-3da4-4b9f-8f5a-03a9232a3558",
+		"fields": {
+			"value": "Плиты"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "83e1ebe2-b58b-40d7-b2f6-f5b0833427cb",
+		"fields": {
+			"value": "Микроволновки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "a7b5ae30-934d-496d-a968-9ee416ab6f6a",
+		"fields": {
+			"value": "Чайники"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "3d986354-f4e3-4509-91e6-2a02955c4f0a",
+		"fields": {
+			"value": "Кофемашины"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "efbc5069-bf88-4627-b44a-83ba1312c2d9",
+		"fields": {
+			"value": "Блендеры"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "02ad03ae-d7f6-4811-b76d-b1d652c3e2df",
+		"fields": {
+			"value": "Тостеры"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "e93bd671-c721-4a01-a386-de245bdff44f",
+		"fields": {
+			"value": "Пылесосы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "8364ab4f-088d-491a-a271-6375ad103115",
+		"fields": {
+			"value": "Утюги"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "76eec18b-ff59-4f80-9deb-1002909799a4",
+		"fields": {
+			"value": "Фены"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "472b65f5-c8fc-4a2f-b7e2-ac41d79b4151",
+		"fields": {
+			"value": "Эпиляторы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "6051555b-50e4-46ae-a876-f3fd19a0c3f4",
+		"fields": {
+			"value": "Бритвы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "e7d87d6e-aa1c-44a0-a7cf-e39786751aa2",
+		"fields": {
+			"value": "Зубные щетки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "68c96f3b-938f-4491-96fc-0d6994561c60",
+		"fields": {
+			"value": "Весы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "b0b5aab4-19df-4d10-a638-6c80e7f03631",
+		"fields": {
+			"value": "Кондиционеры"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "4a07d5ea-c35f-4962-8dfa-7a3a5fcbf1c0",
+		"fields": {
+			"value": "Платья"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "57f39905-874b-46f5-b0b8-aea98b43dae0",
+		"fields": {
+			"value": "Рубашки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "ba2eec8f-82a3-4848-96cb-725851a27f52",
+		"fields": {
+			"value": "Джинсы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "37c3e78a-878e-4b63-94bf-489bac5ccd6e",
+		"fields": {
+			"value": "Брюки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "9e5af0be-78c1-48f3-b8f3-a89b8c670258",
+		"fields": {
+			"value": "Юбки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "04e0192d-71dd-4bd4-850a-6191366a868e",
+		"fields": {
+			"value": "Костюмы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "af330a91-a12a-4655-8b03-053feac5d9e5",
+		"fields": {
+			"value": "Пальто"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "222a0a49-d90b-4cb9-a341-3be1c95d38e9",
+		"fields": {
+			"value": "Куртки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "1558ccc1-40b8-499d-8a4d-88c8fe982ecd",
+		"fields": {
+			"value": "Свитера"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "f340d5bf-287c-4f14-9f8e-3817de5fdc77",
+		"fields": {
+			"value": "Футболки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "9fc3627f-bda3-4b29-9780-d1f13ab4a1aa",
+		"fields": {
+			"value": "Шорты"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "adce5046-935a-401e-a5bd-733ac818622c",
+		"fields": {
+			"value": "Нижнее белье"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "76f596a3-6e4f-45b1-958d-295bb69e55d9",
+		"fields": {
+			"value": "Носки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "19daa98d-cf6a-4250-a9fd-371a7d7c4941",
+		"fields": {
+			"value": "Кроссовки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "08e746c3-869f-4793-a086-897c1249a331",
+		"fields": {
+			"value": "Туфли"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "c66f8907-4417-4cbe-b3df-36f51fb22b87",
+		"fields": {
+			"value": "Ботинки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "ef710312-a7a7-4eb9-bb61-41217b1453b4",
+		"fields": {
+			"value": "Сандалии"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "88790bd9-619e-48cd-9ecb-eb53998667dd",
+		"fields": {
+			"value": "Сумки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "899f4510-2b6e-4e7d-bbfe-786cd81eecf7",
+		"fields": {
+			"value": "Рюкзаки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "b020b4d3-b647-4663-a5a9-66dc6e1daf28",
+		"fields": {
+			"value": "Кошельки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "c8e24548-7871-48d2-8072-3c416ebe653b",
+		"fields": {
+			"value": "Ремни"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "da2eba3e-93f1-4927-9093-ff98c08c4974",
+		"fields": {
+			"value": "Шляпы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "8b10a700-3f72-44a9-bdd9-6690064e04ff",
+		"fields": {
+			"value": "Очки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "5541bb13-f296-4dd4-9336-b49c19a59438",
+		"fields": {
+			"value": "Серьги"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "66fa66fb-d7ba-406c-8ba9-b49a19fe35a3",
+		"fields": {
+			"value": "Кольца"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "41b274ba-8aaa-41d0-9547-ab8e01f2c352",
+		"fields": {
+			"value": "Браслеты"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "200b16fe-37a9-4738-8665-34b78ff9e546",
+		"fields": {
+			"value": "Кровати"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "c998e708-61ad-449c-af22-cffb7b2c053c",
+		"fields": {
+			"value": "Диваны"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "35d74ffe-6e45-4362-ab34-6755091a3ebe",
+		"fields": {
+			"value": "Столы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "dcdc1dce-fd81-47a6-bfb2-10659c2db6a6",
+		"fields": {
+			"value": "Стулья"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "520106e5-c537-4973-a5cf-ffb27ac59ce4",
+		"fields": {
+			"value": "Шкафы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "0597a7ee-5437-42ac-b954-4629c5056123",
+		"fields": {
+			"value": "Комоды"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "eccf70c1-27a8-4dca-bf5b-a65c513754f3",
+		"fields": {
+			"value": "Полки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "881627d1-4823-480a-86c2-9421c07075ba",
+		"fields": {
+			"value": "Зеркала"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "42af1819-1004-49cd-a6dd-2e52fe9d3d37",
+		"fields": {
+			"value": "Матрасы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "3cd1dbce-dc37-4976-96e0-0cf85844e883",
+		"fields": {
+			"value": "Постельное белье"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "2f6f5d7c-5f44-4f05-ab4a-e3392a489c4b",
+		"fields": {
+			"value": "Полотенца"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "520102dc-68ca-4092-a67b-51dd716fdf62",
+		"fields": {
+			"value": "Шторы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "6d77ef88-4ca9-4ebb-ab69-d2595bcc952d",
+		"fields": {
+			"value": "Посуда"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "0942665c-6216-48db-b537-37ab7fd8dd52",
+		"fields": {
+			"value": "Сковородки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "1e93955e-7896-4e7b-83c3-94c0e90969b8",
+		"fields": {
+			"value": "Кастрюли"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "7df01d02-7b88-4f64-b7c3-a5584af981b3",
+		"fields": {
+			"value": "Ножи"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "3b9f9dc7-4de8-4ec1-b658-af117fba92a5",
+		"fields": {
+			"value": "Инструменты"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "c18b9689-6567-48d8-bd51-86a7c65bbc3a",
+		"fields": {
+			"value": "Дрели"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "ac8a4d8f-871e-4631-a756-2ad03d569c28",
+		"fields": {
+			"value": "Шуруповерты"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "cfc5863f-3190-4590-8155-6734639881c8",
+		"fields": {
+			"value": "Молотки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "52d57c50-4fd9-4061-88d4-416a20b32516",
+		"fields": {
+			"value": "Обои"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "cf0212ad-f3d5-4b61-b17f-dfbfb4edf163",
+		"fields": {
+			"value": "Краски"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "3915c15b-4fa1-4bab-a71d-3f52e5c4b004",
+		"fields": {
+			"value": "Ламинат"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "ef71d4d9-e7e2-4e3f-ab42-f03ed5283db9",
+		"fields": {
+			"value": "Плитка"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "b5568ede-78fc-4c47-b9a2-451dc6aad39a",
+		"fields": {
+			"value": "Корм для кошек"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "c4494cd7-8484-4d3e-abb8-6f2a1fbf39ab",
+		"fields": {
+			"value": "Корм для собак"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "1570e19f-691d-424d-a53d-89ac5b9cd1bc",
+		"fields": {
+			"value": "Аквариумы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "8a51aaff-88c8-4b60-a41c-cdafb8c57c96",
+		"fields": {
+			"value": "Клетки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "377e64c6-85e0-4e55-9aeb-16f97da5ca6f",
+		"fields": {
+			"value": "Игрушки для животных"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "7cf68842-b3f5-4baf-abb7-e9b38e4bd87e",
+		"fields": {
+			"value": "Детское питание"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "0db336b8-18ad-4448-ae32-808afaa73ca4",
+		"fields": {
+			"value": "Подгузники"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "dd1fe7d1-f373-46fb-95ad-68a3cba48f55",
+		"fields": {
+			"value": "Коляски"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "24b1a0ef-8de8-4d2c-b08e-3995e98fafbd",
+		"fields": {
+			"value": "Автокресла"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "d3d9f0d7-0840-4a1d-b905-89295527a642",
+		"fields": {
+			"value": "Конструкторы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "5079f84c-ce85-4e4d-a410-a6260f33f1d4",
+		"fields": {
+			"value": "Куклы"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "5eda20eb-ee57-43cc-87a8-50d4243d3874",
+		"fields": {
+			"value": "Машинки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "d3ce938a-b15f-44c9-9db8-4eb125c05b64",
+		"fields": {
+			"value": "Спортивная одежда"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "324f940a-b620-4f0c-81ef-5d174a98d2a4",
+		"fields": {
+			"value": "Мячи"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "8543983c-9454-4e53-910f-01d749b77f46",
+		"fields": {
+			"value": "Гантели"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "522a247b-f851-4b14-86b5-4f7f904ecba9",
+		"fields": {
+			"value": "Йога"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "78059f69-f381-4f7f-b670-eed577e4913a",
+		"fields": {
+			"value": "Туризм"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "1e47f00c-1850-44d5-9dc8-b49ec0d96510",
+		"fields": {
+			"value": "Палатки"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "3251876e-7de0-431b-9174-8c33169b22f5",
+		"fields": {
+			"value": "Спальники"
+		}
+	},
+	{
+		"model": "src.Category",
+		"pk": "91a8590b-194e-478e-9502-8462a31a27da",
+		"fields": {
+			"value": "Фонари"
+		}
+	}
+]

@@ -1,108 +1,110 @@
 <script lang="ts">
-    import { goto } from "$app/navigation";
-    import KeyValueEditor from "$lib/components/molecules/KeyValueEditor.svelte";
-    import type { ProductType, Char, Category, Image } from "$lib/types";
-    import { API_URL } from "$lib";
-    import CategorySelect from "$lib/components/molecules/CategorySelect.svelte";
-    import Carousel from "$lib/components/shadcn/carousel/carousel.svelte";
-    import CarouselContent from "$lib/components/shadcn/carousel/carousel-content.svelte";
-    import CarouselItem from "$lib/components/shadcn/carousel/carousel-item.svelte";
-    import CarouselPrevious from "$lib/components/shadcn/carousel/carousel-previous.svelte";
-    import CarouselNext from "$lib/components/shadcn/carousel/carousel-next.svelte";
-    import { onMount } from "svelte";
+import { onMount } from "svelte";
+import { goto } from "$app/navigation";
+import { API_URL, authorized } from "$lib";
+import CategorySelect from "$lib/components/molecules/CategorySelect.svelte";
+import KeyValueEditor from "$lib/components/molecules/KeyValueEditor.svelte";
+import Carousel from "$lib/components/shadcn/carousel/carousel.svelte";
+import CarouselContent from "$lib/components/shadcn/carousel/carousel-content.svelte";
+import CarouselItem from "$lib/components/shadcn/carousel/carousel-item.svelte";
+import CarouselNext from "$lib/components/shadcn/carousel/carousel-next.svelte";
+import CarouselPrevious from "$lib/components/shadcn/carousel/carousel-previous.svelte";
+import type { Category, Char, Image, ProductType } from "$lib/types";
 
-    let {
-        product,
-        categories
-    }: {
-        product: ProductType;
-        categories: Category[];
-    } = $props();
+let {
+	product,
+	categories,
+}: {
+	product: ProductType;
+	categories: Category[];
+} = $props();
 
-    let title : string = $state(product.title);
-    let description : string = $state(product.description);
-    let category : Category = $state(product.category);
-    let characteristics : Char[] = $state(product.characteristics || []);
-    let images : Image[] = $state(product.images);
+let title: string = $state(product.title);
+let description: string = $state(product.description);
+let category: Category = $state(product.category);
+let characteristics: Char[] = $state(product.characteristics || []);
+let images: Image[] = $state(product.images);
 
-    let formImages : File[] = $state([])
-    let fileInput : HTMLInputElement | null = $state(null);
-    let imagePreviews : string[] = $state([]);
+let formImages: File[] = $state([]);
+let fileInput: HTMLInputElement | null = $state(null);
+let imagePreviews: string[] = $state([]);
 
-    async function putImagesInForm() {
-        try {
-            const loadedImages = await Promise.all(images.map(async (image) => { 
-                try {
-                    const res = await fetch(image.url);
-                    if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
-                    const blob = await res.blob();
-                    return new File([blob], image.id, { type: blob.type });
-                } catch (e) {
-                    console.warn(`Failed to load image ${image.url}:`, e);
-                    return null;
-                }
-            }));
-            
-            formImages = loadedImages.filter((img): img is File => img !== null);
-            console.log('Loaded images:', formImages);
-        } catch (e) {
-            console.error('Error loading images:', e);
-        }
-    }
+async function putImagesInForm() {
+	try {
+		const loadedImages = await Promise.all(
+			images.map(async (image) => {
+				try {
+					const res = await fetch(image.url);
+					if (!res.ok) throw new Error(`Failed to fetch: ${res.status}`);
+					const blob = await res.blob();
+					return new File([blob], image.id, { type: blob.type });
+				} catch (e) {
+					console.warn(`Failed to load image ${image.url}:`, e);
+					return null;
+				}
+			}),
+		);
 
-    imagePreviews = images.map(image => image.url);
+		formImages = loadedImages.filter((img): img is File => img !== null);
+		console.log("Loaded images:", formImages);
+	} catch (e) {
+		console.error("Error loading images:", e);
+	}
+}
 
-    function handleImageChange(e: Event) {
-        const target = e.target as HTMLInputElement;
-        const files = target.files;
-        if (files && files.length > 0) {
-            const newImages = Array.from(files);
-            formImages = [...formImages, ...newImages];
-            
-            const newPreviews = newImages.map(file => URL.createObjectURL(file));
-            imagePreviews = [...imagePreviews, ...newPreviews];
-        }
-        // Reset input to allow selecting same files again
-        target.value = '';
-    }
+imagePreviews = images.map((image) => image.url);
 
-    function openFilePicker() {
-        fileInput?.click();
-    }
+function handleImageChange(e: Event) {
+	const target = e.target as HTMLInputElement;
+	const files = target.files;
+	if (files && files.length > 0) {
+		const newImages = Array.from(files);
+		formImages = [...formImages, ...newImages];
 
-    function removeImage(index: number, e: Event) {
-        e.stopPropagation();
-        imagePreviews = imagePreviews.filter((_, i) => i !== index);
-        formImages = formImages.filter((_, i) => i !== index);
-    }
+		const newPreviews = newImages.map((file) => URL.createObjectURL(file));
+		imagePreviews = [...imagePreviews, ...newPreviews];
+	}
+	// Reset input to allow selecting same files again
+	target.value = "";
+}
 
-    onMount(async () => {
-        await putImagesInForm()
-    });
+function openFilePicker() {
+	fileInput?.click();
+}
 
-    async function handleSubmit(e: SubmitEvent) {
-        e.preventDefault();
+function removeImage(index: number, e: Event) {
+	e.stopPropagation();
+	imagePreviews = imagePreviews.filter((_, i) => i !== index);
+	formImages = formImages.filter((_, i) => i !== index);
+}
 
-        const formData = new FormData();
-        
-        formData.append("title", title);
-        formData.append("description", description);
-        formData.append("category", typeof category === 'object' && category !== null ? category.id : category);
-        formImages.forEach((image) => {
-            formData.append("images", image);
-        });
-        formData.append("characteristics", JSON.stringify(characteristics));
+onMount(async () => {
+	await putImagesInForm();
+});
 
-        await fetch(`${API_URL}/products/${product.id}/`, {
-            method: 'PUT',
-            body: formData,
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
-        
-        goto(`/products/${product.id}`);
-    }
+async function handleSubmit(e: SubmitEvent) {
+	e.preventDefault();
+
+	const formData = new FormData();
+
+	formData.append("title", title);
+	formData.append("description", description);
+	formData.append(
+		"category",
+		typeof category === "object" && category !== null ? category.id : category,
+	);
+	formImages.forEach((image) => {
+		formData.append("images", image);
+	});
+	formData.append("characteristics", JSON.stringify(characteristics));
+
+	await authorized(fetch)(`${API_URL}/products/${product.id}/`, {
+		method: "PUT",
+		body: formData,
+	});
+
+	goto(`/products/${product.id}`);
+}
 </script>
 
 <form onsubmit={handleSubmit}>

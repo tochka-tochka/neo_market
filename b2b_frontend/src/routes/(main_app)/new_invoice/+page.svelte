@@ -1,9 +1,9 @@
 <script lang="ts">
-    import NewInvoiceForm from "$lib/components/organisms/NewInvoiceForm.svelte";
+import NewInvoiceForm from "$lib/components/organisms/NewInvoiceForm.svelte";
 
-    let { data } = $props();
+let { data } = $props();
 
-    let products = data?.products;
+let products = data?.products;
 </script>
 
 <div class="min-h-screen bg-neutral">

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import favicon from '$lib/assets/favicon.svg';
-    import { sidebarOpen } from '$lib/stores/sidebar';
+import favicon from "$lib/assets/favicon.svg";
+import { sidebarOpen } from "$lib/stores/sidebar";
 
-	let { children } = $props();
-	import '../app.css'
+let { children } = $props();
+import "../app.css";
 </script>
 
 <svelte:head>

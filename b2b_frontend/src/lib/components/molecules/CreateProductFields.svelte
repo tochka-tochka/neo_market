@@ -1,5 +1,5 @@
 <script lang="ts">
-    let { categories }: { categories: string[] } = $props();
+let { categories }: { categories: string[] } = $props();
 </script>
 
 <div class="grid grid-cols-1 gap-6">

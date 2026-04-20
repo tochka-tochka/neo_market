@@ -1,77 +1,76 @@
 <script lang="ts">
-    import CreateProductFields from "../molecules/CreateProductFields.svelte";
-    import KeyValueEditor from "$lib/components/molecules/KeyValueEditor.svelte";
-    import CategorySelect from "../molecules/CategorySelect.svelte";
-    import Carousel from "$lib/components/shadcn/carousel/carousel.svelte";
-    import CarouselContent from "$lib/components/shadcn/carousel/carousel-content.svelte";
-    import CarouselItem from "$lib/components/shadcn/carousel/carousel-item.svelte";
-    import CarouselPrevious from "$lib/components/shadcn/carousel/carousel-previous.svelte";
-    import CarouselNext from "$lib/components/shadcn/carousel/carousel-next.svelte";
-    import { API_URL } from '$lib';
-    import type { Char, Category } from "$lib/types";
-    import { goto } from "$app/navigation";
+import { goto } from "$app/navigation";
+import { API_URL, authorized } from "$lib";
+import KeyValueEditor from "$lib/components/molecules/KeyValueEditor.svelte";
+import Carousel from "$lib/components/shadcn/carousel/carousel.svelte";
+import CarouselContent from "$lib/components/shadcn/carousel/carousel-content.svelte";
+import CarouselItem from "$lib/components/shadcn/carousel/carousel-item.svelte";
+import CarouselNext from "$lib/components/shadcn/carousel/carousel-next.svelte";
+import CarouselPrevious from "$lib/components/shadcn/carousel/carousel-previous.svelte";
+import type { Category, Char } from "$lib/types";
+import CategorySelect from "../molecules/CategorySelect.svelte";
 
-    let { categoryOptions } : { categoryOptions: Category[] } = $props();
+let { categoryOptions }: { categoryOptions: Category[] } = $props();
 
-    let title : string = $state("");
-    let description : string = $state("");
-    let category : Category = $state({
-        id: "",
-        value: ""
-    });
-    let images : File[] = $state([]);
-    let imagePreviews : string[] = $state([]);
-    let characteristics : Char[] = $state([]);
-    let fileInput : HTMLInputElement | null = $state(null);
-    
-    function handleImageChange(e: Event) {
-        const target = e.target as HTMLInputElement;
-        const files = target.files;
-        if (files && files.length > 0) {
-            const newImages = Array.from(files);
-            images = [...images, ...newImages];
-            
-            const newPreviews = newImages.map(file => URL.createObjectURL(file));
-            imagePreviews = [...imagePreviews, ...newPreviews];
-        }
-        // Reset input to allow selecting same files again
-        target.value = '';
-    }
+let title: string = $state("");
+let description: string = $state("");
+let category: Category = $state({
+	id: "",
+	value: "",
+});
+let images: File[] = $state([]);
+let imagePreviews: string[] = $state([]);
+let characteristics: Char[] = $state([]);
+let fileInput: HTMLInputElement | null = $state(null);
 
-    function openFilePicker() {
-        fileInput?.click();
-    }
+function handleImageChange(e: Event) {
+	const target = e.target as HTMLInputElement;
+	const files = target.files;
+	if (files && files.length > 0) {
+		const newImages = Array.from(files);
+		images = [...images, ...newImages];
 
-    function removeImage(index: number, e: Event) {
-        e.stopPropagation();
-        images = images.filter((_, i) => i !== index);
-        imagePreviews = imagePreviews.filter((_, i) => i !== index);
-    }
+		const newPreviews = newImages.map((file) => URL.createObjectURL(file));
+		imagePreviews = [...imagePreviews, ...newPreviews];
+	}
+	target.value = "";
+}
 
-    async function submitForm(e: SubmitEvent) {
-        e.preventDefault();
+function openFilePicker() {
+	fileInput?.click();
+}
 
-        const formData = new FormData();
-        
-        formData.append("title", title);
-        formData.append("description", description);
-        formData.append("category", category.id);
-        images.forEach((image) => {
-            formData.append("images", image);
-        });
-        formData.append("characteristics", JSON.stringify(characteristics));
+function removeImage(index: number, e: Event) {
+	e.stopPropagation();
+	images = images.filter((_, i) => i !== index);
+	imagePreviews = imagePreviews.filter((_, i) => i !== index);
+}
 
-        console.log([...formData.entries()]);
+async function submitForm(e: SubmitEvent) {
+	e.preventDefault();
 
-        await fetch(`${API_URL}/products/`, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem("token")}`
-        }});
+	const formData = new FormData();
 
-        goto('/products')
-    }
+	formData.append("title", title);
+	formData.append("description", description);
+	formData.append("category", category.id);
+	images.forEach((image) => {
+		formData.append("images", image);
+	});
+	formData.append("characteristics", JSON.stringify(characteristics));
+
+	console.log([...formData.entries()]);
+
+	await authorized(fetch)(`${API_URL}/products/`, {
+		method: "POST",
+		body: formData,
+		headers: {
+			Authorization: `Bearer ${localStorage.getItem("token")}`,
+		},
+	});
+
+	goto("/products");
+}
 </script>
 
 <div class="pt-8">
