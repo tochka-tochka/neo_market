@@ -1,8 +1,8 @@
 # Neo Market B2B — Кабинет продавца
 
-Модуль личного кабинета продавца для платформы Neo Market B2B.
+Модуль личного кабинета продавца для платформы Neo Market.
 
-## 🚀 Быстрый старт
+## 🚀 Cтарт
 
 Для запуска проекта необходимо склонировать репозиторий и запустить контейнеры через Docker.
 
@@ -64,13 +64,11 @@
     * Товар
     * SKU (товарная позиция)
     * Накладная
-* Также, можно создавать несколько накладных и примать их по id `http://localhost:8010/api/v1/invoices/<:invoice_id>/accept`
+* Также, можно создавать несколько накладных и примать их по id `http://localhost:8010/api/v1/invoices/<:invoice_id>/accept/`
 
 ---
 
 ## 🛠 Технологический стек
-* **Backend:** Python 3.x, Django, Django REST Framework
+* **Backend:** Python 3.12, Django, Django REST Framework
 * **Auth:** Simple-JWT
 * **Storage:** Minio (S3 Compatible)
-* **Deployment:** Docker / Docker Compose
-```
