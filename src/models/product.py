@@ -5,9 +5,10 @@ from django.core.validators import MinValueValidator
 from src.validators.main import validate_characteristics
 
 class ProductStatus(models.TextChoices):
-    ON_MODERATION = 'on_moderation', 'On moderation'
-    ACCEPTED = 'accepted', 'Accepted'
-    BLOCKED = 'blocked', 'Blocked'
+    CREATED = 'CREATED'
+    ON_MODERATION = 'ON_MODERATION'
+    MODERATED = 'MODERATED'
+    BLOCKED = 'BLOCKED'
 
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
@@ -20,8 +21,8 @@ class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     title = models.CharField(max_length=255)
     description = models.TextField()
-    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING, null=True, blank=True)
-    characteristics = models.JSONField(default=None, null=True, blank=True, validators=[validate_characteristics])
+    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING)
+    characteristics = models.JSONField(default=None, validators=[validate_characteristics])
     status = models.CharField(
         max_length=20,
         choices=ProductStatus.choices,

@@ -7,6 +7,10 @@ from src.serializes import ProductSerializer
 from rest_framework import serializers
 from django.db import transaction
 import json
+from rabbitmq_prod.moder import moder_queue
+
+class InvalidCategoryId(Exception):
+    pass
 
 def get_all_products(seller: Seller) -> List[Product]:
     try:
@@ -31,7 +35,7 @@ def get_product(id: str, seller: Seller):
         raise Exception(f"failed to get product: {e}")
 
 @transaction.atomic
-def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Seller) -> uuid.UUID:
+def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Seller):
     product_id = uuid.uuid4()
 
     chars = data.get("characteristics", {})
@@ -41,13 +45,20 @@ def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Sel
         except json.JSONDecodeError:
             chars = {}
 
+    category_id = data.get("category")
+    if category_id:
+        try:
+            Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            raise InvalidCategoryId(f"Category with id {category_id} does not exist")
+
     try:
         product = Product.objects.create(
             id=product_id,
-            title=data["title"],
-            description=data["description"],
-            category_id=data["category"],
-            status=ProductStatus.ON_MODERATION,
+            title=data.get("title"),
+            description=data.get("description"),
+            category_id=data.get("category"),
+            status=ProductStatus.CREATED,
             characteristics=chars,
             seller=seller
         )
@@ -62,11 +73,12 @@ def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Sel
                 ))
             
             Image.objects.bulk_create(image_objects)
+        # moder_queue.product_moder_notification(str(product_id))
 
     except Exception as e:
         raise Exception(f"failed to create product: {e}")
         
-    return product_id
+    return ProductSerializer(product).data
 
 @transaction.atomic
 def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Seller):
@@ -111,7 +123,11 @@ def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Sel
             except Exception as e:
                 raise Exception(f"failed to update product image: {e}")
         
+        product.status = ProductStatus.ON_MODERATION
+        
         product.save()
+
+        # moder_queue.product_moder_notification(product.id)
     except Product.DoesNotExist:
         raise Exception(f"Product with id {data.get('id')} not found")
     except Exception as e:

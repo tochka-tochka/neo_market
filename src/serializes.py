@@ -30,9 +30,15 @@ class SKUSerializer(serializers.ModelSerializer):
         model = SKU
         fields = ['id', 'name', 'price', 'active_quantity', 'characteristics']
 
+class SellerListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Seller
+        fields = ['id', 'username']
+
 
 class ProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(read_only=True)
+    seller = SellerListSerializer(read_only=True)
     images = ImageSerializer(many=True, read_only=True)
     skus = SKUSerializer(many=True, read_only=True)
     characteristics = serializers.JSONField(
@@ -43,7 +49,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ['id', 'title', 'description', 'status', 'images', 'characteristics', 'category', 'skus']
+        fields = ['id', 'title', 'description', 'status', 'seller', 'images', 'characteristics', 'category', 'skus']
 
 
 class ProductCreateSerializer(serializers.ModelSerializer):

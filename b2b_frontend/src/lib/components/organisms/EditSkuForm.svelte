@@ -26,7 +26,7 @@ async function handleSubmit() {
 	formData.append("product_id", product.id);
 
 	await authorized(fetch)(`${API_URL}/skus/${sku.id}/`, {
-		method: "PUT",
+		method: "PATCH",
 		body: formData,
 	});
 

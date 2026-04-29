@@ -22,6 +22,7 @@ from src.api.invoices.views import InvoicesView, InvoiceAcceptView
 from src.api.auth.views import RegisterView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
 
@@ -30,7 +31,7 @@ urlpatterns = [
     path('api/v1/login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
 
-    path('api/v1/products/', ProductsView.as_view()),
+    path('api/v1/products/', ProductsView.as_view(), name="products"),
     path('api/v1/products/<uuid:id>/', ProductsView.as_view()),
     path('api/v1/products/my/', AllProductsView.as_view()),
     path('api/v1/categories/', CategoriesView.as_view()),

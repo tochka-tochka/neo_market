@@ -1,0 +1,19 @@
+import pytest
+from rest_framework.test import APIClient
+from rest_framework_simplejwt.tokens import RefreshToken
+from src.models.user import Seller
+
+@pytest.fixture
+def api_client():
+    return APIClient()
+
+@pytest.fixture
+def test_user(db):
+    return Seller.objects.create_user(username="jwt_user", password="password123")
+
+@pytest.fixture
+def jwt_client(api_client, test_user):
+    refresh = RefreshToken.for_user(test_user)
+    api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
+    api_client.defaults
+    return api_client

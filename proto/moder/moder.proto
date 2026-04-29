@@ -1,0 +1,76 @@
+syntax="proto3";
+
+import "google/protobuf/empty.proto";
+
+package product_moderation;
+
+message Product {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+
+  message Category {
+    string id = 1;
+    string value = 2;
+  }
+  Category category = 4;
+
+  map<string, string> characteristics = 5;
+
+  enum Status {
+    ON_MODERATION = 0;
+    ACCEPTED = 1;
+    BLOCKED = 2;
+  }
+  Status status = 6;
+
+  message Seller {
+    string id = 1;
+    string username = 2;
+  }
+  Seller seller = 7;
+
+  message Image {
+    string id = 1;
+    string url = 2;
+    int32 order = 3;
+    string created_at = 4;
+  }
+  repeated Image images = 8;
+
+  message SKU {
+    string id = 1;
+    string name = 2;
+    int32 price = 3;
+    map<string, string> characteristics = 4;
+    int32 active_quantity = 5;
+  }
+
+  repeated SKU skus = 9;
+}
+
+message GetNextProductRequest {
+  string product_id = 1;
+}
+
+message AcceptDescision {
+  string product_id = 1;
+}
+
+message DeclineDescision {
+  string product_id = 1;
+  string reason = 2;
+}
+
+// Products модерация товаров
+service Products {
+
+    // GetNextProduct возвращает следующий товар на модерацию
+    rpc GetNextProduct(GetNextProductRequest) returns (Product);
+
+    // AcceptProduct одобрить размещение товара в каталоге пользователей
+    rpc AcceptProduct(AcceptDescision) returns (google.protobuf.Empty);
+
+    // DeclineProduct одобрить размещение товара в каталоге пользователей
+    rpc DeclineProduct(DeclineDescision) returns (google.protobuf.Empty);
+};

@@ -1,3 +1,4 @@
+import json
 from django.http import JsonResponse
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
@@ -8,6 +9,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
 from src.serializes import ProductSerializer
+from .service.main import InvalidCategoryId
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -29,13 +31,20 @@ class ProductsView(APIView):
         return JsonResponse({ "product" : product })
     
     def post(self, request: HttpRequest):
+
         title = request.data.get('title')
         description = request.data.get('description')
+        
         category = request.data.get('category')
+        if not category:
+            return JsonResponse({"errors": "category required"}, status=400)
+        
         characteristics = request.data.get('characteristics')
 
 
         images = request.FILES.getlist('images')
+        if len(images) == 0:
+            return JsonResponse({"errors": "images required"}, status=400)
 
         print(images)
 
@@ -51,13 +60,15 @@ class ProductsView(APIView):
             return JsonResponse({"errors": serializer.errors}, status=400)
 
         try:
-            id = create_product(data, images, request.user)
+            product = create_product(data, images, request.user)
+        except InvalidCategoryId as e:
+            return JsonResponse({"message": "category doesnt exists"}, status=400)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
         
-        return JsonResponse({"id": str(id)}, status=201)
+        return JsonResponse(product, status=201, safe=False)
     
-    def put(self, request, id: str = None):
+    def patch(self, request, id):
         title = request.data.get('title')
         description = request.data.get('description')
         category = request.data.get('category')
@@ -65,6 +76,8 @@ class ProductsView(APIView):
 
 
         images = request.FILES.getlist("images")
+        if len(images) == 0:
+            return JsonResponse({"errors": "images required"}, status=400)
 
         data = {
             'id': id,

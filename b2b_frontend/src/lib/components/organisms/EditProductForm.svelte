@@ -99,7 +99,7 @@ async function handleSubmit(e: SubmitEvent) {
 	formData.append("characteristics", JSON.stringify(characteristics));
 
 	await authorized(fetch)(`${API_URL}/products/${product.id}/`, {
-		method: "PUT",
+		method: "PATCH",
 		body: formData,
 	});
 
