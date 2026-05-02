@@ -2,6 +2,8 @@ from django.db import models
 from uuid import uuid4
 from django.conf import settings
 from django.core.validators import MinValueValidator
+
+from src.models.category import Category
 from src.validators.main import validate_characteristics
 
 class ProductStatus(models.TextChoices):
@@ -9,12 +11,6 @@ class ProductStatus(models.TextChoices):
     ACCEPTED = 'accepted', 'Accepted'
     BLOCKED = 'blocked', 'Blocked'
 
-class Category(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    value = models.CharField(max_length=255)
-
-    class Meta:
-        db_table = 'categories'
 
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)

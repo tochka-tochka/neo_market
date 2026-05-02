@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.core.validators import MinValueValidator
-from src.models.product import Product, Category, SKU, Image, InvoiceItem, Invoice
+from src.models.product import Product, SKU, Image, InvoiceItem, Invoice
+from src.models import Category
 from src.models.user import Seller
 from src.validators.main import validate_characteristics
 
@@ -14,7 +15,9 @@ class ImageSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'value']
+        fields = ['id', 'value', 'slug', 'description',
+                  'image_url', 'parent_id', 'seo_title', 'seo_description',
+                  'is_active', 'created_at', 'updated_at']
 
 
 class SKUSerializer(serializers.ModelSerializer):
