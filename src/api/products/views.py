@@ -1,12 +1,17 @@
+import uuid
+from typing import Literal
+
 from django.http import JsonResponse
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
-from rest_framework.response import Response
 from django.http.request import HttpRequest
-from src.api.products.service.main import get_product, create_product, update_product, delete_product, get_all_products, get_categories
+from src.api.products.service.main import get_product, create_product, update_product, delete_product, get_all_products, \
+    get_categories, get_category
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
+
+from src.models import Category, Product
 from src.serializes import ProductSerializer
 
 
