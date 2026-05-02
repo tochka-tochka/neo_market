@@ -1,10 +1,11 @@
 from typing import Dict, List, Union, Any
 import uuid
-from src.models.product import Product, ProductStatus, Category, Image
+from src.models.product import Product, ProductStatus, Image
+from src.models import Category
 from src.models.user import Seller
 from django.core.files.uploadedfile import UploadedFile
 from src.serializes import ProductSerializer
-from rest_framework import serializers
+
 from django.db import transaction
 import json
 from rabbitmq_prod.moder import moder_queue
@@ -145,8 +146,15 @@ def delete_product(id: str, seller: Seller):
 def get_categories() -> List[Category]:
     try:
         categories = Category.objects.all().values(
-            'id', 'product', 'value'
+            'id', 'parent_id', 'value'
         )
         return list(categories)
     except Exception as e:
         raise Exception(f"failed to get categories: {e}")
+
+def get_category(id: uuid.UUID) -> Category:
+    try:
+        category = Category.objects.get(id=id)
+        return category
+    except Exception as e:
+        raise Exception(f"failed to get category: {e}")
