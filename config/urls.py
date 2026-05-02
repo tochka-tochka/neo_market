@@ -24,23 +24,23 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin', admin.site.urls),
 
-    path('api/v1/reg/', RegisterView.as_view(), name='register'),
-    path('api/v1/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/v1/login/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/v1/reg', RegisterView.as_view(), name='register'),
+    path('api/v1/login', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/v1/login/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 
 
-    path('api/v1/products/', ProductsView.as_view(), name="products"),
-    path('api/v1/products/<uuid:id>/', ProductsView.as_view()),
-    path('api/v1/products/my/', AllProductsView.as_view()),
-    path('api/v1/categories/', CategoriesView.as_view()),
     path('api/v1/categories/<uuid:id>', CategoryView.as_view()),
+    path('api/v1/products', ProductsView.as_view(), name="products"),
+    path('api/v1/products/<uuid:id>', ProductsView.as_view()),
+    path('api/v1/products/my', AllProductsView.as_view()),
+    path('api/v1/categories', CategoriesView.as_view()),
 
-    path('api/v1/skus/', SkusView.as_view()),
-    path('api/v1/skus/<uuid:id>/', SkusView.as_view()),
+    path('api/v1/skus', SkusView.as_view(), name="skus"),
+    path('api/v1/skus/<uuid:id>', SkusView.as_view()),
 
-    path('api/v1/invoices/', InvoicesView.as_view()),
-    path('api/v1/invoices/<uuid:id>/', InvoicesView.as_view()),
-    path('api/v1/invoices/<uuid:id>/accept/', InvoiceAcceptView.as_view())
+    path('api/v1/invoices', InvoicesView.as_view()),
+    path('api/v1/invoices/<uuid:id>', InvoicesView.as_view()),
+    path('api/v1/invoices/<uuid:id>/accept', InvoiceAcceptView.as_view())
 ]

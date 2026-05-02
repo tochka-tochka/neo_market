@@ -1,13 +1,17 @@
+import logging
 import pika
+import json
+from typing import Dict
+import os
 
 class ModerQueue:
     def __init__(self):
         self.connection = None
         self.channel = None
+        self.access_key = os.environ.get('MODER_SERVICE_KEY')
         self._connect()
 
     def _connect(self):
-        """Создаёт соединение и канал"""
         self.connection = pika.BlockingConnection(
             pika.ConnectionParameters('localhost', 5672)
         )
@@ -19,31 +23,32 @@ class ModerQueue:
         )
 
     def _ensure_connection(self):
-        """Проверяет и восстанавливает соединение при необходимости"""
         if self.connection is None or self.connection.is_closed:
             self._connect()
         if self.channel is None or self.channel.is_closed:
             self._connect()
 
-    def product_moder_notification(self, id: str):
+    def product_moder_notification(self, data: Dict[str, str], corrected: bool):
         try:
+            if not self.access_key:
+                return Exception("Not Authorized")
+            data['X-Service-Key'] = self.access_key
             self._ensure_connection()
             self.channel.basic_publish(
                 exchange='',
                 routing_key='moder',
-                body=id,
-                properties=pika.BasicProperties(delivery_mode=2)  # persistent
+                body=json.dumps(data),
+                properties=pika.BasicProperties(delivery_mode=2)
             )
         except pika.exceptions.ConnectionClosedByBroker:
             self._connect()
             self.channel.basic_publish(
                 exchange='',
                 routing_key='moder',
-                body=id,
+                body=json.dumps(data),
                 properties=pika.BasicProperties(delivery_mode=2)
             )
         except pika.exceptions.AMQPConnectionError:
-            # Логгируем ошибку, но не прерываем создание продукта
-            print(f"Warning: RabbitMQ connection failed, message not sent for product {id}")
+            logging.debug(f"Warning: RabbitMQ connection failed, message not sent for product {id}")
         
 moder_queue = ModerQueue()

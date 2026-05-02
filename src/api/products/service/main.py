@@ -1,19 +1,17 @@
-from typing import Dict, List, Union, Any
+from typing import Dict, List, Any
 import uuid
-from src.models.product import Product, ProductStatus, Image
+from src.models.product import Product, ProductStatus, ProductImage
 from src.models import Category
 from src.models.user import Seller
 from django.core.files.uploadedfile import UploadedFile
 from src.serializes import ProductSerializer
-
 from django.db import transaction
 import json
-from rabbitmq_prod.moder import moder_queue
 
 class InvalidCategoryId(Exception):
     pass
 
-def get_all_products(seller: Seller) -> List[Product]:
+def get_all_products(seller: Seller):
     try:
         products = Product.objects.select_related('category').filter(seller=seller)
         serializer = ProductSerializer(products, many=True)
@@ -67,13 +65,13 @@ def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Sel
         if images:
             image_objects = []
             for index, file in enumerate(images):
-                image_objects.append(Image(
+                image_objects.append(ProductImage(
                     product=product,
                     url=file,
                     order=index
                 ))
             
-            Image.objects.bulk_create(image_objects)
+            ProductImage.objects.bulk_create(image_objects)
         # moder_queue.product_moder_notification(str(product_id))
 
     except Exception as e:
@@ -111,16 +109,16 @@ def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Sel
 
         if images is not None:
             try:
-                Image.objects.filter(product=product).delete()
+                ProductImage.objects.filter(product=product).delete()
                 image_objects = []
                 for index, file in enumerate(images):
-                    image_objects.append(Image(
+                    image_objects.append(ProductImage(
                         product=product,
                         url=file,
                         order=index
                     ))
                 
-                Image.objects.bulk_create(image_objects)
+                ProductImage.objects.bulk_create(image_objects)
             except Exception as e:
                 raise Exception(f"failed to update product image: {e}")
         
@@ -143,7 +141,7 @@ def delete_product(id: str, seller: Seller):
     except Exception as e:
         raise Exception(f"failed to delete product: {e}")
     
-def get_categories() -> List[Category]:
+def get_categories():
     try:
         categories = Category.objects.all().values(
             'id', 'parent_id', 'value'

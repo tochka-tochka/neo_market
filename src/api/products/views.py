@@ -36,7 +36,7 @@ class ProductsView(APIView):
 
         return JsonResponse({ "product" : product })
     
-    def post(self, request: HttpRequest):
+    def post(self, request):
 
         title = request.data.get('title')
         description = request.data.get('description')
