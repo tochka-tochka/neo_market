@@ -1,6 +1,3 @@
-import uuid
-from typing import Literal
-
 from django.http import JsonResponse
 from django.http.request import HttpRequest
 from django.utils.decorators import method_decorator
@@ -9,12 +6,9 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-from src.api.products.service.main import get_product, create_product, update_product, delete_product, get_all_products, \
-    get_categories, get_category
-from src.models import Category, Product
+from src.api.products.service.main import get_product, create_product, update_product, delete_product, get_all_products
 from src.serializes import ProductSerializer
 from .service.main import InvalidCategoryId
-from ...models.category import CategoryMetaTag, CategorySEOKeyword, CategoryFilter
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -119,104 +113,5 @@ class AllProductsView(APIView):
         try:
             products = get_all_products(seller=request.user)
             return JsonResponse({ "products" : products }, status=200)
-        except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
-        
-
-@method_decorator(csrf_exempt, name='dispatch')
-class CategoriesView(APIView):
-    # permission_classes = [IsAuthenticated]
-    def get(self, request: HttpRequest):
-        try:
-            categories = get_categories()
-            return JsonResponse({ "categories" : categories }, status=200)
-        except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
-
-
-def get_full_category(_id: uuid.UUID, include_product_count: bool, lang: Literal["ru", "en"]):
-    category = get_category(_id)
-    if category.parent_id:
-        parent_obj = Category.objects.get(id=category.parent_id)
-        parent = {
-            "id": parent_obj.id,
-            "name": parent_obj.value,
-            "slug": parent_obj.slug
-        }
-    else:
-        parent = None
-    seo_keywords = CategorySEOKeyword.objects.filter(category_id=_id)
-    seo = {
-        "title": category.seo_title,
-        "description": category.seo_description,
-        "keywords": [kw.name for kw in seo_keywords]
-    }
-    if include_product_count:
-        product_count = Product.objects.filter(category=_id).count()
-    else:
-        product_count = None
-    meta_tags = CategoryMetaTag.objects.filter(category_id=_id)
-    meta = {mt.tag: mt.value for mt in meta_tags}
-    return {
-        "id": category.id,
-        "name": category.value,
-        "slug": category.slug,
-        "description": category.description,
-        "parent": parent,
-        "product_count": product_count,
-        "seo": seo,
-        "meta_tags": meta,
-        "image_url": category.image_url,
-        "is_active": category.is_active,
-        "created_at": category.created_at,
-        "updated_at": category.updated_at
-    }
-
-
-@method_decorator(csrf_exempt, name='dispatch')
-class CategoryView(APIView):
-    # permission_classes = [IsAuthenticated]
-    def get(self, request: HttpRequest, id: uuid.UUID):
-        try:
-            include_product_count = request.GET.get("include_product_count") == "true"
-            lang = request.GET.get("lang", "ru")
-            json_cat = get_full_category(id, include_product_count, lang)
-            return JsonResponse(json_cat, status=200, safe=False)
-        except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
-
-
-def format_category_filter(category_filter: CategoryFilter):
-    d = {
-        "slug": category_filter.slug,
-        "name": category_filter.name,
-        "type": category_filter.type,
-
-    }
-    match category_filter.type:
-        case "list":
-            d["value"] = category_filter.values
-        case "range":
-            d["min"] = category_filter.values[0]
-            d["max"] = category_filter.values[1]
-        case "switch":
-            pass
-    return d
-
-
-def get_category_filters(category_id: uuid.UUID):
-    filters = CategoryFilter.objects.filter(category_id=category_id)
-    return {
-        "items": [format_category_filter(cf) for cf in filters]
-    }
-
-
-@method_decorator(csrf_exempt, name='dispatch')
-class CategoryFilterView(APIView):
-    # permission_classes = [IsAuthenticated]
-    def get(self, request: HttpRequest, id: uuid.UUID):
-        try:
-            json_filters = get_category_filters(id)
-            return JsonResponse(json_filters, status=200, safe=False)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)

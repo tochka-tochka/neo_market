@@ -16,7 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from src.api.products.views import ProductsView, AllProductsView, CategoriesView, CategoryView, CategoryFilterView
+from src.api.products.views import ProductsView, AllProductsView
+from src.api.categories.views import CategoriesView, CategoryView, CategoryFilterView
 from src.api.skus.views import SkusView
 from src.api.invoices.views import InvoicesView, InvoiceAcceptView
 from src.api.auth.views import RegisterView
