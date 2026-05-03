@@ -11,7 +11,8 @@ class TestProductAPI:
     def test_create_product_returns_201(self, jwt_client):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category"
+            value="Test Category",
+            slug="test_category"
         )
         url = reverse('products')
         
@@ -43,7 +44,8 @@ class TestProductAPI:
     def test_seller_id_taken_from_jwt(self, test_user, jwt_client):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category"
+            value="Test Category",
+            slug="test_category"
         )
         url = reverse('products')
 
@@ -74,7 +76,8 @@ class TestProductAPI:
     def test_missing_images_returns_400(self, jwt_client):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category"
+            value="Test Category",
+            slug="test_category"
         )
         url = reverse('products')
 
@@ -97,7 +100,8 @@ class TestProductAPI:
     def test_missing_category_returns_400(self, jwt_client):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category"
+            value="Test Category",
+            slug="test_category"
         )
         url = reverse('products')
         
@@ -126,7 +130,8 @@ class TestProductAPI:
     def test_invalid_category_id_returns_400(self, jwt_client):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category"
+            value="Test Category",
+            slug="test_category"
         )
         url = reverse('products')
         
@@ -156,7 +161,8 @@ class TestProductAPI:
     def test_invalid_characteristics_returns_400(self, jwt_client):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category"
+            value="Test Category",
+            slug="test_category"
         )
         url = reverse('products')
         

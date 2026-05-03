@@ -13,7 +13,8 @@ class TestProductAPI:
     def test_first_sku_transitions_product_to_on_moderation(self, jwt_client, test_user):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category"
+            value="Test Category",
+            slug="test_category"
         )
         
         product = Product.objects.create(
@@ -61,7 +62,8 @@ class TestProductAPI:
     def test_first_sku_emits_created_event_to_moderation(self, jwt_client, test_user):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5",
-            value="Test Category"
+            value="Test Category",
+            slug="test_category"
         )
 
         product = Product.objects.create(
@@ -137,7 +139,8 @@ class TestProductAPI:
     def test_adding_more_sku_dont_trigger_cross_service_events(self, jwt_client, test_user):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category"
+            value="Test Category",
+            slug="test_category"
         )
         
         product = Product.objects.create(
@@ -184,7 +187,8 @@ class TestProductAPI:
     def test_impossible_add_sku_to_blocked_product(self, jwt_client, test_user):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category"
+            value="Test Category",
+            slug="test_category"
         )
         
         product = Product.objects.create(
