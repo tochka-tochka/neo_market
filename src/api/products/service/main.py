@@ -7,8 +7,16 @@ from django.core.files.uploadedfile import UploadedFile
 from src.serializes import ProductSerializer
 from django.db import transaction
 import json
+from rabbitmq_prod.moder import ModerQueue
+from datetime import datetime
 
 class InvalidCategoryId(Exception):
+    pass
+
+class HardBlockerProduct(Exception):
+    pass
+
+class AccessDenied(Exception):
     pass
 
 def get_all_products(seller: Seller):
@@ -72,7 +80,6 @@ def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Sel
                 ))
             
             ProductImage.objects.bulk_create(image_objects)
-        # moder_queue.product_moder_notification(str(product_id))
 
     except Exception as e:
         raise Exception(f"failed to create product: {e}")
@@ -85,8 +92,11 @@ def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Sel
     try:
         product = Product.objects.get(id=data.get("id"))
 
+        if product.status == ProductStatus.HARD_BLOCKED:
+            raise HardBlockerProduct("Product is hard-blocked")
+
         if product.seller != seller:
-            raise Exception("Access Denied")
+            raise AccessDenied("Access Denied")
         
         if data.get("title") is not None:
             product.title = data["title"]
@@ -123,10 +133,26 @@ def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Sel
                 raise Exception(f"failed to update product image: {e}")
         
         product.status = ProductStatus.ON_MODERATION
+
+        moder_queue = ModerQueue()
+        idempotency_key = str(uuid.uuid4())
+        moder_queue.product_moder_notification(data={
+            "idempotency_key": idempotency_key,
+            "product_id": str(product.id),
+            "seller_id": str(seller.id),
+            "event": "EDITED",
+            "date": str(datetime.now()),
+        }, corrected=True)
         
         product.save()
 
+        return ProductSerializer(product).data
+
         # moder_queue.product_moder_notification(product.id)
+    except AccessDenied:
+        raise HardBlockerProduct("failed to update product: You are not product's owner")
+    except HardBlockerProduct:
+        raise HardBlockerProduct("failed to update product: Product is hard-blocked")
     except Product.DoesNotExist:
         raise Exception(f"Product with id {data.get('id')} not found")
     except Exception as e:

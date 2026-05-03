@@ -129,7 +129,8 @@ class TestProductAPI:
             pass
         finally:
             connection.close()
-
+            
+        print(received_message_body)
         assert received_message_body is not None, "RabbitMQ message was not received"
         assert received_message_body['idempotency_key'] is not None, received_message_body
         assert received_message_body['product_id'] == str(product.id), received_message_body

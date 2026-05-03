@@ -8,7 +8,7 @@ from rest_framework.views import APIView
 
 from src.api.products.service.main import get_product, create_product, update_product, delete_product, get_all_products
 from src.serializes import ProductSerializer
-from .service.main import InvalidCategoryId
+from .service.main import AccessDenied, InvalidCategoryId, HardBlockerProduct
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -60,7 +60,7 @@ class ProductsView(APIView):
 
         try:
             product = create_product(data, images, request.user)
-        except InvalidCategoryId as e:
+        except InvalidCategoryId:
             return JsonResponse({"message": "category doesnt exists"}, status=400)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
@@ -91,13 +91,17 @@ class ProductsView(APIView):
             return JsonResponse({"errors": serializer.errors}, status=400)
 
         try:
-            update_product(data, images, request.user)
+            updated_product = update_product(data, images, request.user)
+        except AccessDenied as e:
+            return JsonResponse({"message": str(e)}, status=403)
+        except HardBlockerProduct as e:
+            return JsonResponse({"message": str(e)}, status=403)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
         
-        return JsonResponse({"message": "success"}, status=200)
+        return JsonResponse(updated_product, status=200)
     
-    def delete(self, request: HttpRequest, id: str):
+    def delete(self, request, id: str):
         try:
             delete_product(id, request.user)
         except Exception as e:
