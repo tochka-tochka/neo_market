@@ -15,6 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from src.models import Category, Product
 from src.serializes import ProductSerializer
 from .service.main import InvalidCategoryId
+from ...models.category import CategoryMetaTag, CategorySEOKeyword
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -144,16 +145,18 @@ def get_full_category(_id: uuid.UUID, include_product_count: bool, lang: Literal
         }
     else:
         parent = None
+    seo_keywords = CategorySEOKeyword.objects.filter(category_id=_id)
     seo = {
         "title": category.seo_title,
         "description": category.seo_description,
-        "keywords": []  # TODO
+        "keywords": [kw.name for kw in seo_keywords]
     }
     if include_product_count:
         product_count = Product.objects.filter(category=_id).count()
     else:
         product_count = None
-    meta = {}
+    meta_tags = CategoryMetaTag.objects.filter(category_id=_id)
+    meta = {mt.tag: mt.value for mt in meta_tags}
     return {
         "id": category.id,
         "name": category.value,

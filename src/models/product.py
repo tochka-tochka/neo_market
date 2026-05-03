@@ -17,7 +17,7 @@ class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     title = models.CharField(max_length=255)
     description = models.TextField()
-    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING)
+    category = models.ForeignKey(Category, on_delete=models.DO_NOTHING, null=True, blank=True)
     characteristics = models.JSONField(default=None, validators=[validate_characteristics])
     status = models.CharField(
         max_length=20,

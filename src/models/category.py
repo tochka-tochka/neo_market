@@ -29,6 +29,15 @@ class CategorySEOKeyword(models.Model):
         db_table = 'categories_keywords'
 
 
+class CategoryMetaTag(models.Model):
+    category_id = models.UUIDField()
+    tag = models.CharField()
+    value = models.CharField()
+
+    class Meta:
+        db_table = 'categories_metatags'
+
+
 class CategoryFilter(models.Model):
     category_id = models.UUIDField()
     slug = models.CharField()
