@@ -16,7 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from src.api.products.views import ProductsView, AllProductsView, CategoriesView, CategoryView
+from src.api.products.views import ProductsView, AllProductsView
+from src.api.categories.views import CategoriesView, CategoryView, CategoryFilterView
 from src.api.skus.views import SkusView
 from src.api.invoices.views import InvoicesView, InvoiceAcceptView
 from src.api.auth.views import RegisterView
@@ -36,6 +37,7 @@ urlpatterns = [
     path('api/v1/products/<uuid:id>', ProductsView.as_view()),
     path('api/v1/products/my', AllProductsView.as_view()),
     path('api/v1/categories', CategoriesView.as_view()),
+    path('api/v1/categories/<uuid:id>/filters', CategoryFilterView.as_view()),
 
     path('api/v1/skus', SkusView.as_view(), name="skus"),
     path('api/v1/skus/<uuid:id>', SkusView.as_view()),
