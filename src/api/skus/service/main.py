@@ -14,6 +14,8 @@ from src.serializes import SKUSerializer
 class BlockedProductException(Exception):
     pass
 
+class AccessDenied(Exception):
+    pass
 
 @transaction.atomic
 def create_sku(data: Dict[str, Any], images: List[UploadedFile], seller):
@@ -27,68 +29,72 @@ def create_sku(data: Dict[str, Any], images: List[UploadedFile], seller):
 
     product = Product.objects.get(id=data.get("product_id"))
 
-    if seller == product.seller:
-        try:
-            if product.status == ProductStatus.HARD_BLOCKED:
-                raise BlockedProductException("This product hard-blocked")
+    try:
+        if product.status == ProductStatus.HARD_BLOCKED:
+            raise BlockedProductException("This product hard-blocked")
 
-            sku = SKU.objects.create(
-                name=data["name"],
-                price=data["price"],
-                cost_price=data["price"],
-                discount=data["discount"],
-                active_quantity=data["active_quantity"],
-                characteristics=chars,
-                product=product,
+        if product.seller != seller:
+            raise AccessDenied("Access Denied")
+
+        sku = SKU.objects.create(
+            name=data["name"],
+            price=data["price"],
+            cost_price=data["price"],
+            discount=data["discount"],
+            active_quantity=data["active_quantity"],
+            characteristics=chars,
+            product=product,
+        )
+
+        if images:
+            for index, image in enumerate(images):
+                SKUImage.objects.create(sku=sku, url=image, order=index)
+
+        if product.status == ProductStatus.CREATED:
+            idempotency_key = str(uuid.uuid4())
+            moder_queue = ModerQueue()
+            moder_queue.product_moder_notification(
+                data={
+                    "idempotency_key": idempotency_key,
+                    "product_id": str(product.id),
+                    "seller_id": str(seller.id),
+                    "event": "EDITED",
+                    "date": str(datetime.now()),
+                },
+                corrected=False,
             )
+            product.status = ProductStatus.ON_MODERATION
+            product.save()
 
-            if images:
-                for index, image in enumerate(images):
-                    SKUImage.objects.create(sku=sku, url=image, order=index)
+        if product.status == ProductStatus.ON_MODERATION:
+            moder_queue = ModerQueue()
+            moder_queue.product_moder_notification(
+                data={
+                    "idempotency_key": str(uuid.uuid4()),
+                    "product_id": str(product.id),
+                    "seller_id": str(seller.id),
+                    "event": "EDITED",
+                    "date": str(datetime.now()),
+                },
+                corrected=True,
+            )
+    except AccessDenied as e:
+        raise e
+    except BlockedProductException as e:
+        raise e
+    except Exception as e:
+        raise Exception(f"failed to create SKU: {e}")
 
-            if product.status == ProductStatus.CREATED:
-                idempotency_key = str(uuid.uuid4())
-                moder_queue = ModerQueue()
-                moder_queue.product_moder_notification(
-                    data={
-                        "idempotency_key": idempotency_key,
-                        "product_id": str(product.id),
-                        "seller_id": str(seller.id),
-                        "event": "EDITED",
-                        "date": str(datetime.now()),
-                    },
-                    corrected=False,
-                )
-                product.status = ProductStatus.ON_MODERATION
-                product.save()
-
-            if product.status == ProductStatus.ON_MODERATION:
-                moder_queue = ModerQueue()
-                moder_queue.product_moder_notification(
-                    data={
-                        "idempotency_key": str(uuid.uuid4()),
-                        "product_id": str(product.id),
-                        "seller_id": str(seller.id),
-                        "event": "EDITED",
-                        "date": str(datetime.now()),
-                    },
-                    corrected=True,
-                )
-
-        except BlockedProductException as e:
-            raise e
-        except Exception as e:
-            raise Exception(f"failed to create SKU: {e}")
-
-        return SKUSerializer(sku).data
-    else:
-        raise Exception("Access Denied")
+    return SKUSerializer(sku).data
 
 
 @transaction.atomic
 def update_sku(data: Dict[str, str], images: List[UploadedFile], seller):
     try:
         sku = SKU.objects.get(id=data.get("id"))
+        product = Product.objects.get(id=sku.product.id)
+        if product.status == ProductStatus.HARD_BLOCKED:
+            raise BlockedProductException("This product hard-blocked")
 
         if sku.product.seller == seller:
             if data.get("name") is not None:
@@ -118,9 +124,29 @@ def update_sku(data: Dict[str, str], images: List[UploadedFile], seller):
                     SKUImage.objects.create(sku=sku, url=image, order=index)
 
             sku.save()
+            product = Product.objects.get(id=sku.product.id)
+            product.status = ProductStatus.ON_MODERATION
+            product.save()
 
+            moder_queue = ModerQueue()
+            moder_queue.product_moder_notification(
+                data={
+                    "idempotency_key": str(uuid.uuid4()),
+                    "product_id": str(product.id),
+                    "seller_id": str(seller.id),
+                    "event": "EDITED",
+                    "date": str(datetime.now()),
+                },
+                corrected=True,
+            )
+
+            return SKUSerializer(sku).data
         else:
-            raise Exception("Access Denied")
+            raise AccessDenied("Access Denied")
+    except AccessDenied as e:
+        raise e
+    except BlockedProductException as e:
+        raise e
     except SKU.DoesNotExist:
         raise Exception(f"SKU with id {data.get('id')} not found")
     except Exception as e:
