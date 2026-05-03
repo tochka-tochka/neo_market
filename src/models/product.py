@@ -11,6 +11,7 @@ class ProductStatus(models.TextChoices):
     ON_MODERATION = 'ON_MODERATION'
     MODERATED = 'MODERATED'
     BLOCKED = 'BLOCKED'
+    HARD_BLOCKED = 'HARD_BLOCKED'
 
 
 class Product(models.Model):
@@ -18,11 +19,11 @@ class Product(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.DO_NOTHING, null=True, blank=True)
-    characteristics = models.JSONField(default=None, validators=[validate_characteristics])
+    characteristics = models.JSONField(default=None, null=True, blank=True, validators=[validate_characteristics])
     status = models.CharField(
         max_length=20,
         choices=ProductStatus.choices,
-        default=ProductStatus.ON_MODERATION,
+        default=ProductStatus.CREATED,
     )
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -31,18 +32,18 @@ class Product(models.Model):
     
 class SKU(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='skus')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, name="product", related_name='skus')
     name = models.CharField(max_length=255)
     price = models.IntegerField(validators=[MinValueValidator(0)])
+    cost_price = models.IntegerField(validators=[MinValueValidator(0)])
+    discount = models.IntegerField(default=0, null=True, blank=True, validators=[MinValueValidator(0)])
     characteristics = models.JSONField(default=None, null=True, blank=True, validators=[validate_characteristics])
     active_quantity = models.IntegerField(validators=[MinValueValidator(0)])
-    image = models.ImageField(upload_to='skus/', null=True, blank=True)
 
     class Meta:
         db_table = 'skus'
 
-class Image(models.Model):
-    """Модель для хранения изображений товара"""
+class ProductImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     url = models.ImageField(upload_to='products/')
@@ -50,10 +51,24 @@ class Image(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'images'
+        db_table = 'product_images'
         ordering = ['order', 'created_at']
         constraints = [
             models.UniqueConstraint(fields=['product', 'order'], name='unique_product_image_order')
+        ]
+
+class SKUImage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    sku = models.ForeignKey(SKU, db_column='sku_id', on_delete=models.CASCADE, related_name='images')
+    url = models.ImageField(upload_to='products/')
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'sku_images'
+        ordering = ['order', 'created_at']
+        constraints = [
+            models.UniqueConstraint(fields=['sku', 'order'], name='unique_sku_image_order')
         ]
 
 

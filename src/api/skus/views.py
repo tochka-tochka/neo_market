@@ -1,13 +1,12 @@
 from django.http import JsonResponse
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
-from django.http.request import HttpRequest
 from src.api.skus.service.main import create_sku, update_sku, delete_sku
 from src.serializes import SKUSerializer
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
-
+from .service.main import BlockedProductException
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SkusView(APIView):
@@ -15,16 +14,22 @@ class SkusView(APIView):
     
     parser_classes = [MultiPartParser, FormParser]
     
-    def post(self, request: HttpRequest):
+    def post(self, request):
+        product_id = request.data.get('product_id')
         name = request.data.get('name')
         price = request.data.get('price')
+        cost_price = request.data.get('cost_price')
+        discount = request.data.get('discount')
         active_quantity = request.data.get('active_quantity')
         characteristics = request.data.get('characteristics')
-        product_id = request.data.get('product_id')
+
+        images = request.FILES.getlist('images')
 
         data = {
             'name': name,
             'price': int(price),
+            'cost_price': int(cost_price),
+            'discount': int(discount or 0),
             'active_quantity': int(active_quantity),
             'characteristics': characteristics,
             'product_id': product_id
@@ -35,15 +40,19 @@ class SkusView(APIView):
             return JsonResponse({"errors": serializer.errors}, status=400)
 
         try:
-            id = create_sku(data, request.user)
+            sku = create_sku(data, images, request.user)
+        except BlockedProductException as e:
+            return JsonResponse({"message": str(e)}, status=403)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
         
-        return JsonResponse({"id": str(id)}, status=201)
+        return JsonResponse(sku, status=201)
     
-    def put(self, request, id: str):
+    def patch(self, request, id: str):
         name = request.data.get('name')
         price = request.data.get('price')
+        cost_price = request.data.get('cost_price')
+        discount = request.data.get('discount')
         active_quantity = request.data.get('active_quantity')
         characteristics = request.data.get('characteristics')
 
@@ -51,16 +60,20 @@ class SkusView(APIView):
             'id': id,
             'name': name,
             'price': price,
+            'cost_price': int(cost_price),
+            'discount': int(discount),
             'active_quantity': active_quantity,
             'characteristics': characteristics
         }
+
+        images = request.FILES.getlist('images')
 
         serializer = SKUSerializer(data=data)
         if not serializer.is_valid():
             return JsonResponse({"errors": serializer.errors}, status=400)
 
         try:
-            update_sku(data, request.user)
+            update_sku(data, images, request.user)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
         
