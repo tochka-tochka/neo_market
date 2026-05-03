@@ -33,14 +33,14 @@ urlpatterns = [
 
 
     path('api/v1/categories/<uuid:id>', CategoryView.as_view()),
-    path('api/v1/products', ProductsView.as_view(), name="products"),
-    path('api/v1/products/<uuid:id>', ProductsView.as_view(), name="specific-product"),
+    path('api/v1/products', ProductsView.as_view(), name='products'),
+    path('api/v1/products/<uuid:id>', ProductsView.as_view(), name='specific-product'),
     path('api/v1/products/my', AllProductsView.as_view()),
     path('api/v1/categories', CategoriesView.as_view()),
     path('api/v1/categories/<uuid:id>/filters', CategoryFilterView.as_view()),
 
     path('api/v1/skus', SkusView.as_view(), name="skus"),
-    path('api/v1/skus/<uuid:id>', SkusView.as_view()),
+    path('api/v1/skus/<uuid:id>', SkusView.as_view(), name='specific-sku'),
 
     path('api/v1/invoices', InvoicesView.as_view()),
     path('api/v1/invoices/<uuid:id>', InvoicesView.as_view()),

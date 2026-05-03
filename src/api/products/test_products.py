@@ -12,7 +12,7 @@ import json
 @pytest.mark.django_db
 class TestProductAPI:
     
-    def _create_product_returns_201(self, jwt_client):
+    def test_create_product_returns_201(self, jwt_client):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
             value="Test Category",
@@ -45,7 +45,7 @@ class TestProductAPI:
         assert response.json()['status'] == 'CREATED'
         assert response.json()['skus'] == []
 
-    def _seller_id_taken_from_jwt(self, test_user, jwt_client):
+    def test_seller_id_taken_from_jwt(self, test_user, jwt_client):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
             value="Test Category",
@@ -77,7 +77,7 @@ class TestProductAPI:
         assert response.status_code == status.HTTP_201_CREATED, response.json()
         assert response.json()['seller']['id'] == str(test_user.id)
 
-    def _missing_images_returns_400(self, jwt_client):
+    def test_missing_images_returns_400(self, jwt_client):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
             value="Test Category",
@@ -101,7 +101,7 @@ class TestProductAPI:
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
 
-    def _missing_category_returns_400(self, jwt_client):
+    def test_missing_category_returns_400(self, jwt_client):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
             value="Test Category",
@@ -131,7 +131,7 @@ class TestProductAPI:
         
         assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
 
-    def _invalid_category_id_returns_400(self, jwt_client):
+    def test_invalid_category_id_returns_400(self, jwt_client):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
             value="Test Category",
@@ -162,7 +162,7 @@ class TestProductAPI:
         
         assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
         
-    def _invalid_characteristics_returns_400(self, jwt_client):
+    def test_invalid_characteristics_returns_400(self, jwt_client):
         category = Category.objects.create(
             id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
             value="Test Category",
