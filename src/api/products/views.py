@@ -1,21 +1,20 @@
 import uuid
 from typing import Literal
 
-import json
 from django.http import JsonResponse
-from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.views import APIView
 from django.http.request import HttpRequest
-from src.api.products.service.main import get_product, create_product, update_product, delete_product, get_all_products, \
-    get_categories, get_category
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.views import APIView
 
+from src.api.products.service.main import get_product, create_product, update_product, delete_product, get_all_products, \
+    get_categories, get_category
 from src.models import Category, Product
 from src.serializes import ProductSerializer
 from .service.main import InvalidCategoryId
-from ...models.category import CategoryMetaTag, CategorySEOKeyword
+from ...models.category import CategoryMetaTag, CategorySEOKeyword, CategoryFilter
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -134,6 +133,7 @@ class CategoriesView(APIView):
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 
+
 def get_full_category(_id: uuid.UUID, include_product_count: bool, lang: Literal["ru", "en"]):
     category = get_category(_id)
     if category.parent_id:
@@ -182,5 +182,41 @@ class CategoryView(APIView):
             lang = request.GET.get("lang", "ru")
             json_cat = get_full_category(id, include_product_count, lang)
             return JsonResponse(json_cat, status=200, safe=False)
+        except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+
+
+def format_category_filter(category_filter: CategoryFilter):
+    d = {
+        "slug": category_filter.slug,
+        "name": category_filter.name,
+        "type": category_filter.type,
+
+    }
+    match category_filter.type:
+        case "list":
+            d["value"] = category_filter.values
+        case "range":
+            d["min"] = category_filter.values[0]
+            d["max"] = category_filter.values[1]
+        case "switch":
+            pass
+    return d
+
+
+def get_category_filters(category_id: uuid.UUID):
+    filters = CategoryFilter.objects.filter(category_id=category_id)
+    return {
+        "items": [format_category_filter(cf) for cf in filters]
+    }
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CategoryFilterView(APIView):
+    # permission_classes = [IsAuthenticated]
+    def get(self, request: HttpRequest, id: uuid.UUID):
+        try:
+            json_filters = get_category_filters(id)
+            return JsonResponse(json_filters, status=200, safe=False)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
