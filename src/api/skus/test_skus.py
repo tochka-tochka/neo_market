@@ -71,7 +71,6 @@ class TestProductAPI:
             status=ProductStatus.CREATED,
             seller_id=test_user.id
         )
-        print(product.id)
         url = reverse('skus')
 
         images = []
@@ -192,7 +191,7 @@ class TestProductAPI:
             title="test",
             description="test",
             category=category,
-            status=ProductStatus.BLOCKED,
+            status=ProductStatus.HARD_BLOCKED,
             seller_id=test_user.id
         )
 

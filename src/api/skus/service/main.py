@@ -1,6 +1,6 @@
 import json
 import uuid
-from datetime import date, datetime
+from datetime import datetime
 from typing import Any, Dict, List
 
 from django.core.files.uploadedfile import UploadedFile
@@ -29,7 +29,7 @@ def create_sku(data: Dict[str, Any], images: List[UploadedFile], seller):
 
     if seller == product.seller:
         try:
-            if product.status == ProductStatus.BLOCKED:
+            if product.status == ProductStatus.HARD_BLOCKED:
                 raise BlockedProductException("This product hard-blocked")
 
             sku = SKU.objects.create(
@@ -47,7 +47,6 @@ def create_sku(data: Dict[str, Any], images: List[UploadedFile], seller):
                     SKUImage.objects.create(sku=sku, url=image, order=index)
 
             if product.status == ProductStatus.CREATED:
-                print(product.id)
                 idempotency_key = str(uuid.uuid4())
                 moder_queue = ModerQueue()
                 moder_queue.product_moder_notification(

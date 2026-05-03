@@ -11,6 +11,7 @@ class ProductStatus(models.TextChoices):
     ON_MODERATION = 'ON_MODERATION'
     MODERATED = 'MODERATED'
     BLOCKED = 'BLOCKED'
+    HARD_BLOCKED = 'HARD_BLOCKED'
 
 
 class Product(models.Model):
@@ -22,7 +23,7 @@ class Product(models.Model):
     status = models.CharField(
         max_length=20,
         choices=ProductStatus.choices,
-        default=ProductStatus.ON_MODERATION,
+        default=ProductStatus.CREATED,
     )
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
