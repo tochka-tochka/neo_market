@@ -1,433 +1,138 @@
 import pytest
-from django.urls import reverse
-from rest_framework import status
-from io import BytesIO
-from PIL import Image
-from src.models.product import Category, Product, ProductStatus
-from src.models.user import Seller
+import json
 import uuid
 import pika
-import json
+from io import BytesIO
+from PIL import Image
+from django.urls import reverse
+from rest_framework import status
+from src.models.product import Category, Product, ProductStatus
+from src.models.user import Seller
+
+@pytest.fixture
+def test_category(db):
+    return Category.objects.create(
+        id="e36e66d9-3c26-4085-a7d7-4be7132a46e5",
+        value="Test Category",
+        slug="test_category"
+    )
+
+@pytest.fixture
+def dummy_image():
+    """Фабрика для создания тестового изображения"""
+    file_res = BytesIO()
+    image = Image.new('RGB', (100, 100))
+    image.save(file_res, 'JPEG')
+    file_res.name = 'test.jpg'
+    file_res.seek(0)
+    return file_res
+
+@pytest.fixture
+def base_data(test_category, dummy_image):
+    """Базовая нагрузка для POST/PATCH запросов"""
+    return {
+        "title": "test",
+        "description": "test",
+        "category": str(test_category.id),
+        "images": dummy_image,
+        "characteristics": json.dumps([{"name": "test", "value": "test"}])
+    }
 
 @pytest.mark.django_db
 class TestProductAPI:
     
-    def test_create_product_returns_201(self, jwt_client):
-        category = Category.objects.create(
-            id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category",
-            slug="test_category"
-        )
-        url = reverse('products')
+    def get_rabbitmq_message(self, queue_name='moder'):
+        """Утилитный метод для получения одного сообщения из RabbitMQ"""
+        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost', 5672))
+        channel = connection.channel()
         
-        file_res = BytesIO()
-        image = Image.new('RGB', (100, 100))
-        image.save(file_res, 'JPEG')
-        file_res.name = 'test.jpg'
-        file_res.seek(0)
+        channel.queue_declare(queue=queue_name, durable=True, arguments={'x-queue-type': 'quorum'})
+        
+        received_body = None
 
-        data = {
-            "title": "test",
-            "description": "test",
-            "category": str(category.id),
-            "images": file_res,
-            "characteristics": """[
-                {
-                    "name": "test", 
-                    "value": "test"
-                }
-            ]"""
-        }
-        
-        response = jwt_client.post(url, data, format='multipart')
+        def callback(ch, method, properties, body):
+            nonlocal received_body
+            received_body = json.loads(body.decode())
+            ch.stop_consuming()
+
+        channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
+        try:
+            connection.process_data_events(time_limit=5)
+        finally:
+            connection.close()
+        return received_body
+
+    def test_create_product_success(self, jwt_client, base_data):
+        url = reverse('products')
+        response = jwt_client.post(url, base_data, format='multipart')
         
         assert response.status_code == status.HTTP_201_CREATED, response.json()
         assert response.json()['status'] == 'CREATED'
         assert response.json()['skus'] == []
 
-    def test_seller_id_taken_from_jwt(self, test_user, jwt_client):
-        category = Category.objects.create(
-            id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category",
-            slug="test_category"
-        )
+    def test_seller_id_taken_from_jwt(self, jwt_client, test_user, base_data):
         url = reverse('products')
-
-        file_res = BytesIO()
-        image = Image.new('RGB', (100, 100))
-        image.save(file_res, 'JPEG')
-        file_res.name = 'test.jpg'
-        file_res.seek(0)
-
-        data = {
-            "title": "test",
-            "description": "test",
-            "category": str(category.id),
-            "images": file_res,
-            "characteristics": """[
-                {
-                    "name": "test", 
-                    "value": "test"
-                }
-            ]"""
-        }
-
-        response = jwt_client.post(url, data, format='multipart')
-
-        assert response.status_code == status.HTTP_201_CREATED, response.json()
+        response = jwt_client.post(url, base_data, format='multipart')
+        
         assert response.json()['seller']['id'] == str(test_user.id)
 
-    def test_missing_images_returns_400(self, jwt_client):
-        category = Category.objects.create(
-            id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category",
-            slug="test_category"
-        )
+    @pytest.mark.parametrize("field_to_remove", ["images", "category"])
+    def test_missing_fields_returns_400(self, jwt_client, base_data, field_to_remove):
         url = reverse('products')
+        del base_data[field_to_remove]
+        
+        response = jwt_client.post(url, base_data, format='multipart')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-        data = {
-            "title": "test",
-            "description": "test",
-            "category": str(category.id),
-            "characteristics": """[
-                {
-                    "name": "test", 
-                    "value": "test"
-                }
-            ]"""
-        }
-
-        response = jwt_client.post(url, data, format='multipart')
-
-        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
-
-    def test_missing_category_returns_400(self, jwt_client):
-        category = Category.objects.create(
-            id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category",
-            slug="test_category"
-        )
+    @pytest.mark.parametrize("invalid_payload", [
+        {"category": "e36e66d9-3c26-4085-a7d7-4be7132a46e6"},
+        {"characteristics": json.dumps([{"name": 10, "value": 20}])}
+    ])
+    def test_invalid_data_returns_400(self, jwt_client, base_data, invalid_payload):
         url = reverse('products')
+        base_data.update(invalid_payload)
         
-        file_res = BytesIO()
-        image = Image.new('RGB', (100, 100))
-        image.save(file_res, 'JPEG')
-        file_res.name = 'test.jpg'
-        file_res.seek(0)
+        response = jwt_client.post(url, base_data, format='multipart')
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-        data = {
-            "title": "test",
-            "description": "test",
-            "images": file_res,
-            "characteristics": """[
-                {
-                    "name": "test", 
-                    "value": "test"
-                }
-            ]"""
-        }
-        
-        response = jwt_client.post(url, data, format='multipart')
-        
-        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
-
-    def test_invalid_category_id_returns_400(self, jwt_client):
-        category = Category.objects.create(
-            id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category",
-            slug="test_category"
-        )
-        url = reverse('products')
-        
-        file_res = BytesIO()
-        image = Image.new('RGB', (100, 100))
-        image.save(file_res, 'JPEG')
-        file_res.name = 'test.jpg'
-        file_res.seek(0)
-
-        data = {
-            "title": "test",
-            "description": "test",
-            "images": file_res,
-            "category": "e36e66d9-3c26-4085-a7d7-4be7132a46e6",
-            "characteristics": """[
-                {
-                    "name": "test", 
-                    "value": "test"
-                }
-            ]"""
-        }
-        
-        response = jwt_client.post(url, data, format='multipart')
-        
-        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
-        
-    def test_invalid_characteristics_returns_400(self, jwt_client):
-        category = Category.objects.create(
-            id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category",
-            slug="test_category"
-        )
-        url = reverse('products')
-        
-        file_res = BytesIO()
-        image = Image.new('RGB', (100, 100))
-        image.save(file_res, 'JPEG')
-        file_res.name = 'test.jpg'
-        file_res.seek(0)
-
-        data = {
-            "title": "test",
-            "description": "test",
-            "images": file_res,
-            "category": str(category.id),
-            "characteristics": """[
-                {
-                    "name": 10, 
-                    "value": 20
-                }
-            ]"""
-        }
-        
-        response = jwt_client.post(url, data, format='multipart')
-        
-        assert response.status_code == status.HTTP_400_BAD_REQUEST, response.json()
-
-    def test_edit_moderated_product_returns_to_on_moderation(self, jwt_client, test_user):
-        category = Category.objects.create(
-            id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category",
-            slug="test_category"
-        )
-        url = reverse('products')
-        
-        file_res = BytesIO()
-        image = Image.new('RGB', (100, 100))
-        image.save(file_res, 'JPEG')
-        file_res.name = 'test.jpg'
-        file_res.seek(0)
-
-        data = {
-            "title": "test",
-            "description": "test",
-            "category": str(category.id),
-            "images": file_res,
-            "characteristics": """[
-                {
-                    "name": "test", 
-                    "value": "test"
-                }
-            ]"""
-        }
-        
-        response = jwt_client.post(url, data, format='multipart')
-
-        product_id = response.json()['id']
-        
-        assert response.status_code == status.HTTP_201_CREATED, response.json()
-        assert response.json()['status'] == 'CREATED'
-        assert response.json()['skus'] == []
-
-        data['title'] = 'test2'
-
-        patch_url = reverse('specific-product', args=[product_id])
-        
-        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost', 5672))
-        channel = connection.channel()
-        channel.queue_purge(queue='moder')
-        channel.queue_declare(
-            queue='moder',
-            durable=True,
-            arguments={'x-queue-type': 'quorum'}
-        )
-        
-        response = jwt_client.patch(patch_url, data, format='multipart')
-
-        assert response.status_code == status.HTTP_200_OK, response.json()
-        assert response.json()['status'] == ProductStatus.ON_MODERATION, response.json()
-
-        received_message_body = None
-        
-        def callback(ch, method, properties, body):
-            nonlocal received_message_body
-            rabbitmq_msg_body = json.loads(body.decode())
-            received_message_body = rabbitmq_msg_body
-            ch.stop_consuming()
-
-        channel.basic_consume(queue='moder',
-                                on_message_callback=callback,
-                                auto_ack=True
-                            )
-        try:
-            connection.process_data_events(time_limit=5)
-        except pika.exceptions.ConnectionClosedByBroker:
-            pass
-        finally:
-            connection.close()
-
-        assert received_message_body is not None, "RabbitMQ message was not received"
-        assert received_message_body['idempotency_key'] is not None, received_message_body
-        assert received_message_body['product_id'] == product_id, received_message_body
-        assert received_message_body['seller_id'] == str(test_user.id), received_message_body
-        assert received_message_body['date'] is not None , received_message_body
-
-    def test_edit_blocked_product_returns_to_on_moderation(self, jwt_client, test_user):
-        category = Category.objects.create(
-            id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category",
-            slug="test_category"
-        )
-        
+    @pytest.mark.parametrize("initial_status", [
+        ProductStatus.CREATED, 
+        ProductStatus.BLOCKED
+    ])
+    def test_edit_triggers_moderation_event(self, jwt_client, test_user, test_category, base_data, initial_status):
         product = Product.objects.create(
-            title="test",
-            description="test",
-            category=category,
-            status=ProductStatus.BLOCKED,
-            seller_id=test_user.id
+            title="Old Title", seller_id=test_user.id, category=test_category, status=initial_status
         )
-
         url = reverse('specific-product', args=[product.id])
-
-        file_res = BytesIO()
-        image = Image.new('RGB', (100, 100))
-        image.save(file_res, 'JPEG')
-        file_res.name = 'test.jpg'
-        file_res.seek(0)
-
-        data = {
-            "title": "test",
-            "description": "test",
-            "category": str(category.id),
-            "images": file_res,
-            "characteristics": """[
-                {
-                    "name": "test", 
-                    "value": "test"
-                }
-            ]"""
-        }
-
-        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost', 5672))
-        channel = connection.channel()
-        channel.queue_purge(queue='moder')
-        channel.queue_declare(
-            queue='moder',
-            durable=True,
-            arguments={'x-queue-type': 'quorum'}
-        )
         
-        response = jwt_client.patch(url, data, format='multipart')
+        self.get_rabbitmq_message() 
 
-        assert response.status_code == status.HTTP_200_OK, response.json()
-        assert response.json()['status'] == ProductStatus.ON_MODERATION, response.json()
+        response = jwt_client.patch(url, base_data, format='multipart')
 
-        received_message_body = None
-        
-        def callback(ch, method, properties, body):
-            nonlocal received_message_body
-            rabbitmq_msg_body = json.loads(body.decode())
-            received_message_body = rabbitmq_msg_body
-            ch.stop_consuming()
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()['status'] == ProductStatus.ON_MODERATION
 
-        channel.basic_consume(queue='moder',
-                                on_message_callback=callback,
-                                auto_ack=True
-                            )
-        try:
-            connection.process_data_events(time_limit=5)
-        except pika.exceptions.ConnectionClosedByBroker:
-            pass
-        finally:
-            connection.close()
+        msg = self.get_rabbitmq_message()
+        assert msg is not None
+        assert msg['product_id'] == str(product.id)
+        assert msg['seller_id'] == str(test_user.id)
+        assert 'idempotency_key' in msg
 
-        assert received_message_body is not None, "RabbitMQ message was not received"
-        assert received_message_body['idempotency_key'] is not None, received_message_body
-        assert received_message_body['product_id'] == str(product.id), received_message_body
-        assert received_message_body['seller_id'] == str(test_user.id), received_message_body
-        assert received_message_body['date'] is not None , received_message_body
-
-    def test_edit_hard_blocked_returns_403(self, jwt_client, test_user):
-        category = Category.objects.create(
-            id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category",
-            slug="test_category"
-        )
-        
+    def test_edit_hard_blocked_returns_403(self, jwt_client, test_user, test_category, base_data):
         product = Product.objects.create(
-            title="test",
-            description="test",
-            category=category,
-            status=ProductStatus.HARD_BLOCKED,
-            seller_id=test_user.id
+            title="Hard Blocked", seller_id=test_user.id, category=test_category, status=ProductStatus.HARD_BLOCKED
         )
-
         url = reverse('specific-product', args=[product.id])
-
-        file_res = BytesIO()
-        image = Image.new('RGB', (100, 100))
-        image.save(file_res, 'JPEG')
-        file_res.name = 'test.jpg'
-        file_res.seek(0)
-
-        data = {
-            "title": "test",
-            "description": "test",
-            "category": str(category.id),
-            "images": file_res,
-            "characteristics": """[
-                {
-                    "name": "test", 
-                    "value": "test"
-                }
-            ]"""
-        }
-
-        response = jwt_client.patch(url, data, format='multipart')
-
-        assert response.status_code == status.HTTP_403_FORBIDDEN, response.json()
-
-    def test_others_product_returns_403(self, jwt_client, test_user):
-        another_user_id = uuid.uuid4()
-        Seller.objects.create(
-            id=another_user_id,
-            username="test_user_2",
-            password="password123"
-        )
-        category = Category.objects.create(
-            id="e36e66d9-3c26-4085-a7d7-4be7132a46e5", 
-            value="Test Category",
-            slug="test_category"
-        )
         
+        response = jwt_client.patch(url, base_data, format='multipart')
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_edit_others_product_returns_403(self, jwt_client, test_user, test_category, base_data):
+        another_seller = Seller.objects.create_user(username="other", password="pass")
         product = Product.objects.create(
-            title="test",
-            description="test",
-            category=category,
-            status=ProductStatus.HARD_BLOCKED,
-            seller_id=str(another_user_id)
+            title="Not Mine", seller=another_seller, category=test_category
         )
-
         url = reverse('specific-product', args=[product.id])
-
-        file_res = BytesIO()
-        image = Image.new('RGB', (100, 100))
-        image.save(file_res, 'JPEG')
-        file_res.name = 'test.jpg'
-        file_res.seek(0)
-
-        data = {
-            "title": "test",
-            "description": "test",
-            "category": str(category.id),
-            "images": file_res,
-            "characteristics": """[
-                {
-                    "name": "test", 
-                    "value": "test"
-                }
-            ]"""
-        }
-
-        response = jwt_client.patch(url, data, format='multipart')
-
-        assert response.status_code == status.HTTP_403_FORBIDDEN, response.json()
+        
+        response = jwt_client.patch(url, base_data, format='multipart')
+        assert response.status_code == status.HTTP_403_FORBIDDEN
