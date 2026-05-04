@@ -7,7 +7,7 @@ from django.core.files.uploadedfile import UploadedFile
 from src.serializes import ProductSerializer
 from django.db import transaction
 import json
-from rabbitmq_prod.moder import ModerQueue
+from rabbitmq_prod.moder import moder_queue
 from datetime import datetime
 
 class InvalidCategoryId(Exception):
@@ -19,9 +19,12 @@ class HardBlockerProduct(Exception):
 class AccessDenied(Exception):
     pass
 
+class ProductAlreadyDeleted(Exception):
+    pass
+
 def get_all_products(seller: Seller):
     try:
-        products = Product.objects.select_related('category').filter(seller=seller)
+        products = Product.objects.select_related('category').filter(seller=seller, deleted=False)
         serializer = ProductSerializer(products, many=True)
         return serializer.data
     except Exception as e:
@@ -88,7 +91,6 @@ def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Sel
 
 @transaction.atomic
 def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Seller):
-    print(f"DEBUG update_product data: {data}")
     try:
         product = Product.objects.get(id=data.get("id"))
 
@@ -134,7 +136,6 @@ def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Sel
         
         product.status = ProductStatus.ON_MODERATION
 
-        moder_queue = ModerQueue()
         idempotency_key = str(uuid.uuid4())
         moder_queue.product_moder_notification(data={
             "idempotency_key": idempotency_key,
@@ -148,7 +149,6 @@ def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Sel
 
         return ProductSerializer(product).data
 
-        # moder_queue.product_moder_notification(product.id)
     except AccessDenied:
         raise HardBlockerProduct("failed to update product: You are not product's owner")
     except HardBlockerProduct:
@@ -162,8 +162,35 @@ def delete_product(id: str, seller: Seller):
     try:
         product = Product.objects.get(id=id)
         if product.seller != seller:
-            raise Exception("Access Denied")
-        product.delete()
+            raise AccessDenied("Access Denied")
+
+        if product.deleted:
+            raise ProductAlreadyDeleted("Product already deleted")
+        product.deleted = True
+        product.save()
+
+
+        moder_queue.product_moder_notification(data={
+            "idempotency_key": str(uuid.uuid4()),
+            "product_id": str(product.id),
+            "seller_id": str(seller.id),
+            "event": "DELETED",
+            "date": str(datetime.now()),
+        }, corrected=True)
+
+        product_serializer = ProductSerializer(product).data
+                
+        moder_queue.product_b2c_notification(data={
+            "idempotency_key": str(uuid.uuid4()),
+            "product_id": str(product.id),
+            "sku_ids": list(map(lambda sku: sku['id'], product_serializer['skus'])),
+            "event": "PRODUCT_DELETED",
+            "date": str(datetime.now()),
+        }, corrected=True)
+    except AccessDenied as e:
+        raise e
+    except ProductAlreadyDeleted as e:
+        raise e
     except Exception as e:
         raise Exception(f"failed to delete product: {e}")
     
