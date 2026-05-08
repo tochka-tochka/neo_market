@@ -17,3 +17,8 @@ def jwt_client(api_client, test_user):
     api_client.credentials(HTTP_AUTHORIZATION=f'Bearer {refresh.access_token}')
     api_client.defaults
     return api_client
+
+@pytest.fixture(autouse=True)
+def mock_service_key(monkeypatch):
+    monkeypatch.setenv('MODER_SERVICE_KEY', 'test_key_123')
+    monkeypatch.setenv('B2B_SERVICE_KEY', 'test_key_123')

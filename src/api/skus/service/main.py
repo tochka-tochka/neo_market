@@ -6,7 +6,7 @@ from typing import Any, Dict, List
 from django.core.files.uploadedfile import UploadedFile
 from django.db import transaction
 
-from rabbitmq_prod.moder import ModerQueue
+from rabbitmq_prod.moder import moder_queue
 from src.models.product import SKU, Product, ProductStatus, SKUImage
 from src.serializes import SKUSerializer
 
@@ -52,7 +52,6 @@ def create_sku(data: Dict[str, Any], images: List[UploadedFile], seller):
 
         if product.status == ProductStatus.CREATED:
             idempotency_key = str(uuid.uuid4())
-            moder_queue = ModerQueue()
             moder_queue.product_moder_notification(
                 data={
                     "idempotency_key": idempotency_key,
@@ -67,7 +66,6 @@ def create_sku(data: Dict[str, Any], images: List[UploadedFile], seller):
             product.save()
 
         if product.status == ProductStatus.ON_MODERATION:
-            moder_queue = ModerQueue()
             moder_queue.product_moder_notification(
                 data={
                     "idempotency_key": str(uuid.uuid4()),
@@ -128,7 +126,6 @@ def update_sku(data: Dict[str, str], images: List[UploadedFile], seller):
             product.status = ProductStatus.ON_MODERATION
             product.save()
 
-            moder_queue = ModerQueue()
             moder_queue.product_moder_notification(
                 data={
                     "idempotency_key": str(uuid.uuid4()),

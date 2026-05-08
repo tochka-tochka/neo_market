@@ -25,6 +25,7 @@ class Product(models.Model):
         choices=ProductStatus.choices,
         default=ProductStatus.CREATED,
     )
+    deleted = models.BooleanField(default=False)
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:
