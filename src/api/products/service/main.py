@@ -32,15 +32,13 @@ def get_all_products(seller: Seller):
 
 def get_product(id: str, seller: Seller):
     try:
-        product = Product.objects.select_related('category').get(id=id)
-        if product.seller != seller:
-            raise Exception("Access Denied")
+        product = Product.objects.select_related('category').get(id=id, seller=seller, deleted=False)
         
         serializer = ProductSerializer(product) 
         
         return serializer.data
-    except Product.DoesNotExist:
-        raise Exception(f"Product with id {id} not found")
+    except Product.DoesNotExist as e:
+        raise e
     except Exception as e:
         raise Exception(f"failed to get product: {e}")
 

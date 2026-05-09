@@ -2,7 +2,7 @@ import pytest
 import json
 from io import BytesIO
 from PIL import Image
-from src.models.product import Category, Product, ProductStatus, SKU
+from src.models.product import Category, Product, ProductStatus, SKU, ProductFieldReport
 import pika
 
 @pytest.fixture
@@ -34,7 +34,6 @@ def base_data(test_category, dummy_image):
 
 @pytest.fixture
 def product_factory(db, test_user, test_category):
-    """Фабрика для создания продуктов с разным состоянием"""
     def _make_product(seller=test_user, status=ProductStatus.CREATED, **kwargs):
         return Product.objects.create(
             title=kwargs.pop('title', "Test Product"),
@@ -42,6 +41,7 @@ def product_factory(db, test_user, test_category):
             seller=seller,
             category=test_category,
             status=status,
+            blocking_reason=kwargs.pop('blocking_reason', None),
             **kwargs
         )
     return _make_product
