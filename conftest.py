@@ -22,3 +22,8 @@ def jwt_client(api_client, test_user):
 def mock_service_key(monkeypatch):
     monkeypatch.setenv('MODER_SERVICE_KEY', 'test_key_123')
     monkeypatch.setenv('B2B_SERVICE_KEY', 'test_key_123')
+
+@pytest.fixture
+def service_client(client):
+    client.defaults['HTTP_X_SERVICE_KEY'] = 'test_key_123'
+    return client

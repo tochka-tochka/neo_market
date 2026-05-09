@@ -1,7 +1,7 @@
 import uuid
 from typing import Literal
 
-from src.api.products.service.main import get_category
+from src.api.products.service.category_service import get_category
 from src.models import Category, Product
 from src.models.category import CategorySEOKeyword, CategoryMetaTag, CategoryFilter
 

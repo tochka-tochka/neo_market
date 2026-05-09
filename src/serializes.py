@@ -7,9 +7,9 @@ from src.models.product import (
     Invoice,
     InvoiceItem,
     Product,
+    ProductFieldReport,
     ProductImage,
     SKUImage,
-    ProductFieldReport
 )
 from src.models.user import Seller
 from src.validators.main import validate_characteristics
@@ -74,10 +74,33 @@ class SKUSerializer(serializers.ModelSerializer):
             "characteristics",
         ]
 
+class PublicSKUSerializer(serializers.ModelSerializer):
+    product_id = serializers.UUIDField(source="product.id", read_only=True)
+    price = serializers.IntegerField(validators=[MinValueValidator(0)])
+    active_quantity = serializers.IntegerField(validators=[MinValueValidator(0)])
+    images = SKUImageSerializer(many=True, read_only=True)
+    characteristics = serializers.JSONField(
+        required=False, allow_null=True, validators=[validate_characteristics]
+    )
+
+    class Meta:
+        model = SKU
+        fields = [
+            "id",
+            "product_id",
+            "name",
+            "price",
+            "active_quantity",
+            "images",
+            "characteristics",
+        ]
+
+
 class ProductFieldReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductFieldReport
         fields = ["sku", "field", "comment"]
+
 
 class SellerListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -104,6 +127,27 @@ class ProductSerializer(serializers.ModelSerializer):
             "status",
             "blocking_reason",
             "field_reports",
+            "seller",
+            "images",
+            "characteristics",
+            "category",
+            "skus",
+        ]
+
+
+class PublicProductSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    seller = SellerListSerializer(read_only=True)
+    images = ProductImageSerializer(many=True, read_only=True)
+    skus = PublicSKUSerializer(many=True, read_only=True)
+    characteristics = serializers.JSONField(required=False, allow_null=True)
+
+    class Meta:
+        model = Product
+        fields = [
+            "id",
+            "title",
+            "description",
             "seller",
             "images",
             "characteristics",

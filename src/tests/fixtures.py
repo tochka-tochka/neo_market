@@ -34,10 +34,10 @@ def base_data(test_category, dummy_image):
 
 @pytest.fixture
 def product_factory(db, test_user, test_category):
-    def _make_product(seller=test_user, status=ProductStatus.CREATED, **kwargs):
+    def _make_product(seller=test_user, status=ProductStatus.CREATED, description="Test Description", category=test_category, **kwargs):
         return Product.objects.create(
             title=kwargs.pop('title', "Test Product"),
-            description="Test Description",
+            description=description,
             seller=seller,
             category=test_category,
             status=status,
@@ -71,7 +71,6 @@ def product_with_skus(product_factory):
 class BaseTestUtil:
     
     def get_rabbitmq_message(self, queue_name, timeout=5):
-        """Утилитный метод для получения сообщения"""
         connection = pika.BlockingConnection(pika.ConnectionParameters('localhost', 5672))
         channel = connection.channel()
         channel.queue_declare(queue=queue_name, durable=True, arguments={'x-queue-type': 'quorum'})
@@ -90,6 +89,34 @@ class BaseTestUtil:
         return received_body
 
     def _clear_queues(self):
-        """Вспомогательный метод для очистки очередей перед/после теста"""
         self.get_rabbitmq_message('moder', timeout=0.1)
         self.get_rabbitmq_message('b2c', timeout=0.1)
+
+@pytest.fixture
+def catalog_products(product_factory):
+    p_visible = product_factory(title="Visible Product", status=ProductStatus.MODERATED)
+    SKU.objects.create(product=p_visible, name="sku_vis_1", price=100, cost_price=80, active_quantity=10)
+
+    p_visible_2 = product_factory(title="Visible Product 2", status=ProductStatus.MODERATED)
+    SKU.objects.create(product=p_visible_2, name="sku_vis_2", price=150, cost_price=100, active_quantity=5)
+
+    p_out_of_stock = product_factory(title="Out of Stock", status=ProductStatus.MODERATED)
+    SKU.objects.create(product=p_out_of_stock, name="sku_oos", price=200, cost_price=150, active_quantity=0)
+
+    p_hard_blocked = product_factory(title="Hard Blocked", status=ProductStatus.HARD_BLOCKED)
+    SKU.objects.create(product=p_hard_blocked, name="sku_blocked", price=300, cost_price=200, active_quantity=10)
+
+    p_deleted = product_factory(title="Deleted Product", status=ProductStatus.MODERATED, deleted=True)
+    SKU.objects.create(product=p_deleted, name="sku_del", price=400, cost_price=300, active_quantity=10)
+
+    p_created = product_factory(title="Created Product", status=ProductStatus.CREATED)
+    SKU.objects.create(product=p_created, name="sku_new", price=500, cost_price=400, active_quantity=10)
+
+    return {
+        "visible": p_visible,
+        "visible_2": p_visible_2,
+        "out_of_stock": p_out_of_stock,
+        "hard_blocked": p_hard_blocked,
+        "deleted": p_deleted,
+        "created": p_created
+    }

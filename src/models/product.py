@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.db import models
 from uuid import uuid4
 from django.conf import settings
@@ -28,6 +29,7 @@ class Product(models.Model):
     blocking_reason = models.TextField(null=True, blank=True)
     deleted = models.BooleanField(default=False)
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    date = models.DateField(auto_now_add=True, null=True, blank=True,)
 
     class Meta:
         db_table = 'products'
