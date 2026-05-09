@@ -1,5 +1,4 @@
 from django.http import JsonResponse
-from django.http.request import HttpRequest
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -8,6 +7,7 @@ from rest_framework.views import APIView
 
 from src.api.products.service.main import get_product, create_product, update_product, delete_product, get_all_products
 from src.serializes import ProductSerializer
+from src.models.product import Product
 from .service.main import AccessDenied, InvalidCategoryId, HardBlockerProduct, ProductAlreadyDeleted
 
 
@@ -20,11 +20,10 @@ class ProductsView(APIView):
     def get(self, request, id: str):
         try:
             product = get_product(id, request.user)
+        except Product.DoesNotExist:
+            return JsonResponse({"message": "product not found"}, status=404)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
-
-        if product is None:
-            return JsonResponse({"message": "product not found"}, status=404)
         
 
         return JsonResponse({ "product" : product })

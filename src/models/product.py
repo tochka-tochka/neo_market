@@ -25,6 +25,7 @@ class Product(models.Model):
         choices=ProductStatus.choices,
         default=ProductStatus.CREATED,
     )
+    blocking_reason = models.TextField(null=True, blank=True)
     deleted = models.BooleanField(default=False)
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
@@ -71,6 +72,12 @@ class SKUImage(models.Model):
         constraints = [
             models.UniqueConstraint(fields=['sku', 'order'], name='unique_sku_image_order')
         ]
+
+class ProductFieldReport(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, name="product", related_name="field_reports")
+    sku = models.ForeignKey(SKU, on_delete=models.CASCADE, name="sku", related_name="sku_field_reports", blank=True, null=True)
+    field = models.CharField(max_length=255)
+    comment = models.CharField(max_length=255)
 
 
 class Invoice(models.Model):
