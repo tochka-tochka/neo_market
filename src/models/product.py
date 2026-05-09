@@ -43,6 +43,7 @@ class SKU(models.Model):
     discount = models.IntegerField(default=0, null=True, blank=True, validators=[MinValueValidator(0)])
     characteristics = models.JSONField(default=None, null=True, blank=True, validators=[validate_characteristics])
     active_quantity = models.IntegerField(validators=[MinValueValidator(0)])
+    reserved_quantity = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
     class Meta:
         db_table = 'skus'
@@ -97,3 +98,10 @@ class InvoiceItem(models.Model):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='items')
     class Meta:
         db_table = 'invoice_items'
+
+class ReserveOperations(models.Model):
+    idempotency_key = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    result = models.JSONField(default=None, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        db_table = 'reserve_operations'
