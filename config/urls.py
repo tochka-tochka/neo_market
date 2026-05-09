@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from src.api.products.views import ProductsView, AllProductsView
+from src.api.products.views import ProductsView, ProductDetailView
 from src.api.categories.views import CategoriesView, CategoryView, CategoryFilterView
 from src.api.skus.views import SkusView
 from src.api.invoices.views import InvoicesView, InvoiceAcceptView
@@ -31,13 +31,12 @@ urlpatterns = [
     path('api/v1/login', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/v1/login/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 
-
     path('api/v1/categories/<uuid:id>', CategoryView.as_view()),
-    path('api/v1/products', ProductsView.as_view(), name='products'),
-    path('api/v1/products/<uuid:id>', ProductsView.as_view(), name='product-detail'),
-    path('api/v1/products/my', AllProductsView.as_view(), name='my-products'),
     path('api/v1/categories', CategoriesView.as_view()),
     path('api/v1/categories/<uuid:id>/filters', CategoryFilterView.as_view()),
+
+    path('api/v1/products', ProductsView.as_view(), name='products'),
+    path('api/v1/products/<uuid:id>', ProductDetailView.as_view(), name='product-detail'),
 
     path('api/v1/skus', SkusView.as_view(), name="skus"),
     path('api/v1/skus/<uuid:id>', SkusView.as_view(), name='specific-sku'),

@@ -55,7 +55,7 @@ class TestCreateSKU(BaseTestUtil):
         product.deleted = True
         product.save()
         
-        response = jwt_client.get(reverse('my-products'))
+        response = jwt_client.get(reverse('products'))
         data = response.json()
         
         assert len(data['products']) == 1

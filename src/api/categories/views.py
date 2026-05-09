@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 
 from src.api.categories.services import get_full_category, get_category_filters
-from src.api.products.service.main import get_categories
+from src.api.products.service.category_service import get_categories
 
 
 @method_decorator(csrf_exempt, name='dispatch')

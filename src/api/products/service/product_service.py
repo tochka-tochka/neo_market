@@ -22,7 +22,7 @@ class AccessDenied(Exception):
 class ProductAlreadyDeleted(Exception):
     pass
 
-def get_all_products(seller: Seller):
+def get_seller_products(seller: Seller):
     try:
         products = Product.objects.select_related('category').filter(seller=seller, deleted=False)
         serializer = ProductSerializer(products, many=True)
@@ -191,19 +191,3 @@ def delete_product(id: str, seller: Seller):
         raise e
     except Exception as e:
         raise Exception(f"failed to delete product: {e}")
-    
-def get_categories():
-    try:
-        categories = Category.objects.all().values(
-            'id', 'parent_id', 'value'
-        )
-        return list(categories)
-    except Exception as e:
-        raise Exception(f"failed to get categories: {e}")
-
-def get_category(id: uuid.UUID) -> Category:
-    try:
-        category = Category.objects.get(id=id)
-        return category
-    except Exception as e:
-        raise Exception(f"failed to get category: {e}")
