@@ -18,7 +18,7 @@ from src.tests.fixtures import (
 @pytest.mark.django_db
 class TestCreateSKU(BaseTestUtil):
 
-    @pytest.mark.parametrize("initial_status", [ProductStatus.CREATED, ProductStatus.BLOCKED])
+    @pytest.mark.parametrize("initial_status", [ProductStatus.CREATED, ProductStatus.MODERATED, ProductStatus.BLOCKED])
     def test_edit_triggers_moderation_event(self, jwt_client, test_user, product_factory, base_data, initial_status):
         product = product_factory(status=initial_status)
         url = reverse('product-detail', args=[product.id])
@@ -57,6 +57,19 @@ class TestCreateSKU(BaseTestUtil):
         product.refresh_from_db()
         assert response.status_code == status.HTTP_200_OK
         assert product.status == ProductStatus.ON_MODERATION
+
+    def test_reserves_preserved_after_sku_edit(self, jwt_client, test_user, test_category, sku_payload):
+        product = Product.objects.create(title="T", category=test_category, seller=test_user, status=ProductStatus.MODERATED)
+        sku = SKU.objects.create(name="Old", price=10, cost_price=5, active_quantity=1, reserved_quantity=999, product=product)
+        
+        url = reverse("specific-sku", args=[sku.id])
+        sku_payload["product_id"] = product.id
+        
+        response = jwt_client.patch(url, sku_payload | { "reserved_quantity": 1000 }, format="multipart")
+        
+        sku.refresh_from_db()
+        assert response.status_code == status.HTTP_200_OK
+        assert sku.reserved_quantity == 999
 
     def test_edit_sku_of_hard_blocked_product_returns_403(self, jwt_client, test_user, test_category, sku_payload):
         product = Product.objects.create(title="T", category=test_category, seller=test_user, status=ProductStatus.HARD_BLOCKED)
