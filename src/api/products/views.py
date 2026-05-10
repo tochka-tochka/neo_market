@@ -97,6 +97,8 @@ class ProductDetailView(APIView):
             delete_product(id, request.user)
         except ProductAlreadyDeleted as e:
             return JsonResponse({"message": str(e)}, status=400)
+        except HardBlockerProduct as e:
+            return JsonResponse({"message": str(e)}, status=403)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 

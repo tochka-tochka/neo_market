@@ -2,6 +2,7 @@ import pytest
 from rest_framework.test import APIClient
 from rest_framework_simplejwt.tokens import RefreshToken
 from src.models.user import Seller
+from django import db
 
 @pytest.fixture
 def api_client():
@@ -27,3 +28,16 @@ def mock_service_key(monkeypatch):
 def service_client(client):
     client.defaults['HTTP_X_SERVICE_KEY'] = 'test_key_123'
     return client
+
+@pytest.fixture(scope="session", autouse=True)
+def force_close_connections(django_db_setup, django_db_blocker):
+    yield
+    with django_db_blocker.unblock():
+        from django.db import connection
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT pg_terminate_backend(pg_stat_activity.pid)
+                FROM pg_stat_activity
+                WHERE pg_stat_activity.datname = current_database()
+                  AND pid <> pg_backend_pid();
+            """)

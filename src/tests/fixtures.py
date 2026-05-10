@@ -4,6 +4,8 @@ from io import BytesIO
 from PIL import Image
 from src.models.product import Category, Product, ProductStatus, SKU, ProductFieldReport
 import pika
+import time
+import threading
 
 @pytest.fixture
 def test_category(db):
@@ -88,9 +90,39 @@ class BaseTestUtil:
             connection.close()
         return received_body
 
+    def send_moder_decision(self, data: dict):
+            """
+            Отправляет тестовые данные в очередь moder_decisions.
+            Используется для имитации ответа от сервиса модерации в тестах.
+            """
+            connection = pika.BlockingConnection(
+                pika.ConnectionParameters('localhost', 5672)
+            )
+            try:
+                channel = connection.channel()
+                
+                channel.queue_declare(
+                    queue='moder_decisions', 
+                    durable=True, 
+                    arguments={'x-queue-type': 'quorum'}
+                )
+                
+                channel.basic_publish(
+                    exchange='',
+                    routing_key='moder_decisions',
+                    body=json.dumps(data),
+                    properties=pika.BasicProperties(
+                        delivery_mode=2,
+                        content_type='application/json'
+                    )
+                )
+            finally:
+                connection.close()
+
     def _clear_queues(self):
         self.get_rabbitmq_message('moder', timeout=0.1)
         self.get_rabbitmq_message('b2c', timeout=0.1)
+        self.get_rabbitmq_message('moder_decisions', timeout=0.1)
 
 @pytest.fixture
 def catalog_products(product_factory):

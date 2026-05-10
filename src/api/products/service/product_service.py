@@ -164,6 +164,9 @@ def delete_product(id: str, seller: Seller):
         if product.seller != seller:
             raise AccessDenied("Access Denied")
 
+        if product.status == ProductStatus.HARD_BLOCKED:
+            raise HardBlockerProduct("Product is hard-blocked")
+
         if product.deleted:
             raise ProductAlreadyDeleted("Product already deleted")
         product.deleted = True
@@ -188,6 +191,8 @@ def delete_product(id: str, seller: Seller):
             "date": str(datetime.now()),
         }, corrected=True)
     except AccessDenied as e:
+        raise e
+    except HardBlockerProduct as e:
         raise e
     except ProductAlreadyDeleted as e:
         raise e
