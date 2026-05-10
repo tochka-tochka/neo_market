@@ -2,7 +2,7 @@ import json
 from django.template.context_processors import request
 from django.db import transaction
 from src.models.product import SKU, ReserveOperations
-from rabbitmq_prod.moder import moder_queue
+from interservice_queues.producers import services_channel_producer
 
 class NotEnoughQunatity(Exception):
     def __init__(self, message, sku_id, requested, available):
@@ -27,7 +27,7 @@ def reserve(idempotency_key, reserved_items):
                 
             if sku.active_quantity - item["quantity"] == 0:
                 print("MESSAGE SENT\n")
-                moder_queue.product_b2c_notification(data={
+                services_channel_producer.product_b2c_notification(data={
                     "sku_id": str(sku.id),
                     "event": "SKU_OUT_OF_STOCK"
                 }, corrected=False)
