@@ -18,7 +18,7 @@ from src.tests.fixtures import (
 @pytest.mark.django_db
 class TestCreateSKU(BaseTestUtil):
 
-    @pytest.mark.parametrize("initial_status", [ProductStatus.CREATED, ProductStatus.MODERATED, ProductStatus.BLOCKED])
+    @pytest.mark.parametrize("initial_status", [ProductStatus.MODERATED, ProductStatus.BLOCKED])
     def test_edit_triggers_moderation_event(self, jwt_client, test_user, product_factory, base_data, initial_status):
         product = product_factory(status=initial_status)
         url = reverse('product-detail', args=[product.id])

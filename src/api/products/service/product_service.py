@@ -131,17 +131,19 @@ def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Sel
                 ProductImage.objects.bulk_create(image_objects)
             except Exception as e:
                 raise Exception(f"failed to update product image: {e}")
-        
-        product.status = ProductStatus.ON_MODERATION
 
-        idempotency_key = str(uuid.uuid4())
-        moder_queue.product_moder_notification(data={
-            "idempotency_key": idempotency_key,
-            "product_id": str(product.id),
-            "seller_id": str(seller.id),
-            "event": "EDITED",
-            "date": str(datetime.now()),
-        }, corrected=True)
+        if product.status != ProductStatus.CREATED:
+            idempotency_key = str(uuid.uuid4())
+            moder_queue.product_moder_notification(data={
+                "idempotency_key": idempotency_key,
+                "product_id": str(product.id),
+                "seller_id": str(seller.id),
+                "event": "EDITED",
+                "date": str(datetime.now()),
+            }, corrected=True)
+
+            
+        product.status = ProductStatus.ON_MODERATION
         
         product.save()
 
