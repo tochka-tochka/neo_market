@@ -7,7 +7,7 @@ from django.core.files.uploadedfile import UploadedFile
 from src.serializes import ProductSerializer
 from django.db import transaction
 import json
-from rabbitmq_prod.moder import moder_queue
+from interservice_queues.producers import services_channel_producer
 from datetime import datetime
 
 class InvalidCategoryId(Exception):
@@ -134,7 +134,7 @@ def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Sel
 
         if product.status != ProductStatus.CREATED:
             idempotency_key = str(uuid.uuid4())
-            moder_queue.product_moder_notification(data={
+            services_channel_producer.product_moder_notification(data={
                 "idempotency_key": idempotency_key,
                 "product_id": str(product.id),
                 "seller_id": str(seller.id),
@@ -170,7 +170,7 @@ def delete_product(id: str, seller: Seller):
         product.save()
 
 
-        moder_queue.product_moder_notification(data={
+        services_channel_producer.product_moder_notification(data={
             "idempotency_key": str(uuid.uuid4()),
             "product_id": str(product.id),
             "seller_id": str(seller.id),
@@ -180,7 +180,7 @@ def delete_product(id: str, seller: Seller):
 
         product_serializer = ProductSerializer(product).data
                 
-        moder_queue.product_b2c_notification(data={
+        services_channel_producer.product_b2c_notification(data={
             "idempotency_key": str(uuid.uuid4()),
             "product_id": str(product.id),
             "sku_ids": list(map(lambda sku: sku['id'], product_serializer['skus'])),

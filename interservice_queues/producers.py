@@ -4,7 +4,7 @@ import json
 from typing import Dict, List
 import os
 
-class ModerQueue:
+class ServicesChannelProducer:
     def __init__(self):
         self.connection = None
         self.channel = None
@@ -80,4 +80,4 @@ class ModerQueue:
         except pika.exceptions.AMQPConnectionError:
             logging.debug(f"Warning: RabbitMQ connection failed, message not sent for product {id}")
         
-moder_queue = ModerQueue()
+services_channel_producer = ServicesChannelProducer()
