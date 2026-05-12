@@ -35,6 +35,7 @@ urlpatterns = [
     path('api/v1/categories/<uuid:id>', CategoryView.as_view()),
     path('api/v1/categories', CategoriesView.as_view()),
     path('api/v1/categories/<uuid:id>/filters', CategoryFilterView.as_view()),
+    path('api/v1/catalog/facets', CatalogFacets.as_view()),
 
     path('api/v1/products', ProductsView.as_view(), name='products'),
     path('api/v1/products/<uuid:id>', ProductDetailView.as_view(), name='product-detail'),

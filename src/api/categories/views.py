@@ -5,7 +5,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 
-from src.api.categories.services import get_full_category, get_category_filters
+from src.api.categories.services import get_full_category, get_category_filters,get_category_facet
 from src.api.products.service.category_service import get_categories
 
 
@@ -42,3 +42,11 @@ class CategoryFilterView(APIView):
             return JsonResponse(json_filters, status=200, safe=False)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
+
+
+class CatalogFacets(APIView):
+    def get(self, request: HttpRequest):
+        category_id = request.GET.get('category_id')
+        applied_filters = request.GET.get('filters')
+        print(applied_filters)
+        return JsonResponse(get_category_facet(uuid.UUID(category_id), applied_filters), safe=False)

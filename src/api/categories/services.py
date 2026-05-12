@@ -1,9 +1,13 @@
 import uuid
 from typing import Literal
 
+from django.db.models import Q
+
 from src.api.products.service.category_service import get_category
 from src.models import Category, Product
 from src.models.category import CategorySEOKeyword, CategoryMetaTag, CategoryFilter
+from src.models.product import ProductCharacteristics
+
 
 # TODO: lang support
 def get_full_category(_id: uuid.UUID, include_product_count: bool, lang: Literal["ru", "en"]):
@@ -68,3 +72,15 @@ def get_category_filters(category_id: uuid.UUID):
     return {
         "items": [format_category_filter(cf) for cf in filters]
     }
+
+
+def category_products_queryset(category_id: uuid.UUID, applied_filters: list[tuple[str, str]]):
+    characteristics_filter = Q()
+    for filter_name, filter_value in applied_filters:
+        characteristics_filter |= Q(characteristics__name=filter_name, characteristics__value=filter_value)
+
+    return Product.objects.filter(characteristics_filter, category_id=category_id)
+
+
+def get_category_facet(category_id: uuid.UUID, applied_filters: list[tuple[str, str]]):
+    raise NotImplementedError
