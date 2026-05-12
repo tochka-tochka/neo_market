@@ -1,7 +1,7 @@
 from django.db.models import Max, Sum, Q
 
 from src.models.product import Product, ProductStatus
-from src.serializes import PublicProductSerializer
+from src.serializers.product_serializers import PublicProductSerializer
 
 
 class WrongSortParam(Exception):

@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from src.api.skus.service.main import create_sku, update_sku, delete_sku
-from src.serializes import SKUSerializer
+from src.serializers.skus_serializers import SKUSerializer
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated

@@ -8,7 +8,7 @@ from django.db import transaction
 
 from interservice_queues.producers import services_channel_producer
 from src.models.product import SKU, Product, ProductStatus, SKUImage
-from src.serializes import SKUSerializer
+from src.serializers.skus_serializers import SKUSerializer
 
 
 class BlockedProductException(Exception):

@@ -51,7 +51,7 @@ class SKU(models.Model):
 class ProductImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    url = models.ImageField(upload_to='products/')
+    url = models.ImageField()
     order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -65,7 +65,7 @@ class ProductImage(models.Model):
 class SKUImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     sku = models.ForeignKey(SKU, db_column='sku_id', on_delete=models.CASCADE, related_name='images')
-    url = models.ImageField(upload_to='products/')
+    url = models.ImageField()
     order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 

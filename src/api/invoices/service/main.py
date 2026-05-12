@@ -1,5 +1,5 @@
 from src.models.product import Invoice, InvoiceItem, Product, SKU
-from src.serializes import InvoiceSerializer
+from src.serializers.invoice_serializers import InvoiceSerializer
 from django.db import transaction
 from datetime import datetime
 from uuid import UUID

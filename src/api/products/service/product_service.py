@@ -1,10 +1,11 @@
+from django.template.context_processors import request
 from typing import Dict, List, Any
 import uuid
 from src.models.product import Product, ProductStatus, ProductImage
 from src.models import Category
 from src.models.user import Seller
 from django.core.files.uploadedfile import UploadedFile
-from src.serializes import ProductSerializer
+from src.serializers.product_serializers import ProductSerializer
 from django.db import transaction
 import json
 from interservice_queues.producers import services_channel_producer
@@ -43,7 +44,7 @@ def get_product(id: str, seller: Seller):
         raise Exception(f"failed to get product: {e}")
 
 @transaction.atomic
-def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Seller):
+def create_product(data: Dict[str, Any], seller: Seller):
     product_id = uuid.uuid4()
 
     chars = data.get("characteristics", {})
@@ -70,14 +71,16 @@ def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Sel
             characteristics=chars,
             seller=seller
         )
+
+        images = data.get("images")
         
         if images:
             image_objects = []
-            for index, file in enumerate(images):
+            for index, image in enumerate(images):
                 image_objects.append(ProductImage(
                     product=product,
-                    url=file,
-                    order=index
+                    url=image["url"],
+                    order=image["ordering"]
                 ))
             
             ProductImage.objects.bulk_create(image_objects)

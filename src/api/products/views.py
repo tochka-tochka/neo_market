@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import FormParser, MultiPartParser
+from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated, OR
 from rest_framework.views import APIView
 from rest_framework.request import Request
@@ -21,7 +21,7 @@ from src.api.products.service.public_product_service import (
 
 from src.models.product import Product
 from src.permissions import IsService
-from src.serializes import ProductSerializer
+from src.serializers.product_serializers import ProductSerializer
 
 from .service.product_service import (
     AccessDenied,
@@ -38,7 +38,7 @@ from .service.public_product_service import (
 @method_decorator(csrf_exempt, name="dispatch")
 class ProductDetailView(APIView):
     permission_classes = [IsAuthenticated | IsService]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [JSONParser]
 
     def get_permissions(self):
             if self.request.method == "GET":
@@ -108,6 +108,7 @@ class ProductDetailView(APIView):
 @method_decorator(csrf_exempt, name="dispatch")
 class ProductsView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [JSONParser]
 
     def get_permissions(self):
         if self.request.method == "GET":
@@ -152,8 +153,10 @@ class ProductsView(APIView):
             return JsonResponse({"errors": "category required"}, status=400)
 
         characteristics = request.data.get("characteristics")
+        if len(characteristics) == 0:
+            return JsonResponse({"errors": "images required"}, status=400)
 
-        images = request.FILES.getlist("images")
+        images = request.data.get("images")
         if len(images) == 0:
             return JsonResponse({"errors": "images required"}, status=400)
 
@@ -164,6 +167,7 @@ class ProductsView(APIView):
             "description": description,
             "category": category,
             "characteristics": characteristics,
+            "images": images
         }
 
         serializer = ProductSerializer(data=data)
@@ -171,7 +175,7 @@ class ProductsView(APIView):
             return JsonResponse({"errors": serializer.errors}, status=400)
 
         try:
-            product = create_product(data, images, request.user)
+            product = create_product(data, request.user)
         except InvalidCategoryId:
             return JsonResponse({"message": "category doesnt exists"}, status=400)
         except Exception as e:
