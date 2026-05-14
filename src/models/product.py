@@ -163,6 +163,13 @@ class ReserveOperations(models.Model):
     class Meta:
         db_table = "reserve_operations"
 
+class FullifiedOrders(models.Model):
+    order_id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "fullified_orders"
+
 
 class ModerationDecisions(models.Model):
     idempotency_key = models.UUIDField(primary_key=True, default=uuid4, editable=False)

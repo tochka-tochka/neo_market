@@ -21,7 +21,7 @@ from src.api.categories.views import CategoriesView, CategoryView, CategoryFilte
 from src.api.skus.views import SkusView
 from src.api.invoices.views import InvoicesView
 from src.api.auth.views import RegisterView
-from src.api.reserve.views import ReserveView, UnreserveView
+from src.api.reserve.views import ReserveView, UnreserveView, FullifyView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
@@ -44,6 +44,7 @@ urlpatterns = [
 
     path('api/v1/reserve', ReserveView.as_view(), name="reserve"),
     path('api/v1/unreserve', UnreserveView.as_view(), name="unreserve"),
+    path('api/v1/fullify', FullifyView.as_view(), name="fullify"),
 
     path('api/v1/invoices', InvoicesView.as_view(), name="invoices"),
     path('api/v1/invoices/<uuid:id>', InvoicesView.as_view()),
