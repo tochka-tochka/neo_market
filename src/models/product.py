@@ -123,9 +123,19 @@ class ProductFieldReport(models.Model):
     comment = models.CharField(max_length=255)
 
 
+class InvoiceStatus(models.TextChoices):
+    PENDING = "PENDING"
+    ACCEPTED = "ACCEPTED"
+    PARTIALLY_ACCEPTED = "PARTIALLY_ACCEPTED"
+    REJECTED = "REJECTED"
+
+
 class Invoice(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    date = models.DateField(auto_now_add=True)
+    status = models.TextField(
+        choices=InvoiceStatus.choices, default=InvoiceStatus.PENDING
+    )
+    created_at = models.DateField(auto_now_add=True)
     seller = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="invoices"
     )
@@ -136,9 +146,9 @@ class Invoice(models.Model):
 
 class InvoiceItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     sku = models.ForeignKey(SKU, on_delete=models.CASCADE)
     quantity = models.IntegerField(validators=[MinValueValidator(0)])
+    accepted_quantity = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0)])
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="items")
 
     class Meta:

@@ -65,7 +65,7 @@ class ProductDetailView(APIView):
         category = request.data.get("category")
         characteristics = request.data.get("characteristics")
 
-        images = request.FILES.getlist("images")
+        images = request.get=("images")
         if len(images) == 0:
             return JsonResponse({"errors": "images required"}, status=400)
 
@@ -75,6 +75,7 @@ class ProductDetailView(APIView):
             "description": description,
             "category": category,
             "characteristics": characteristics,
+            "images": images
         }
 
         serializer = ProductSerializer(data=data)
@@ -82,7 +83,7 @@ class ProductDetailView(APIView):
             return JsonResponse({"errors": serializer.errors}, status=400)
 
         try:
-            updated_product = update_product(data, images, request.user)
+            updated_product = update_product(data, request.user)
         except AccessDenied as e:
             return JsonResponse({"message": str(e)}, status=403)
         except HardBlockerProduct as e:

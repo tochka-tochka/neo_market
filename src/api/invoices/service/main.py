@@ -1,8 +1,19 @@
-from src.models.product import Invoice, InvoiceItem, Product, SKU
-from src.serializers.invoice_serializers import InvoiceSerializer
-from django.db import transaction
 from datetime import datetime
 from uuid import UUID
+
+from django.db import transaction
+
+from src.models.product import SKU, Invoice, InvoiceItem, Product, ProductStatus
+from src.serializers.invoice_serializers import InvoiceSerializer
+
+
+class ProductNotModerated(Exception):
+    pass
+
+
+class AccessDenied(Exception):
+    pass
+
 
 @transaction.atomic
 def get_all_invoices(seller):
@@ -12,32 +23,39 @@ def get_all_invoices(seller):
         return serializer.data
     except Exception as e:
         raise Exception(f"failed to get invoices: {e}")
-    
+
+
 @transaction.atomic
 def create_invoice(data, seller):
     try:
-        invoice = Invoice.objects.create(
-            date=datetime.now(),
-            seller=seller
-        )
-        for item in data['items']:
-            product = Product.objects.get(id=item['product_id'])
-            sku = SKU.objects.get(id=item['sku_id'])
-            if sku.product != product:
-                raise Exception("failed to create invoice: product's sku doesn't exist")
+        invoice = Invoice.objects.create(created_at=datetime.now(), seller=seller)
+        for item in data["items"]:
+            sku = SKU.objects.get(id=item["sku_id"])
+            product = Product.objects.get(id=sku.product.id)
+            if product.status != ProductStatus.MODERATED:
+                raise ProductNotModerated(
+                    "Invoice can only be created for MODERATED products"
+                )
+
+            if product.seller != seller:
+                raise AccessDenied(
+                    "One or more SKUs do not belong to the authenticated seller"
+                )
 
             invoice_item = InvoiceItem(
-                product=product,
-                sku=sku,
-                quantity=item['quantity'],
-                invoice=invoice
+                sku=sku, quantity=item["quantity"], invoice=invoice
             )
             invoice_item.full_clean()
             invoice_item.save()
-        return invoice.id
+        return InvoiceSerializer(invoice).data
+    except AccessDenied as e:
+        raise e
+    except ProductNotModerated as e:
+        raise e
     except Exception as e:
         raise Exception(f"failed to create invoice: {e}")
-    
+
+
 @transaction.atomic
 def delete_invoice(id, seller):
     try:
@@ -47,22 +65,37 @@ def delete_invoice(id, seller):
         invoice.delete()
     except Exception as e:
         raise Exception(f"failed to delete invoice: {e}")
-    
+
+
 @transaction.atomic
-def accept_invoice(id, seller):
+def accept_invoice(id, items):
     try:
         invoice = Invoice.objects.get(id=id)
-        if invoice.seller != seller:
-            raise Exception("access denied")
-        
-        for item in invoice.items.all():
+
+        status = "ACCEPTED"
+        count_accepted = 0
+
+        for item in items:
+            if item.accepted_quantity > 0:
+                count_accepted += item.accepted_quantity
+
+            if item.quantity > item.accepted_quantity:
+                status = "PARTIALLY_ACCEPTED"
+            elif item.quantity < item.accepted_quantity:
+                raise Exception(
+                    "accepted quantity can't be greater than actual quantity"
+                )
+
             sku = item.sku
-            sku.active_quantity -= item.quantity
-            if sku.active_quantity < 0:
-                raise Exception("failed to accept invoice: invoice quantity greater than actual")
+            sku.active_quantity += item.accepted_quantity
             sku.save()
 
-        invoice.delete()
-            
+        if count_accepted == 0:
+            status = "REJECTED"
+
+        invoice.status = status
+        invoice.save()
+
+        return invoice
     except Exception as e:
         raise Exception(f"failed to accept invoice: {e}")
