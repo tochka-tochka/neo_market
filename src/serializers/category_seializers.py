@@ -8,14 +8,6 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = [
             "id",
-            "value",
-            "slug",
-            "description",
-            "image_url",
+            "name",
             "parent_id",
-            "seo_title",
-            "seo_description",
-            "is_active",
-            "created_at",
-            "updated_at",
         ]

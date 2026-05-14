@@ -5,7 +5,7 @@ from src.models.product import Product, ProductStatus, ProductImage
 from src.models import Category
 from src.models.user import Seller
 from django.core.files.uploadedfile import UploadedFile
-from src.serializers.product_serializers import ProductSerializer
+from src.serializers.product_serializers import ProductSerializer, CreateProductSerializer
 from django.db import transaction
 import json
 from interservice_queues.producers import services_channel_producer
@@ -80,7 +80,7 @@ def create_product(data: Dict[str, Any], seller: Seller):
                 image_objects.append(ProductImage(
                     product=product,
                     url=image["url"],
-                    order=image["ordering"]
+                    ordering=image["ordering"]
                 ))
             
             ProductImage.objects.bulk_create(image_objects)
@@ -88,7 +88,7 @@ def create_product(data: Dict[str, Any], seller: Seller):
     except Exception as e:
         raise Exception(f"failed to create product: {e}")
         
-    return ProductSerializer(product).data
+    return CreateProductSerializer(product).data
 
 @transaction.atomic
 def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Seller):

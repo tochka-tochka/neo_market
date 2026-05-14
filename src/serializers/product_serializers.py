@@ -13,7 +13,7 @@ from src.serializers.category_seializers import CategorySerializer
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
-        fields = ["id", "product", "url", "order", "created_at"]
+        fields = ["url", "ordering"]
 
 class ProductFieldReportSerializer(serializers.ModelSerializer):
     class Meta:
@@ -71,5 +71,28 @@ class PublicProductSerializer(serializers.ModelSerializer):
             "images",
             "characteristics",
             "category",
+            "skus",
+        ]
+
+class CreateProductSerializer(serializers.ModelSerializer):
+    category = CategorySerializer(read_only=True)
+    seller_id = serializers.UUIDField(source="seller.id", read_only=True)
+    images = ProductImageSerializer(many=True, read_only=True)
+    skus = PublicSKUSerializer(many=True, read_only=True)
+    characteristics = serializers.JSONField(required=False, allow_null=True)
+
+    class Meta:
+        model = Product
+        fields = [
+            "id",
+            "seller_id",
+            "category",
+            "title",
+            "description",
+            "status",
+            "deleted",
+            "blocked",
+            "images",
+            "characteristics",
             "skus",
         ]

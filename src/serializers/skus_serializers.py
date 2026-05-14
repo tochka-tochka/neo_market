@@ -11,7 +11,7 @@ from src.models.product import (
 class SKUImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = SKUImage
-        fields = ["id", "sku", "url", "order", "created_at"]
+        fields = ["id", "sku", "url", "ordering", "created_at"]
 
 class ProductIdSerializer(serializers.ModelSerializer):
     class Meta:
