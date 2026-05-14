@@ -91,7 +91,7 @@ def create_product(data: Dict[str, Any], seller: Seller):
     return CreateProductSerializer(product).data
 
 @transaction.atomic
-def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Seller):
+def update_product(data: Dict[str, str], seller: Seller):
     try:
         product = Product.objects.get(id=data.get("id"))
 
@@ -120,6 +120,7 @@ def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Sel
                 chars = json.loads(chars)
             product.characteristics = chars
 
+        images = data.get("images")
         if images is not None:
             try:
                 ProductImage.objects.filter(product=product).delete()
@@ -128,7 +129,7 @@ def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Sel
                     image_objects.append(ProductImage(
                         product=product,
                         url=file,
-                        order=index
+                        ordering=index
                     ))
                 
                 ProductImage.objects.bulk_create(image_objects)

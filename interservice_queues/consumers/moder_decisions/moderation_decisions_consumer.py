@@ -22,7 +22,7 @@ from src.models.product import (
     ProductFieldReport,
     ProductStatus,
 )
-from src.serializes import ProductSerializer
+from src.serializers.product_serializers import ProductSerializer
 
 
 class WrongMessageFormat(Exception):

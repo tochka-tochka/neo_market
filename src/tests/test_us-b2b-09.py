@@ -6,7 +6,7 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 from django import db
-from src.serializes import ProductSerializer
+from src.serializers.product_serializers import ProductSerializer
 
 from interservice_queues.consumers.moder_decisions.moderation_decisions_consumer import (
     ModerationConsumer,
@@ -117,7 +117,7 @@ class TestModerDecisionApply(BaseTestUtil):
 
     def test_edit_hard_blocked_returns_403(self, jwt_client, product_factory, base_data):
         product = product_factory(status=ProductStatus.HARD_BLOCKED)
-        response = jwt_client.patch(reverse('product-detail', args=[product.id]), base_data, format='multipart')
+        response = jwt_client.patch(reverse('product-detail', args=[product.id]), base_data, format='json')
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
         response = jwt_client.delete(reverse('product-detail', args=[product.id]))

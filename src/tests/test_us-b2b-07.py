@@ -114,7 +114,7 @@ class TestCatalogProducts(BaseTestUtil):
         cat_b_id = uuid.uuid4()
         cat_b = Category.objects.create(
             id=cat_b_id, 
-            value="Another Category", 
+            name="Another Category", 
             slug="another_category"
         )
         
@@ -131,7 +131,7 @@ class TestCatalogProducts(BaseTestUtil):
 
         response = service_client.get(f"{url}?category={str(cat_b_id)}")
         
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status.HTTP_200_OK, response.json()
         items = response.json().get("items")
         item_ids = [item["id"] for item in items]
         
