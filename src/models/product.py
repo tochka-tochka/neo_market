@@ -1,3 +1,4 @@
+from src.models.user import Seller
 from datetime import datetime
 from uuid import uuid4
 
@@ -167,9 +168,18 @@ class Invoice(models.Model):
     status = models.TextField(
         choices=InvoiceStatus.choices, default=InvoiceStatus.PENDING
     )
-    created_at = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    accepted_at = models.DateTimeField(null=True, blank=True)
+    accepted_by = models.ForeignKey(
+        Seller,
+        on_delete=models.DO_NOTHING,
+        related_name="accepted_invoices",
+        null=True,
+        blank=True,
+    )
     seller = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="invoices"
+        settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name="invoices"
     )
 
     class Meta:

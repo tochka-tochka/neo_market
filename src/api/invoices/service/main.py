@@ -68,7 +68,7 @@ def delete_invoice(id, seller):
 
 
 @transaction.atomic
-def accept_invoice(id, items):
+def accept_invoice(id, items, operator):
     try:
         invoice = Invoice.objects.get(id=id)
 
@@ -93,7 +93,9 @@ def accept_invoice(id, items):
         if count_accepted == 0:
             status = "REJECTED"
 
+        invoice.accepted_at = datetime.now()
         invoice.status = status
+        invoice.accepted_by = operator
         invoice.save()
 
         return invoice
