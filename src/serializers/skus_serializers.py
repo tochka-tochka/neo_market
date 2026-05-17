@@ -11,7 +11,7 @@ from src.models.product import (
 class SKUImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = SKUImage
-        fields = ["id", "sku", "url", "ordering", "created_at"]
+        fields = ["id", "url", "ordering"]
 
 class ProductIdSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,7 +22,6 @@ class ProductIdSerializer(serializers.ModelSerializer):
 class SKUSerializer(serializers.ModelSerializer):
     product_id = serializers.UUIDField(source="product.id", read_only=True)
     price = serializers.IntegerField(validators=[MinValueValidator(0)])
-    active_quantity = serializers.IntegerField(validators=[MinValueValidator(0)])
     images = SKUImageSerializer(many=True, read_only=True)
     characteristics = serializers.JSONField(
         required=False, allow_null=True, validators=[validate_characteristics]
@@ -37,9 +36,14 @@ class SKUSerializer(serializers.ModelSerializer):
             "price",
             "cost_price",
             "discount",
+            "stock_quantity",
             "active_quantity",
+            "reserved_quantity",
+            "article",
             "images",
             "characteristics",
+            "created_at",
+            "updated_at"
         ]
 
 class PublicSKUSerializer(serializers.ModelSerializer):

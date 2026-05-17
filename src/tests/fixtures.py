@@ -75,7 +75,7 @@ def sku_payload(test_category, dummy_image):
         "name": "test sku",
         "price": 10000000,
         "cost_price": 9000000,
-        "active_quantity": 10,
+        "article": "test",
         "images": [
             {"url": "/some_bucket/test1.jpg", "ordering": 0},
             {"url": "/some_bucket/test1.jpg", "ordering": 1},

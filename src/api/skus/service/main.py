@@ -14,8 +14,10 @@ from src.serializers.skus_serializers import SKUSerializer
 class BlockedProductException(Exception):
     pass
 
+
 class AccessDenied(Exception):
     pass
+
 
 @transaction.atomic
 def create_sku(data: Dict[str, Any], seller):
@@ -55,8 +57,8 @@ def create_sku(data: Dict[str, Any], seller):
             name=data["name"],
             price=data["price"],
             cost_price=data["cost_price"],
+            article=data["article"],
             discount=data["discount"],
-            active_quantity=data["active_quantity"],
             characteristics=chars,
             product=product,
         )
@@ -65,7 +67,9 @@ def create_sku(data: Dict[str, Any], seller):
 
         if images:
             for index, image in enumerate(images):
-                SKUImage.objects.create(sku=sku, url=image["url"], ordering=image["ordering"])
+                SKUImage.objects.create(
+                    sku=sku, url=image["url"], ordering=image["ordering"]
+                )
     except AccessDenied as e:
         raise e
     except BlockedProductException as e:
