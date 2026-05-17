@@ -101,11 +101,10 @@ class ProductSerializer(serializers.ModelSerializer):
     category_id = serializers.UUIDField(source="category.id", read_only=True)
     seller_id = serializers.UUIDField(source="seller.id", read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
-    skus = PublicSKUSerializer(many=True, read_only=True)
+    skus = SKUSerializer(many=True, read_only=True)
     characteristics = serializers.JSONField(required=False, allow_null=True)
-    blocking_reason_id = serializers.UUIDField(
-        source="blocking_reason.id", read_only=True
-    )
+    blocking_reason_id = serializers.SerializerMethodField()
+    field_reports = ProductFieldReportSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
@@ -119,6 +118,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "status",
             "deleted",
             "blocking_reason_id",
+            "field_reports",
             "moderator_comment",
             "blocked",
             "images",
@@ -127,3 +127,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def get_blocking_reason_id(self, obj):
+        # If blocking_reason exists, return its ID; otherwise, return None.
+        return obj.blocking_reason.id if obj.blocking_reason else None
