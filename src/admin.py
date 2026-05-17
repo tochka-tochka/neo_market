@@ -22,7 +22,8 @@ class InvoiceAdmin(admin.ModelAdmin):
                 
                 accept_invoice(
                     id=obj.id,
-                    items=items_data
+                    items=items_data,
+                    operator=request.user
                 )
                 
                 self.message_user(request, "Накладная успешно обработана!")

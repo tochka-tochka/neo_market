@@ -129,5 +129,4 @@ class ProductSerializer(serializers.ModelSerializer):
         ]
 
     def get_blocking_reason_id(self, obj):
-        # If blocking_reason exists, return its ID; otherwise, return None.
         return obj.blocking_reason.id if obj.blocking_reason else None
