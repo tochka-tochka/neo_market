@@ -11,7 +11,8 @@ class BlockingReasonSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlockingReason
         fields = ["id", "reason"]
-        
+
+
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
@@ -76,9 +77,39 @@ class ProductListSerializer(serializers.ModelSerializer):
         return sum(list(map(lambda sku: sku.active_quantity, obj.skus)))
 
 
+class PublicCatalogProductSerializer(serializers.ModelSerializer):
+    category_id = serializers.UUIDField(source="category.id", read_only=True)
+    min_price = serializers.SerializerMethodField()
+    cover_image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = [
+            "id",
+            "title",
+            "slug",
+            "status",
+            "category_id",
+            "min_price",
+            "cover_image",
+            "created_at",
+        ]
+
+    def get_min_price(self, obj):
+        if obj.skus.exists():
+            prices = [sku.price for sku in obj.skus.all()]
+            return min(prices)
+        return 0
+
+    def get_cover_image(self, obj):
+        first_image = obj.images.first()
+        if first_image:
+            return ProductImageSerializer(first_image).data['url']
+        return None
+
+
 class PublicProductSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True)
-    seller = SellerListSerializer(read_only=True)
+    category_id = serializers.UUIDField(source="category.id", read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
     skus = PublicSKUSerializer(many=True, read_only=True)
     characteristics = serializers.JSONField(required=False, allow_null=True)
@@ -89,10 +120,10 @@ class PublicProductSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "description",
-            "seller",
+            "status",
             "images",
             "characteristics",
-            "category",
+            "category_id",
             "skus",
         ]
 
