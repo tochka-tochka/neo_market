@@ -21,6 +21,7 @@ from src.models.product import (
     Product,
     ProductFieldReport,
     ProductStatus,
+    BlockingReason
 )
 from src.serializers.product_serializers import ProductSerializer
 
@@ -79,13 +80,14 @@ class ModerationConsumer:
                     ProductFieldReport.objects.filter(product=product).delete()
                 case "BLOCKED":
                     product = Product.objects.filter(id=data["product_id"]).first()
+                    blocking_reason = BlockingReason.objects.get(id=data["blocking_reason_id"])
 
                     if product is None:
                         raise ProductNotFound(
                             "product doesn't exists", data["product_id"]
                         )
 
-                    product.blocking_reason = data["blocking_reason"]
+                    product.blocking_reason = blocking_reason
 
                     for report in data["field_reports"]:
                         ProductFieldReport.objects.create(
