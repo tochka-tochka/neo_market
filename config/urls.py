@@ -42,9 +42,9 @@ urlpatterns = [
     path('api/v1/skus', SkusView.as_view(), name="skus"),
     path('api/v1/skus/<uuid:id>', SkusView.as_view(), name='specific-sku'),
 
-    path('api/v1/reserve', ReserveView.as_view(), name="reserve"),
-    path('api/v1/unreserve', UnreserveView.as_view(), name="unreserve"),
-    path('api/v1/fullify', FullifyView.as_view(), name="fullify"),
+    path('api/v1/inventory/reserve', ReserveView.as_view(), name="reserve"),
+    path('api/v1/inventory/unreserve', UnreserveView.as_view(), name="unreserve"),
+    path('api/v1/inventory/fullify', FullifyView.as_view(), name="fullify"),
 
     path('api/v1/invoices', InvoicesView.as_view(), name="invoices"),
     path('api/v1/invoices/<uuid:id>', InvoicesView.as_view()),

@@ -1,3 +1,4 @@
+from datetime import datetime
 import json
 
 from django.db import transaction
@@ -21,7 +22,6 @@ def reserve(idempotency_key, reserved_items):
     if reserve is not None:
         return reserve.result
     try:
-        result = []
         for item in reserved_items:
             sku = SKU.objects.get(id=item["sku_id"])
 
@@ -42,14 +42,12 @@ def reserve(idempotency_key, reserved_items):
 
             sku.active_quantity -= item["quantity"]
             sku.reserved_quantity += item["quantity"]
-            result.append(
-                {
-                    "sku_id": str(sku.id),
-                    "reserved_quantity": sku.reserved_quantity + item["quantity"],
-                    "remaning_stock": sku.active_quantity - item["quantity"],
-                }
-            )
             sku.save()
+        result = {
+            "order_id": idempotency_key,
+            "status": "RESERVED",
+            "reserved_at": datetime.now()
+        }
         ReserveOperations.objects.create(
             idempotency_key=idempotency_key, result=json.dumps(result)
         )
@@ -68,6 +66,11 @@ def unreserve(reserved_items):
             sku.active_quantity += item["quantity"]
             sku.reserved_quantity -= item["quantity"]
             sku.save()
+        result = {
+            "order_id": idempotency_key,
+            "status": "RESERVED",
+            "reserved_at": datetime.now()
+        }
     except Exception as e:
         raise Exception(f"failed to reserve sku: {e}")
 
