@@ -9,7 +9,7 @@ from src.models.product import (
     Product,
     ProductFieldReport,
     ProductImage,
-    SKUImage,
+    SKUImage, ProductCharacteristics, SkuCharacteristics,
 )
 from src.models.user import Seller
 from src.validators.main import validate_characteristics
@@ -50,15 +50,23 @@ class ProductIdSerializer(serializers.ModelSerializer):
         model = Product
         fields = ["id"]
 
+class ProductCharacteristicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductCharacteristics
+        fields = ["id", "product_id", "name", "value"]
+
+
+class SkuCharacteristicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SkuCharacteristics
+        fields = ["id", "sku_id", "name", "value"]
 
 class SKUSerializer(serializers.ModelSerializer):
     product_id = serializers.UUIDField(source="product.id", read_only=True)
     price = serializers.IntegerField(validators=[MinValueValidator(0)])
     active_quantity = serializers.IntegerField(validators=[MinValueValidator(0)])
     images = SKUImageSerializer(many=True, read_only=True)
-    characteristics = serializers.JSONField(
-        required=False, allow_null=True, validators=[validate_characteristics]
-    )
+    characteristics = SkuCharacteristicSerializer(many=True)
 
     class Meta:
         model = SKU
@@ -79,9 +87,7 @@ class PublicSKUSerializer(serializers.ModelSerializer):
     price = serializers.IntegerField(validators=[MinValueValidator(0)])
     active_quantity = serializers.IntegerField(validators=[MinValueValidator(0)])
     images = SKUImageSerializer(many=True, read_only=True)
-    characteristics = serializers.JSONField(
-        required=False, allow_null=True, validators=[validate_characteristics]
-    )
+    characteristics = SkuCharacteristicSerializer(many=True)
 
     class Meta:
         model = SKU
@@ -113,9 +119,7 @@ class ProductSerializer(serializers.ModelSerializer):
     seller = SellerListSerializer(read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
     skus = SKUSerializer(many=True, read_only=True)
-    characteristics = serializers.JSONField(
-        required=False, allow_null=True, validators=[validate_characteristics]
-    )
+    characteristics = ProductCharacteristicSerializer(many=True)
     field_reports = ProductFieldReportSerializer(many=True, read_only=True)
 
     class Meta:

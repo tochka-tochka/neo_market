@@ -20,7 +20,6 @@ class Product(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.DO_NOTHING, null=True, blank=True)
-    characteristics = models.JSONField(default=None, null=True, blank=True, validators=[validate_characteristics])
     status = models.CharField(
         max_length=20,
         choices=ProductStatus.choices,
@@ -33,7 +32,18 @@ class Product(models.Model):
 
     class Meta:
         db_table = 'products'
-    
+
+
+class ProductCharacteristics(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    value = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'product_characteristics'
+
+
 class SKU(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, name="product", related_name='skus')
@@ -41,12 +51,22 @@ class SKU(models.Model):
     price = models.IntegerField(validators=[MinValueValidator(0)])
     cost_price = models.IntegerField(validators=[MinValueValidator(0)])
     discount = models.IntegerField(default=0, null=True, blank=True, validators=[MinValueValidator(0)])
-    characteristics = models.JSONField(default=None, null=True, blank=True, validators=[validate_characteristics])
     active_quantity = models.IntegerField(validators=[MinValueValidator(0)])
     reserved_quantity = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
     class Meta:
         db_table = 'skus'
+
+
+class SkuCharacteristics(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    sku_id = models.ForeignKey(SKU, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    value = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'sku_characteristics'
+
 
 class ProductImage(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
