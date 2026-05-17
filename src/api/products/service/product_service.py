@@ -244,6 +244,8 @@ def delete_product(id: str, seller: Seller):
             },
             corrected=True,
         )
+    except Product.DoesNotExist as e:
+        raise e
     except AccessDenied as e:
         raise e
     except HardBlockerProduct as e:

@@ -91,6 +91,8 @@ class ProductDetailView(APIView):
     def delete(self, request, id: str):
         try:
             delete_product(id, request.user)
+        except Product.DoesNotExist:
+            return JsonResponse({"message": "product not found"}, status=404)
         except ProductAlreadyDeleted as e:
             return JsonResponse({"message": str(e)}, status=400)
         except HardBlockerProduct as e:
