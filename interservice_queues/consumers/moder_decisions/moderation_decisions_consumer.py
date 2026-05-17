@@ -2,14 +2,13 @@ import uuid
 import json
 import logging
 import os
-import time
 from datetime import datetime
 
+from config.settings import RABBITMQ_HOST
 from interservice_queues.producers import services_channel_producer
 
 import django
 import pika
-from django import db
 from django.db import transaction
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
@@ -43,7 +42,7 @@ class ModerationConsumer:
 
     def _connect(self):
         self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host="localhost", port=5672)
+            pika.ConnectionParameters(host=RABBITMQ_HOST, port=5672)
         )
         self.channel = self.connection.channel()
         self.channel.queue_declare(

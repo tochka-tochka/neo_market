@@ -140,6 +140,7 @@ AWS_S3_CUSTOM_DOMAIN = 'localhost:9000/media'
 AWS_S3_USE_SSL = False  # Важно для локальной разработки              
 AWS_S3_VERIFY = False
 AWS_QUERYSTRING_AUTH = False
+RABBITMQ_HOST = "mq"
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 

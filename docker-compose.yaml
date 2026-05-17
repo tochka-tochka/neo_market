@@ -89,7 +89,8 @@ services:
       - NODE_ENV=production
       - HOST=0.0.0.0
       - PUBLIC_DJANGO_URL=http://localhost:8010/api/v1
-
+  mq:
+    image: rabbitmq:4.3.0-alpine
 volumes:
   postgres_data:
   minio_data:

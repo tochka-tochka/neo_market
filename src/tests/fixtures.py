@@ -2,6 +2,8 @@ import pytest
 import json
 from io import BytesIO
 from PIL import Image
+
+from config.settings import RABBITMQ_HOST
 from src.models.product import Category, Product, ProductStatus, SKU, ProductFieldReport
 import pika
 import time
@@ -73,7 +75,7 @@ def product_with_skus(product_factory):
 class BaseTestUtil:
     
     def get_rabbitmq_message(self, queue_name, timeout=5):
-        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost', 5672))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST, 5672))
         channel = connection.channel()
         channel.queue_declare(queue=queue_name, durable=True, arguments={'x-queue-type': 'quorum'})
         
@@ -96,7 +98,7 @@ class BaseTestUtil:
             Используется для имитации ответа от сервиса модерации в тестах.
             """
             connection = pika.BlockingConnection(
-                pika.ConnectionParameters('localhost', 5672)
+                pika.ConnectionParameters(RABBITMQ_HOST, 5672)
             )
             try:
                 channel = connection.channel()

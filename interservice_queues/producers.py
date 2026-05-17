@@ -4,6 +4,9 @@ import json
 from typing import Dict, List
 import os
 
+from config.settings import RABBITMQ_HOST
+
+
 class ServicesChannelProducer:
     def __init__(self):
         self.connection = None
@@ -14,7 +17,7 @@ class ServicesChannelProducer:
 
     def _connect(self):
         self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters('localhost', 5672)
+            pika.ConnectionParameters(RABBITMQ_HOST, 5672)
         )
         self.channel = self.connection.channel()
         self.channel.queue_declare(

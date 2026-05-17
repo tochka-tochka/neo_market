@@ -6,6 +6,8 @@ from io import BytesIO
 from PIL import Image
 from django.urls import reverse
 from rest_framework import status
+
+from config.settings import RABBITMQ_HOST
 from src.models.product import Category, Product, ProductStatus, SKU
 from src.models.user import Seller
 
@@ -66,7 +68,7 @@ class TestProductAPI:
     
     def get_rabbitmq_message(self, queue_name, timeout=5):
         """Утилитный метод для получения сообщения"""
-        connection = pika.BlockingConnection(pika.ConnectionParameters('localhost', 5672))
+        connection = pika.BlockingConnection(pika.ConnectionParameters(RABBITMQ_HOST, 5672))
         channel = connection.channel()
         channel.queue_declare(queue=queue_name, durable=True, arguments={'x-queue-type': 'quorum'})
         
