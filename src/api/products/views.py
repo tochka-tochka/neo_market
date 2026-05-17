@@ -60,9 +60,9 @@ class ProductDetailView(APIView):
         category = request.data.get("category")
         characteristics = request.data.get("characteristics")
 
-        images = request.get = "images"
+        images = request.data.get("images")
         if len(images) == 0:
-            return JsonResponse({"errors": "images required"}, status=400)
+            return JsonResponse({"errors": "images required"}, status=422)
 
         data = {
             "id": id,
@@ -75,7 +75,7 @@ class ProductDetailView(APIView):
 
         serializer = ProductSerializer(data=data)
         if not serializer.is_valid():
-            return JsonResponse({"errors": serializer.errors}, status=400)
+            return JsonResponse({"errors": serializer.errors}, status=422)
 
         try:
             updated_product = update_product(data, request.user)

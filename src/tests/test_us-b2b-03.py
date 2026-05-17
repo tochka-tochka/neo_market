@@ -73,12 +73,15 @@ class TestCreateSKU(BaseTestUtil):
 
         url = reverse("specific-sku", args=[sku.id])
         sku_payload["product_id"] = product.id
+        sku_payload["discount"] = 2000000
 
         response = jwt_client.patch(url, sku_payload, format="json")
 
         product.refresh_from_db()
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status.HTTP_200_OK, response.json()
         assert product.status == ProductStatus.ON_MODERATION
+        assert response.json()["cost_price"] == sku_payload["cost_price"]
+        assert response.json()["discount"] == sku_payload["discount"]
 
     def test_reserves_preserved_after_sku_edit(
         self, jwt_client, test_user, test_category, sku_payload
@@ -93,7 +96,8 @@ class TestCreateSKU(BaseTestUtil):
             name="Old",
             price=10,
             cost_price=5,
-            active_quantity=1,
+            active_quantity=5,
+            article="Old",
             reserved_quantity=999,
             product=product,
         )

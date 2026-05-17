@@ -29,4 +29,4 @@ class TestCreateProduct(BaseTestUtil):
     def test_missing_fields_returns_400(self, jwt_client, base_data, field_to_remove):
         del base_data[field_to_remove]
         response = jwt_client.post(reverse("products"), base_data, format="json")
-        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY

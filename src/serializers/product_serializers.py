@@ -30,31 +30,31 @@ class SellerListSerializer(serializers.ModelSerializer):
         fields = ["id", "username"]
 
 
-class ProductSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True)
-    seller = SellerListSerializer(read_only=True)
-    images = ProductImageSerializer(many=True, read_only=True)
-    skus = SKUSerializer(many=True, read_only=True)
-    characteristics = serializers.JSONField(
-        required=False, allow_null=True, validators=[validate_characteristics]
-    )
-    field_reports = ProductFieldReportSerializer(many=True, read_only=True)
+# class ProductSerializer(serializers.ModelSerializer):
+#     category = CategorySerializer(read_only=True)
+#     seller = SellerListSerializer(read_only=True)
+#     images = ProductImageSerializer(many=True, read_only=True)
+#     skus = SKUSerializer(many=True, read_only=True)
+#     characteristics = serializers.JSONField(
+#         required=False, allow_null=True, validators=[validate_characteristics]
+#     )
+#     field_reports = ProductFieldReportSerializer(many=True, read_only=True)
 
-    class Meta:
-        model = Product
-        fields = [
-            "id",
-            "title",
-            "description",
-            "status",
-            "blocking_reason",
-            "field_reports",
-            "seller",
-            "images",
-            "characteristics",
-            "category",
-            "skus",
-        ]
+#     class Meta:
+#         model = Product
+#         fields = [
+#             "id",
+#             "title",
+#             "description",
+#             "status",
+#             "blocking_reason",
+#             "field_reports",
+#             "seller",
+#             "images",
+#             "characteristics",
+#             "category",
+#             "skus",
+#         ]
 
 
 class ProductListSerializer(serializers.ModelSerializer):
@@ -97,7 +97,7 @@ class PublicProductSerializer(serializers.ModelSerializer):
         ]
 
 
-class CreateProductSerializer(serializers.ModelSerializer):
+class ProductSerializer(serializers.ModelSerializer):
     category_id = serializers.UUIDField(source="category.id", read_only=True)
     seller_id = serializers.UUIDField(source="seller.id", read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)

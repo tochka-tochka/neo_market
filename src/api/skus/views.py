@@ -68,27 +68,27 @@ class SkusView(APIView):
         price = request.data.get('price')
         cost_price = request.data.get('cost_price')
         discount = request.data.get('discount')
-        active_quantity = request.data.get('active_quantity')
+        article = request.data.get('article')
         characteristics = request.data.get('characteristics')
+        images = request.data.get('images')
 
         data = {
             'id': id,
             'name': name,
             'price': price,
             'cost_price': int(cost_price),
+            'article': article,
             'discount': int(discount or 0),
-            'active_quantity': active_quantity,
-            'characteristics': characteristics
+            'characteristics': characteristics,
+            'iamges': images
         }
-
-        images = request.FILES.getlist('images')
 
         serializer = SKUSerializer(data=data)
         if not serializer.is_valid():
             return JsonResponse({"errors": serializer.errors}, status=400)
 
         try:
-            sku = update_sku(data, images, request.user)
+            sku = update_sku(data, request.user)
         except AccessDenied as e:
             return JsonResponse({"message": str(e)}, status=403)
         except BlockedProductException as e:
