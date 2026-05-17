@@ -165,15 +165,15 @@ class ProductsView(APIView):
 
         category = request.data.get("category")
         if not category:
-            return JsonResponse({"errors": "category required"}, status=400)
+            return JsonResponse({"errors": "category required"}, status=422)
 
         characteristics = request.data.get("characteristics")
         if characteristics is None:
-            return JsonResponse({"errors": "images required"}, status=400)
+            return JsonResponse({"errors": "images required"}, status=422)
 
         images = request.data.get("images")
         if images is None or len(images) == 0:
-            return JsonResponse({"errors": "images required"}, status=400)
+            return JsonResponse({"errors": "images required"}, status=422)
 
         data = {
             "title": title,
@@ -186,12 +186,12 @@ class ProductsView(APIView):
 
         serializer = ProductSerializer(data=data)
         if not serializer.is_valid():
-            return JsonResponse({"errors": serializer.errors}, status=400)
+            return JsonResponse({"errors": serializer.errors}, status=422)
 
         try:
             product = create_product(data, request.user)
         except InvalidCategoryId:
-            return JsonResponse({"message": "category doesnt exists"}, status=400)
+            return JsonResponse({"message": "category doesnt exists"}, status=422)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 
