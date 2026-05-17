@@ -81,7 +81,7 @@ def create_sku(data: Dict[str, Any], seller):
 
 
 @transaction.atomic
-def update_sku(data: Dict[str, str], images: List[UploadedFile], seller):
+def update_sku(data: Dict[str, Any], seller):
     try:
         sku = SKU.objects.get(id=data.get("id"))
         product = Product.objects.get(id=sku.product.id)
@@ -110,10 +110,11 @@ def update_sku(data: Dict[str, str], images: List[UploadedFile], seller):
                     chars = json.loads(chars)
                 sku.characteristics = chars
 
+            images = data.get("images")
             if images:
                 SKUImage.objects.filter(sku=sku).delete()
                 for index, image in enumerate(images):
-                    SKUImage.objects.create(sku=sku, url=image, order=index)
+                    SKUImage.objects.create(sku=sku, url=image.url, order=index)
 
             sku.save()
             product = Product.objects.get(id=sku.product.id)

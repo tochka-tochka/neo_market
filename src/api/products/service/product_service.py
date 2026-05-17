@@ -13,7 +13,6 @@ from src.models import Category
 from src.models.product import Product, ProductImage, ProductStatus
 from src.models.user import Seller
 from src.serializers.product_serializers import (
-    CreateProductSerializer,
     ProductSerializer,
 )
 
@@ -130,11 +129,11 @@ def create_product(data: Dict[str, Any], seller: Seller):
     except Exception as e:
         raise Exception(f"failed to create product: {e}")
 
-    return CreateProductSerializer(product).data
+    return ProductSerializer(product).data
 
 
 @transaction.atomic
-def update_product(data: Dict[str, str], seller: Seller):
+def update_product(data: Dict[str, Any], seller: Seller):
     try:
         product = Product.objects.get(id=data.get("id"))
 
@@ -168,9 +167,9 @@ def update_product(data: Dict[str, str], seller: Seller):
             try:
                 ProductImage.objects.filter(product=product).delete()
                 image_objects = []
-                for index, file in enumerate(images):
+                for index, image_data in enumerate(images):
                     image_objects.append(
-                        ProductImage(product=product, url=file, ordering=index)
+                        ProductImage(product=product, url=image_data.get("url"), ordering=index)
                     )
 
                 ProductImage.objects.bulk_create(image_objects)
