@@ -32,6 +32,7 @@ def base_data(test_category, dummy_image):
     return {
         "title": "test",
         "description": "test",
+        "slug": "test",
         "category": str(test_category.id),
         "images": [
             {"url": "/some_bucket/test1.jpg", "ordering": 0},

@@ -17,10 +17,19 @@ class ProductStatus(models.TextChoices):
     HARD_BLOCKED = "HARD_BLOCKED"
 
 
+class BlockingReason(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    reason = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = "blocking_reasons"
+
+
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     title = models.CharField(max_length=255)
     description = models.TextField()
+    slug = models.CharField(max_length=255, default="", null=True, blank=True)
     category = models.ForeignKey(
         Category, on_delete=models.DO_NOTHING, null=True, blank=True
     )
@@ -32,11 +41,19 @@ class Product(models.Model):
         choices=ProductStatus.choices,
         default=ProductStatus.CREATED,
     )
-    blocking_reason = models.TextField(null=True, blank=True)
+    blocking_reason = models.ForeignKey(
+        BlockingReason, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    moderator_comment = models.TextField(default="", null=True, blank=True)
     deleted = models.BooleanField(default=False)
     blocked = models.BooleanField(default=False)
     seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    date = models.DateField(
+    updated_at = models.DateTimeField(
+        auto_now_add=True,
+        null=True,
+        blank=True,
+    )
+    created_at = models.DateTimeField(
         auto_now_add=True,
         null=True,
         blank=True,
@@ -122,6 +139,9 @@ class ProductFieldReport(models.Model):
     field = models.CharField(max_length=255)
     comment = models.CharField(max_length=255)
 
+    class Meta:
+        db_table = "product_field_reports"
+
 
 class InvoiceStatus(models.TextChoices):
     PENDING = "PENDING"
@@ -148,7 +168,9 @@ class InvoiceItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     sku = models.ForeignKey(SKU, on_delete=models.CASCADE)
     quantity = models.IntegerField(validators=[MinValueValidator(0)])
-    accepted_quantity = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0)])
+    accepted_quantity = models.IntegerField(
+        null=True, blank=True, validators=[MinValueValidator(0)]
+    )
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name="items")
 
     class Meta:
@@ -163,6 +185,7 @@ class ReserveOperations(models.Model):
     class Meta:
         db_table = "reserve_operations"
 
+
 class FullifiedOrders(models.Model):
     order_id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -173,3 +196,6 @@ class FullifiedOrders(models.Model):
 
 class ModerationDecisions(models.Model):
     idempotency_key = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+
+    class Meta:
+        db_table = "moderation_decisions"
