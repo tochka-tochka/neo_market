@@ -17,10 +17,22 @@ class SkusView(APIView):
     def post(self, request):
         product_id = request.data.get('product_id')
         name = request.data.get('name')
+        if not name:
+            return JsonResponse({"errors": "name required"}, status=422)
+            
         price = request.data.get('price')
+        if not price:
+            return JsonResponse({"errors": "price required"}, status=422)
+            
         cost_price = request.data.get('cost_price')
+        if not cost_price:
+            return JsonResponse({"errors": "cost price required"}, status=422)
+            
+        article = request.data.get('article')
+        if not article:
+            return JsonResponse({"errors": "article required"}, status=422)
+            
         discount = request.data.get('discount')
-        active_quantity = request.data.get('active_quantity')
         characteristics = request.data.get('characteristics')
 
         images = request.data.get('images')
@@ -29,8 +41,8 @@ class SkusView(APIView):
             'name': name,
             'price': int(price),
             'cost_price': int(cost_price),
+            'article': article,
             'discount': int(discount or 0),
-            'active_quantity': int(active_quantity),
             'characteristics': characteristics,
             'product_id': product_id,
             'images': images
@@ -38,7 +50,7 @@ class SkusView(APIView):
 
         serializer = SKUSerializer(data=data)
         if not serializer.is_valid():
-            return JsonResponse({"errors": serializer.errors}, status=400)
+            return JsonResponse({"errors": serializer.errors}, status=422)
 
         try:
             sku = create_sku(data, request.user)

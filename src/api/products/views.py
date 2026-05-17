@@ -169,7 +169,7 @@ class ProductsView(APIView):
 
         characteristics = request.data.get("characteristics")
         if characteristics is None:
-            return JsonResponse({"errors": "images required"}, status=422)
+            return JsonResponse({"errors": "characteristics required"}, status=422)
 
         images = request.data.get("images")
         if images is None or len(images) == 0:

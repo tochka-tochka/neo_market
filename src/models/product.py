@@ -71,15 +71,27 @@ class SKU(models.Model):
     name = models.CharField(max_length=255)
     price = models.IntegerField(validators=[MinValueValidator(0)])
     cost_price = models.IntegerField(validators=[MinValueValidator(0)])
+    article = models.CharField(max_length=255)
     discount = models.IntegerField(
         default=0, null=True, blank=True, validators=[MinValueValidator(0)]
     )
     characteristics = models.JSONField(
         default=None, null=True, blank=True, validators=[validate_characteristics]
     )
-    active_quantity = models.IntegerField(validators=[MinValueValidator(0)])
+    stock_quantity = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    active_quantity = models.IntegerField(default=0, validators=[MinValueValidator(0)])
     reserved_quantity = models.IntegerField(
         default=0, validators=[MinValueValidator(0)]
+    )
+    updated_at = models.DateTimeField(
+        auto_now_add=True,
+        null=True,
+        blank=True,
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        null=True,
+        blank=True,
     )
 
     class Meta:
