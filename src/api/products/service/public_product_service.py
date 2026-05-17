@@ -1,7 +1,7 @@
-from django.db.models import Max, Sum, Q
+from django.db.models import Sum, Q, Min
 
 from src.models.product import Product, ProductStatus
-from src.serializers.product_serializers import PublicProductSerializer
+from src.serializers.product_serializers import PublicProductSerializer, PublicCatalogProductSerializer
 
 
 class WrongSortParam(Exception):
@@ -61,14 +61,14 @@ def get_products_for_catalog(search, category, ids, limit, offset, sort):
     try:
         products = (
             Product.objects.annotate(
-                price=Max("skus__price"),
+                price=Min("skus__price"),
                 total_qty=Sum('skus__active_quantity')
             )
             .select_related("category")
             .filter(query, deleted=False, status=ProductStatus.MODERATED, total_qty__gt=0)
             .order_by(order_by_map[sort])[offset : offset + limit]
         )
-        serializer = PublicProductSerializer(products, many=True)
+        serializer = PublicCatalogProductSerializer(products, many=True)
         return serializer.data, limit, offset
     except WrongSortParam as e:
         raise e
