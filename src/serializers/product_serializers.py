@@ -59,22 +59,35 @@ class SellerListSerializer(serializers.ModelSerializer):
 
 
 class ProductListSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True)
-    images = ProductImageSerializer(many=True, read_only=True)
-    skus = SKUSerializer(many=True, read_only=True)
-
-    skus_count = serializers.SerializerMethodField()
-    total_active_quantity = serializers.SerializerMethodField()
+    category_id = serializers.UUIDField(source="category.id", read_only=True)
+    min_price = serializers.SerializerMethodField()
+    cover_image = serializers.SerializerMethodField()
 
     class Meta:
         model = Product
-        fields = ["id", "title", "status", "category", "images", "created_at"]
+        fields = [
+            "id",
+            "title",
+            "slug",
+            "status",
+            "category_id",
+            "deleted",
+            "created_at",
+            "min_price",
+            "cover_image",
+        ]
 
-    def get_skus_count(self, obj):
-        return len(obj.skus)
+    def get_min_price(self, obj):
+        if obj.skus.exists():
+            prices = [sku.price for sku in obj.skus.all()]
+            return min(prices)
+        return 0
 
-    def get_total_active_quantity(self, obj):
-        return sum(list(map(lambda sku: sku.active_quantity, obj.skus)))
+    def get_cover_image(self, obj):
+        first_image = obj.images.first()
+        if first_image:
+            return ProductImageSerializer(first_image).data["url"]
+        return None
 
 
 class PublicCatalogProductSerializer(serializers.ModelSerializer):
@@ -104,7 +117,7 @@ class PublicCatalogProductSerializer(serializers.ModelSerializer):
     def get_cover_image(self, obj):
         first_image = obj.images.first()
         if first_image:
-            return ProductImageSerializer(first_image).data['url']
+            return ProductImageSerializer(first_image).data["url"]
         return None
 
 

@@ -1,12 +1,10 @@
 import json
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict
 
-from django.core.files.uploadedfile import UploadedFile
 from django.db import transaction
 from django.db.models import Q
-from django.template.context_processors import request
 
 from interservice_queues.producers import services_channel_producer
 from src.models import Category
@@ -14,6 +12,7 @@ from src.models.product import Product, ProductImage, ProductStatus
 from src.models.user import Seller
 from src.serializers.product_serializers import (
     ProductSerializer,
+    ProductListSerializer
 )
 
 
@@ -62,7 +61,7 @@ def get_seller_products(
         products = Product.objects.select_related("category").filter(query)[
             offset : offset + limit
         ]
-        serializer = ProductSerializer(products, many=True)
+        serializer = ProductListSerializer(products, many=True)
         return serializer.data, limit, offset
     except Exception as e:
         raise Exception(f"failed to get products: {e}")
