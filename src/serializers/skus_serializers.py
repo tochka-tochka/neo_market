@@ -1,3 +1,4 @@
+from django.db.models import UUIDField
 from django.core.validators import MinValueValidator
 from rest_framework import serializers
 from src.validators.main import validate_characteristics
@@ -5,7 +6,9 @@ from src.validators.main import validate_characteristics
 from src.models.product import (
     SKU,
     Product,
-    SKUImage
+    SKUImage,
+    Order,
+    OrderItem
 )
 
 class SKUImageSerializer(serializers.ModelSerializer):
@@ -66,3 +69,25 @@ class PublicSKUSerializer(serializers.ModelSerializer):
             "images",
             "characteristics",
         ]
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    order_id = serializers.UUIDField(source="order.id", read_only=True)
+    sku_id = serializers.UUIDField(source="sku.id", read_only=True)
+    class Meta:
+        model = OrderItem
+        fields = [
+            "order_id",
+            "sku_id",
+            "quantity"
+        ]
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = [
+            "id",
+            "status",
+            "created_at",
+            "fullified_at"
+        ]
+    

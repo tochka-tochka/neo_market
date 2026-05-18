@@ -1,3 +1,4 @@
+import json
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -5,7 +6,7 @@ from rest_framework.parsers import JSONParser, MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from src.api.reserve.service.main import NotEnoughQunatity, reserve, unreserve, fullify
+from src.api.reserve.service.main import NotEnoughQunatity, reserve, unreserve
 from src.permissions import IsService
 
 
@@ -17,10 +18,7 @@ class ReserveView(APIView):
     def post(self, request: Request):
         try:
             result = reserve(request.data.get("idempotency_key"), request.data.get("items"))
-            return JsonResponse({
-                "reserved": True,
-                "items": result
-            }, status=200)
+            return JsonResponse(result, status=200)
         except NotEnoughQunatity as e:
             return JsonResponse(
                 {
@@ -47,19 +45,19 @@ class UnreserveView(APIView):
 
     def post(self, request: Request):
         try:
-            unreserve(request.data.get("items"))
-            return JsonResponse({"ok": True}, status=200)
+            result = unreserve(request.data.get("order_id"), request.data.get("items"))
+            return JsonResponse(result, status=200)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 
-@method_decorator(csrf_exempt, name="dispatch")
-class FullifyView(APIView):
-    permission_classes = [IsService]
-    parser_classes = [JSONParser]
+# @method_decorator(csrf_exempt, name="dispatch")
+# class FullifyView(APIView):
+#     permission_classes = [IsService]
+#     parser_classes = [JSONParser]
 
-    def post(self, request: Request):
-        try:
-            fullify(request.data.get("order_id"), request.data.get("items"))
-            return JsonResponse({"ok": True}, status=200)
-        except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
+#     def post(self, request: Request):
+#         try:
+#             fullify(request.data.get("order_id"), request.data.get("items"))
+#             return JsonResponse({"ok": True}, status=200)
+#         except Exception as e:
+#             return JsonResponse({"message": str(e)}, status=500)
