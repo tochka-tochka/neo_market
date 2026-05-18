@@ -15,6 +15,9 @@ class NotEnoughQunatity(Exception):
         self.requested = requested
         self.available = available
 
+class OrderNotFound(Exception):
+    pass
+
 
 @transaction.atomic
 def reserve(idempotency_key, reserved_items):
@@ -72,33 +75,49 @@ def unreserve(order_id, reserved_items):
         result = {
             "order_id": str(order_id),
             "status": "UNRESERVED",
-            "reserved_at": str(datetime.now())
+            "unreserved_at": str(datetime.now())
         }
         return result
     except Exception as e:
         raise Exception(f"failed to reserve sku: {e}")
 
 
-# @transaction.atomic
-# def fullify(order_id, fullifed_items):
-#     reserve = FullifiedOrders.objects.filter(order_id=order_id).first()
-#     if reserve is not None:
-#         return
-#     try:
-#         for item in fullifed_items:
-#             sku = SKU.objects.get(id=item["sku_id"])
-#             if sku.active_quantity - item["quantity"] < 0:
-#                 raise NotEnoughQunatity(
-#                     "Not enough quantity",
-#                     str(sku.id),
-#                     item["quantity"],
-#                     sku.active_quantity,
-#                 )
+@transaction.atomic
+def fullify(order_id, fullifed_items):
+    order = Order.objects.filter(id=order_id).first()
+    if order is None:
+        raise OrderNotFound("order not found")
+    if order.status == OrderStatus.FULLIFIED:
+        result = {
+            "order_id": str(order_id),
+            "status": "FULLIFIED",
+            "fullified_at": str(order.fullified_at)
+        }
+        return result
+    try:
+        for item in fullifed_items:
+            sku = SKU.objects.get(id=item["sku_id"])
+            if sku.active_quantity - item["quantity"] < 0:
+                raise NotEnoughQunatity(
+                    "Not enough quantity",
+                    str(sku.id),
+                    item["quantity"],
+                    sku.active_quantity,
+                )
 
-#             sku.reserved_quantity -= item["quantity"]
-#             sku.save()
-#         FullifiedOrders.objects.create(order_id=order_id)
-#     except NotEnoughQunatity as e:
-#         raise e
-#     except Exception as e:
-#         raise Exception(f"failed to reserve sku: {e}")
+            sku.reserved_quantity -= item["quantity"]
+            sku.save()
+        order.status = OrderStatus.FULLIFIED
+        order.save()
+        result = {
+            "order_id": str(order_id),
+            "status": "FULLIFIED",
+            "fullified_at": str(datetime.now())
+        }
+        return result
+    except OrderNotFound as e:
+        raise e
+    except NotEnoughQunatity as e:
+        raise e
+    except Exception as e:
+        raise Exception(f"failed to reserve sku: {e}")

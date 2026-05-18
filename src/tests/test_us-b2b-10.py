@@ -4,7 +4,7 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
-from src.models.product import SKU, FullifiedOrders, ProductStatus
+from src.models.product import SKU, Order, OrderItem, OrderStatus, ProductStatus
 from src.tests.fixtures import (
     BaseTestUtil,
     base_data,
@@ -70,9 +70,8 @@ class TestFullifyOperations(BaseTestUtil):
 
         fullify_url = reverse("fullify")
         fulfill_quantity = 3
-        order_id = str(uuid.uuid4())
         fullify_payload = {
-            "order_id": order_id,
+            "order_id": reserve_response.json()["order_id"],
             "items": [{"sku_id": str(sku1.id), "quantity": fulfill_quantity}],
         }
 
@@ -84,14 +83,16 @@ class TestFullifyOperations(BaseTestUtil):
         )
 
         assert response.status_code == status.HTTP_200_OK, response.json()
-        assert response.json() == {"ok": True}
 
         sku1.refresh_from_db()
 
         assert sku1.reserved_quantity == initial_reserved_quantity - fulfill_quantity
         assert sku1.active_quantity == initial_active_quantity
 
-        assert FullifiedOrders.objects.filter(order_id=order_id).exists()
+        assert (
+            Order.objects.get(id=reserve_response.json()["order_id"]).status
+            == OrderStatus.FULLIFIED
+        )
 
     def test_idempotent_fulfill_no_double_deduction(self, service_client, two_skus):
         sku1, _ = two_skus
@@ -102,7 +103,12 @@ class TestFullifyOperations(BaseTestUtil):
             "idempotency_key": str(uuid.uuid4()),
             "items": [{"sku_id": str(sku1.id), "quantity": reserve_quantity}],
         }
-        service_client.post(reserve_url, data=reserve_payload, format="json")
+        reserve_response = service_client.post(
+            reserve_url,
+            data=reserve_payload,
+            format="json",
+            content_type="application/json",
+        )
 
         sku1.refresh_from_db()
         initial_active_after_reserve = sku1.active_quantity
@@ -110,9 +116,8 @@ class TestFullifyOperations(BaseTestUtil):
 
         fullify_url = reverse("fullify")
         fulfill_quantity = 2
-        order_id = str(uuid.uuid4())
         fullify_payload = {
-            "order_id": order_id,
+            "order_id": reserve_response.json()["order_id"],
             "items": [{"sku_id": str(sku1.id), "quantity": fulfill_quantity}],
         }
 
@@ -122,14 +127,16 @@ class TestFullifyOperations(BaseTestUtil):
             format="json",
             content_type="application/json",
         )
+        print(reserve_response.json())
         assert first_response.status_code == status.HTTP_200_OK, first_response.json()
-        assert FullifiedOrders.objects.filter(order_id=order_id).exists()
+        assert (
+            Order.objects.get(id=reserve_response.json()["order_id"]).status
+            == OrderStatus.FULLIFIED
+        ), reserve_response.json()
 
         sku1.refresh_from_db()
         expected_active_quantity = initial_active_after_reserve
-        expected_reserved_quantity = (
-            initial_reserved_after_reserve - fulfill_quantity
-        )
+        expected_reserved_quantity = initial_reserved_after_reserve - fulfill_quantity
 
         assert sku1.active_quantity == expected_active_quantity
         assert sku1.reserved_quantity == expected_reserved_quantity
@@ -141,7 +148,6 @@ class TestFullifyOperations(BaseTestUtil):
             content_type="application/json",
         )
         assert second_response.status_code == status.HTTP_200_OK
-        assert second_response.json() == {"ok": True}
 
         sku1.refresh_from_db()
 
