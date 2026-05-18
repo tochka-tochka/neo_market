@@ -1,3 +1,5 @@
+import json
+
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -63,7 +65,7 @@ class ProductDetailView(APIView):
         title = request.data.get("title")
         description = request.data.get("description")
         category = request.data.get("category")
-        characteristics = request.data.get("characteristics")
+        characteristics = json.loads(request.data.get("characteristics") or "[]")
 
         images = request.FILES.getlist("images")
         if len(images) == 0:
@@ -143,7 +145,6 @@ class ProductsView(APIView):
             return JsonResponse({"message": str(e)}, status=500)
 
     def post(self, request):
-
         title = request.data.get("title")
         description = request.data.get("description")
 
@@ -151,7 +152,7 @@ class ProductsView(APIView):
         if not category:
             return JsonResponse({"errors": "category required"}, status=400)
 
-        characteristics = request.data.get("characteristics")
+        characteristics = json.loads(request.data.get("characteristics"))
 
         images = request.FILES.getlist("images")
         if len(images) == 0:

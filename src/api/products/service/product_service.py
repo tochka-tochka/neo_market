@@ -1,6 +1,6 @@
 from typing import Dict, List, Any
 import uuid
-from src.models.product import Product, ProductStatus, ProductImage
+from src.models.product import Product, ProductStatus, ProductImage, ProductCharacteristics
 from src.models import Category
 from src.models.user import Seller
 from django.core.files.uploadedfile import UploadedFile
@@ -67,7 +67,6 @@ def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Sel
             description=data.get("description"),
             category_id=data.get("category"),
             status=ProductStatus.CREATED,
-            characteristics=chars,
             seller=seller
         )
         
@@ -81,7 +80,9 @@ def create_product(data: Dict[str, Any], images: List[UploadedFile], seller: Sel
                 ))
             
             ProductImage.objects.bulk_create(image_objects)
-
+        product.characteristics.set([
+            ProductCharacteristics.objects.create(**chr, product_id=product) for chr in data.get("characteristics", [])
+        ])
     except Exception as e:
         raise Exception(f"failed to create product: {e}")
         
@@ -115,8 +116,11 @@ def update_product(data: Dict[str, str], images: List[UploadedFile], seller: Sel
             chars = data["characteristics"]
             if isinstance(chars, str):
                 chars = json.loads(chars)
-            product.characteristics = chars
-
+            product.characteristics.all().delete()
+            # set() добавит характеристики к тем, что уже были, поэтому удаляем всё
+            product.characteristics.set([
+                ProductCharacteristics.objects.create(**chr, product_id=product) for chr in (chars or [])
+            ])
         if images is not None:
             try:
                 ProductImage.objects.filter(product=product).delete()

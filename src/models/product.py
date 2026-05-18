@@ -36,7 +36,7 @@ class Product(models.Model):
 
 class ProductCharacteristics(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product_id = models.ForeignKey(Product, related_name="characteristics", on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     value = models.CharField(max_length=255)
 

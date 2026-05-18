@@ -119,7 +119,7 @@ class ProductSerializer(serializers.ModelSerializer):
     seller = SellerListSerializer(read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
     skus = SKUSerializer(many=True, read_only=True)
-    characteristics = ProductCharacteristicSerializer(many=True)
+    characteristics = ProductCharacteristicSerializer(many=True, read_only=True)
     field_reports = ProductFieldReportSerializer(many=True, read_only=True)
 
     class Meta:
