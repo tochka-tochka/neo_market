@@ -2,7 +2,7 @@ import pytest
 import uuid
 from django.urls import reverse
 from rest_framework import status
-from src.models.product import SKU, ProductStatus
+from src.models.product import SKU, ProductStatus, Order, OrderStatus, OrderItem
 from src.tests.fixtures import (
     BaseTestUtil,
     base_data,
@@ -20,6 +20,11 @@ def two_skus(product_factory):
     sku1 = SKU.objects.create(product=p, name="SKU 1", price=100, cost_price=80, active_quantity=10, reserved_quantity=0)
     sku2 = SKU.objects.create(product=p, name="SKU 2", price=200, cost_price=80, active_quantity=5, reserved_quantity=0)
     return sku1, sku2
+
+@pytest.fixture
+def test_order():
+    order = Order.objects.create(status="RESERVED")
+    return order
 
 @pytest.mark.django_db
 class TestReserveOperations(BaseTestUtil):
@@ -111,9 +116,11 @@ class TestReserveOperations(BaseTestUtil):
         sku1.active_quantity = 5
         sku1.reserved_quantity = 5
         sku1.save()
-
+        order = Order.objects.create(status=OrderStatus.RESERVED)
+        OrderItem.objects.create(order=order, sku=sku1, quantity=3)
         url = reverse("unreserve")
         payload = {
+            "order_id": order.id,
             "items": [{"sku_id": str(sku1.id), "quantity": 3}]
         }
 
