@@ -58,5 +58,5 @@ class TestCreateSKU(BaseTestUtil):
         response = jwt_client.get(reverse('products'))
         data = response.json()
         
-        assert len(data['products']) == 1
-        assert str(product.id) not in [p['id'] for p in data['products']]
+        assert len(data['items']) == 1
+        assert str(product.id) not in [p['id'] for p in data['items']]

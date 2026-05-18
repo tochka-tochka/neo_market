@@ -8,17 +8,19 @@ from django.db import transaction
 
 from interservice_queues.producers import services_channel_producer
 from src.models.product import SKU, Product, ProductStatus, SKUImage
-from src.serializes import SKUSerializer
+from src.serializers.skus_serializers import SKUSerializer
 
 
 class BlockedProductException(Exception):
     pass
 
+
 class AccessDenied(Exception):
     pass
 
+
 @transaction.atomic
-def create_sku(data: Dict[str, Any], images: List[UploadedFile], seller):
+def create_sku(data: Dict[str, Any], seller):
 
     chars = data.get("characteristics", {})
     if isinstance(chars, str):
@@ -36,28 +38,14 @@ def create_sku(data: Dict[str, Any], images: List[UploadedFile], seller):
         if product.seller != seller:
             raise AccessDenied("Access Denied")
 
-        sku = SKU.objects.create(
-            name=data["name"],
-            price=data["price"],
-            cost_price=data["price"],
-            discount=data["discount"],
-            active_quantity=data["active_quantity"],
-            characteristics=chars,
-            product=product,
-        )
-
-        if images:
-            for index, image in enumerate(images):
-                SKUImage.objects.create(sku=sku, url=image, order=index)
-
-        if product.status == ProductStatus.CREATED:
+        if not SKU.objects.filter(product=product).exists():
             idempotency_key = str(uuid.uuid4())
             services_channel_producer.product_moder_notification(
                 data={
                     "idempotency_key": idempotency_key,
                     "product_id": str(product.id),
                     "seller_id": str(seller.id),
-                    "event": "EDITED",
+                    "event": "CREATED",
                     "date": str(datetime.now()),
                 },
                 corrected=False,
@@ -65,17 +53,23 @@ def create_sku(data: Dict[str, Any], images: List[UploadedFile], seller):
             product.status = ProductStatus.ON_MODERATION
             product.save()
 
-        if product.status == ProductStatus.ON_MODERATION:
-            services_channel_producer.product_moder_notification(
-                data={
-                    "idempotency_key": str(uuid.uuid4()),
-                    "product_id": str(product.id),
-                    "seller_id": str(seller.id),
-                    "event": "EDITED",
-                    "date": str(datetime.now()),
-                },
-                corrected=True,
-            )
+        sku = SKU.objects.create(
+            name=data["name"],
+            price=data["price"],
+            cost_price=data["cost_price"],
+            article=data["article"],
+            discount=data["discount"],
+            characteristics=chars,
+            product=product,
+        )
+
+        images = data["images"]
+
+        if images:
+            for index, image in enumerate(images):
+                SKUImage.objects.create(
+                    sku=sku, url=image["url"], ordering=image["ordering"]
+                )
     except AccessDenied as e:
         raise e
     except BlockedProductException as e:
@@ -87,7 +81,7 @@ def create_sku(data: Dict[str, Any], images: List[UploadedFile], seller):
 
 
 @transaction.atomic
-def update_sku(data: Dict[str, str], images: List[UploadedFile], seller):
+def update_sku(data: Dict[str, Any], seller):
     try:
         sku = SKU.objects.get(id=data.get("id"))
         product = Product.objects.get(id=sku.product.id)
@@ -102,10 +96,10 @@ def update_sku(data: Dict[str, str], images: List[UploadedFile], seller):
                 sku.price = int(data["price"])
 
             if data.get("cost_price") is not None:
-                sku.price = int(data["cost_price"])
+                sku.cost_price = int(data["cost_price"])
 
             if data.get("discount") is not None:
-                sku.price = int(data["discount"])
+                sku.discount = int(data["discount"])
 
             if data.get("active_quantity") is not None:
                 sku.active_quantity = int(data["active_quantity"])
@@ -116,10 +110,11 @@ def update_sku(data: Dict[str, str], images: List[UploadedFile], seller):
                     chars = json.loads(chars)
                 sku.characteristics = chars
 
+            images = data.get("images")
             if images:
                 SKUImage.objects.filter(sku=sku).delete()
                 for index, image in enumerate(images):
-                    SKUImage.objects.create(sku=sku, url=image, order=index)
+                    SKUImage.objects.create(sku=sku, url=image.url, order=index)
 
             sku.save()
             product = Product.objects.get(id=sku.product.id)

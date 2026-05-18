@@ -1,0 +1,10 @@
+{% extends "admin/change_form.html" %}
+{% load i18n admin_modify %}
+
+{% block submit_buttons_bottom %}
+    {{ block.super }}
+    <div class="submit-row">
+        {# Кнопка с именем _accept_invoice, которое мы ловим в response_change #}
+        <input type="submit" value="Принять накладную (обновить склад)" name="_accept_invoice" style="background: #417690; height: 35px; line-height: 15px;">
+    </div>
+{% endblock %}

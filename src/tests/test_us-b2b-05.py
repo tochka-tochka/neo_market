@@ -1,9 +1,16 @@
 import uuid
+
 import pytest
 from django.urls import reverse
 from rest_framework import status
 
-from src.models.product import Product, ProductStatus, SKU, ProductFieldReport
+from src.models.product import (
+    SKU,
+    BlockingReason,
+    Product,
+    ProductFieldReport,
+    ProductStatus,
+)
 from src.models.user import Seller
 from src.tests.fixtures import (
     BaseTestUtil,
@@ -15,24 +22,44 @@ from src.tests.fixtures import (
     test_category,
 )
 
+
+@pytest.fixture
+def blocking_reason():
+    r = BlockingReason.objects.create(reason="test")
+    return r
+
+
 @pytest.fixture
 def moderated_product_with_skus(product_factory):
     p = product_factory(title="Product with SKU", status=ProductStatus.MODERATED)
-    SKU.objects.create(product=p, name="sku1", price=100, cost_price=80, active_quantity=10)
-    SKU.objects.create(product=p, name="sku2", price=200, cost_price=150, active_quantity=5)
+    SKU.objects.create(
+        product=p, name="sku1", price=100, cost_price=80, active_quantity=10
+    )
+    SKU.objects.create(
+        product=p, name="sku2", price=200, cost_price=150, active_quantity=5
+    )
     return p
 
+
 @pytest.fixture
-def blocked_product_with_skus(product_factory):
-    p = product_factory(title="Product with SKU", status=ProductStatus.BLOCKED, blocking_reason="Blocking Reason")
-    sku1 = SKU.objects.create(product=p, name="sku1", price=100, cost_price=80, active_quantity=10)
+def blocked_product_with_skus(product_factory, blocking_reason):
+    p = product_factory(
+        title="Product with SKU",
+        status=ProductStatus.BLOCKED,
+        blocking_reason_id=blocking_reason.id,
+    )
+    sku1 = SKU.objects.create(
+        product=p, name="sku1", price=100, cost_price=80, active_quantity=10
+    )
     ProductFieldReport.objects.create(product=p, field="title", comment="wrong title")
-    ProductFieldReport.objects.create(product=p, sku=sku1, field="images", comment="wrong images")
+    ProductFieldReport.objects.create(
+        product=p, sku=sku1, field="images", comment="wrong images"
+    )
     return p
+
 
 @pytest.mark.django_db
 class TestCheckStatus(BaseTestUtil):
-    
     def test_get_moderated_product_returns_full_payload(
         self, jwt_client, moderated_product_with_skus, product_factory
     ):
@@ -42,12 +69,12 @@ class TestCheckStatus(BaseTestUtil):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["product"]["status"] == ProductStatus.MODERATED
-        assert response.json()["product"]["blocking_reason"] is None
+        assert response.json()["product"]["blocking_reason_id"] is None
         for i in range(len(response.json()["product"]["skus"])):
             assert response.json()["product"]["skus"][i]["cost_price"] is not None
 
     def test_get_blocked_product_returns_blocking_reason_and_field_reports(
-        self, jwt_client, blocked_product_with_skus, product_factory
+        self, jwt_client, blocked_product_with_skus, product_factory, blocking_reason
     ):
         url = reverse("product-detail", args=[blocked_product_with_skus.id])
 
@@ -55,13 +82,19 @@ class TestCheckStatus(BaseTestUtil):
 
         assert response.status_code == status.HTTP_200_OK
         assert response.json()["product"]["status"] == ProductStatus.BLOCKED
-        assert response.json()["product"]["blocking_reason"] is not None
+        assert response.json()["product"]["blocking_reason_id"] is not None
         assert len(response.json()["product"]["field_reports"]) > 0
 
-    def test_get_others_product_returns_404(self, jwt_client, product_factory, test_category):
+    def test_get_others_product_returns_404(
+        self, jwt_client, product_factory, test_category
+    ):
         another_user_id = uuid.uuid4()
-        another_seller = Seller.objects.create(id=another_user_id, username="test_user_2", password="password123")
-        other_product = Product.objects.create(title="Other", category=test_category, seller = another_seller)
+        another_seller = Seller.objects.create(
+            id=another_user_id, username="test_user_2", password="password123"
+        )
+        other_product = Product.objects.create(
+            title="Other", category=test_category, seller=another_seller
+        )
 
         url = reverse("product-detail", args=[other_product.id])
 

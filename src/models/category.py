@@ -6,7 +6,7 @@ from django.db import models
 
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    value = models.CharField()
+    name = models.CharField()
     slug = models.CharField(null=True)
     description = models.CharField(null=True, blank=True)
     image_url = models.CharField(null=True, blank=True)

@@ -1,14 +1,12 @@
-import json
-from typing import Dict, Any
+from typing import Dict, Any, List
 from django.core.exceptions import ValidationError
 
-def validate_characteristics(characteristics: str):
+def validate_characteristics(characteristics: List[Dict[str, Any]]):
     try:
-        characteristics = json.loads(characteristics)
         for c in characteristics:
-            if not isinstance(c["name"], str):
-                raise ValidationError(f"Invalid value {c['name']}")
-            if not isinstance(c["value"], str):
-                raise ValidationError(f"Invalid value {c['value']}")
+            if not isinstance(c.get("name"), str):
+                raise ValidationError(f"Invalid value {c.get("name")}")
+            if not isinstance(c.get("value"), str):
+                raise ValidationError(f"Invalid value {c.get("value")}")
     except Exception as e:
         raise ValidationError(f"Invalid JSON data: {e}")
