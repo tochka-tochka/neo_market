@@ -6,7 +6,7 @@ from src.serializers.skus_serializers import SKUSerializer
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.permissions import IsAuthenticated
-from .service.main import BlockedProductException, AccessDenied
+from .service.main import BlockedProductException, AccessDenied, SKUNotFound, SKUGotActiveReserbes
 
 @method_decorator(csrf_exempt, name='dispatch')
 class SkusView(APIView):
@@ -91,7 +91,7 @@ class SkusView(APIView):
             sku = update_sku(data, request.user)
         except AccessDenied as e:
             return JsonResponse({"message": str(e)}, status=403)
-        except BlockedProductException as e:
+        except BlockedProductException:
             return JsonResponse({"message": "product is hard blocked"}, status=403)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
@@ -101,7 +101,15 @@ class SkusView(APIView):
     def delete(self, request, id: str):
         try:
             delete_sku(id, request.user)
+        except SKUNotFound as e:
+            return JsonResponse({"message" : str(e)}, status=404)
+        except SKUGotActiveReserbes as e:
+            return JsonResponse({"message" : str(e)}, status=409)
+        except AccessDenied as e:
+            return JsonResponse({"message" : str(e)}, status=403)
+        except BlockedProductException as e:
+            return JsonResponse({"message" : str(e)}, status=403)
         except Exception as e:
             return JsonResponse({"message" : str(e)}, status=500)
 
-        return JsonResponse({"message": "success"}, status=200)
+        return JsonResponse({"ok": True}, status=204)

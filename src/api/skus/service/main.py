@@ -1,9 +1,9 @@
+from src.serializers.product_serializers import ProductSerializer
 import json
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict
 
-from django.core.files.uploadedfile import UploadedFile
 from django.db import transaction
 
 from interservice_queues.producers import services_channel_producer
@@ -14,8 +14,13 @@ from src.serializers.skus_serializers import SKUSerializer
 class BlockedProductException(Exception):
     pass
 
-
 class AccessDenied(Exception):
+    pass
+
+class SKUNotFound(Exception):
+    pass
+
+class SKUGotActiveReserbes(Exception):
     pass
 
 
@@ -147,12 +152,61 @@ def update_sku(data: Dict[str, Any], seller):
 
 @transaction.atomic
 def delete_sku(id, seller):
-    sku = SKU.objects.get(id=id)
+    try:
+        sku = SKU.objects.filter(id=id).first()
+        if sku is None:
+            raise SKUNotFound("SKU not found")
 
-    if sku.product.seller == seller:
-        try:
-            sku.delete()
-        except Exception as e:
-            raise Exception(f"failed to delete sku: {e}")
-    else:
-        raise Exception("Access Denied")
+        product = sku.product
+        if product.seller != seller:
+            raise AccessDenied("SKU does not belong to the authenticated seller")
+
+        if product.status == ProductStatus.HARD_BLOCKED:
+            raise BlockedProductException("SKU does not belong to the authenticated seller")
+
+        if sku.reserved_quantity > 0:
+            raise SKUGotActiveReserbes("Cannot delete SKU with active reserves")
+
+        sku_id = sku.id
+        sku.delete()
+
+        if product.status == ProductStatus.ON_MODERATION:
+            services_channel_producer.product_moder_notification(
+                data={
+                    "idempotency_key": str(uuid.uuid4()),
+                    "product_id": str(product.id),
+                    "sku_id": str(sku_id),
+                    "seller_id": str(seller.id),
+                    "event": "DELETED",
+                    "date": str(datetime.now()),
+                },
+                corrected=True,
+            )
+
+        if sku.active_quantity > 0:
+            services_channel_producer.product_b2c_notification(
+                data={
+                    "idempotency_key": str(uuid.uuid4()),
+                    "product_id": str(product.id),
+                    "sku_id": str(sku_id),
+                    "event": "SKU_OUT_OF_STOCK",
+                    "date": str(datetime.now()),
+                },
+                corrected=True,
+            )
+
+        product_serializer = ProductSerializer(product).data
+        if len(product_serializer["skus"]) == 0:
+            product.status = ProductStatus.CREATED
+        product.save()
+
+    except SKUNotFound as e:
+        raise e
+    except BlockedProductException as e:
+        raise e
+    except AccessDenied as e:
+        raise e
+    except SKUGotActiveReserbes as e:
+        raise e
+    except Exception as e:
+        raise Exception(f"failed to delete sku: {e}")
