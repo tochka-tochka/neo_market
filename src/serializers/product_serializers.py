@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from src.models.product import BlockingReason, Product, ProductFieldReport, ProductImage
+from src.models.product import BlockingReason, Product, ProductFieldReport, ProductImage, ProductCharacteristics, \
+    SkuCharacteristics
 from src.models.user import Seller
 from src.serializers.category_seializers import CategorySerializer
 from src.serializers.skus_serializers import PublicSKUSerializer, SKUSerializer
@@ -121,11 +122,17 @@ class PublicCatalogProductSerializer(serializers.ModelSerializer):
         return None
 
 
+class ProductCharacteristicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductCharacteristics
+        fields = ["id", "product_id", "name", "value"]
+
+
 class PublicProductSerializer(serializers.ModelSerializer):
     category_id = serializers.UUIDField(source="category.id", read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
     skus = PublicSKUSerializer(many=True, read_only=True)
-    characteristics = serializers.JSONField(required=False, allow_null=True)
+    characteristics = ProductCharacteristicSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
@@ -146,7 +153,7 @@ class ProductSerializer(serializers.ModelSerializer):
     seller_id = serializers.UUIDField(source="seller.id", read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
     skus = SKUSerializer(many=True, read_only=True)
-    characteristics = serializers.JSONField(required=False, allow_null=True)
+    characteristics = ProductCharacteristicSerializer(many=True, read_only=True)
     blocking_reason_id = serializers.SerializerMethodField()
     field_reports = ProductFieldReportSerializer(many=True, read_only=True)
 
