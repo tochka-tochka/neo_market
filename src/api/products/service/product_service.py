@@ -90,6 +90,8 @@ def create_product(data: Dict[str, Any], seller: Seller):
     if isinstance(chars, str):
         try:
             chars = json.loads(chars)
+            for char in chars:
+                char["id"] = uuid.uuid4()
         except json.JSONDecodeError:
             chars = {}
 
