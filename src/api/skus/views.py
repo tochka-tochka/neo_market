@@ -1,3 +1,4 @@
+from src.models.product import SKU
 from django.http import JsonResponse
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
@@ -80,7 +81,7 @@ class SkusView(APIView):
             'article': article,
             'discount': int(discount or 0),
             'characteristics': characteristics,
-            'iamges': images
+            'images': images
         }
 
         serializer = SKUSerializer(data=data)
@@ -89,6 +90,8 @@ class SkusView(APIView):
 
         try:
             sku = update_sku(data, request.user)
+        except SKU.DoesNotExist:
+            return JsonResponse({"message": "SKU not found"}, status=404)
         except AccessDenied as e:
             return JsonResponse({"message": str(e)}, status=403)
         except BlockedProductException:

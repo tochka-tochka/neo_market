@@ -26,6 +26,7 @@ from .service.product_service import (
     HardBlockerProduct,
     InvalidCategoryId,
     ProductAlreadyDeleted,
+    ProductNotFound
 )
 from .service.public_product_service import WrongSortParam
 
@@ -48,7 +49,7 @@ class ProductDetailView(APIView):
             else:
                 product = get_product(id, request.user)
         except Product.DoesNotExist:
-            return JsonResponse({"message": "product not found"}, status=404)
+            return JsonResponse({"message": "Product not found"}, status=404)
         except Exception as e:
             return JsonResponse({"message": str(e)}, status=500)
 
@@ -79,6 +80,8 @@ class ProductDetailView(APIView):
 
         try:
             updated_product = update_product(data, request.user)
+        except Product.DoesNotExist:
+            return JsonResponse({"message": "Product not found"}, status=404)
         except AccessDenied as e:
             return JsonResponse({"message": str(e)}, status=403)
         except HardBlockerProduct as e:
