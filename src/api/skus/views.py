@@ -1,3 +1,4 @@
+from src.models.product import SKU
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -84,14 +85,14 @@ class SkusView(APIView):
         images = request.data.get("images")
 
         data = {
-            "id": id,
-            "name": name,
-            "price": price,
-            "cost_price": int(cost_price),
-            "article": article,
-            "discount": int(discount or 0),
-            "characteristics": characteristics,
-            "iamges": images,
+            'id': id,
+            'name': name,
+            'price': price,
+            'cost_price': int(cost_price),
+            'article': article,
+            'discount': int(discount or 0),
+            'characteristics': characteristics,
+            'images': images
         }
 
         serializer = SKUSerializer(data=data)
@@ -100,6 +101,8 @@ class SkusView(APIView):
 
         try:
             sku = update_sku(data, request.user)
+        except SKU.DoesNotExist:
+            return JsonResponse({"message": "SKU not found"}, status=404)
         except AccessDenied as e:
             return JsonResponse({"message": str(e)}, status=403)
         except BlockedProductException:

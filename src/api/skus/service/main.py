@@ -102,59 +102,59 @@ def update_sku(data: Dict[str, Any], seller):
         if product.status == ProductStatus.HARD_BLOCKED:
             raise BlockedProductException("This product hard-blocked")
 
-        if sku.product.seller == seller:
-            if data.get("name") is not None:
-                sku.name = data["name"]
+        if sku.product.seller != seller:
+            raise AccessDenied("Product does not belong to the authenticated seller")
+            
+        if data.get("name") is not None:
+            sku.name = data["name"]
 
-            if data.get("price") is not None:
-                sku.price = int(data["price"])
+        if data.get("price") is not None:
+            sku.price = int(data["price"])
 
-            if data.get("cost_price") is not None:
-                sku.cost_price = int(data["cost_price"])
+        if data.get("cost_price") is not None:
+            sku.cost_price = int(data["cost_price"])
 
-            if data.get("discount") is not None:
-                sku.discount = int(data["discount"])
+        if data.get("discount") is not None:
+            sku.discount = int(data["discount"])
 
-            if data.get("active_quantity") is not None:
-                sku.active_quantity = int(data["active_quantity"])
+        if data.get("active_quantity") is not None:
+            sku.active_quantity = int(data["active_quantity"])
 
-            if data.get("characteristics") is not None:
-                chars = data["characteristics"]
-                if isinstance(chars, str):
-                    chars = json.loads(chars)
-                sku.characteristics = chars
+        if data.get("characteristics") is not None:
+            chars = data["characteristics"]
+            if isinstance(chars, str):
+                chars = json.loads(chars)
+            sku.characteristics = chars
 
-            images = data.get("images")
-            if images:
-                SKUImage.objects.filter(sku=sku).delete()
-                for index, image in enumerate(images):
-                    SKUImage.objects.create(sku=sku, url=image.url, order=index)
+        images = data.get("images")
+        if images:
+            SKUImage.objects.filter(sku=sku).delete()
+            for index, image in enumerate(images):
+                SKUImage.objects.create(sku=sku, url=image.url, order=index)
 
-            sku.save()
-            product = Product.objects.get(id=sku.product.id)
-            product.status = ProductStatus.ON_MODERATION
-            product.save()
+        sku.save()
+        product = Product.objects.get(id=sku.product.id)
+        product.status = ProductStatus.ON_MODERATION
+        product.save()
 
-            services_channel_producer.product_moder_notification(
-                data={
-                    "idempotency_key": str(uuid.uuid4()),
-                    "product_id": str(product.id),
-                    "seller_id": str(seller.id),
-                    "event": "EDITED",
-                    "date": str(datetime.now()),
-                },
-                corrected=True,
-            )
+        services_channel_producer.product_moder_notification(
+            data={
+                "idempotency_key": str(uuid.uuid4()),
+                "product_id": str(product.id),
+                "seller_id": str(seller.id),
+                "event": "EDITED",
+                "date": str(datetime.now()),
+            },
+            corrected=True,
+        )
 
-            return SKUSerializer(sku).data
-        else:
-            raise AccessDenied("Access Denied")
+        return SKUSerializer(sku).data
+    except SKU.DoesNotExist as e:
+        raise e
     except AccessDenied as e:
         raise e
     except BlockedProductException as e:
         raise e
-    except SKU.DoesNotExist:
-        raise Exception(f"SKU with id {data.get('id')} not found")
     except Exception as e:
         raise Exception(f"failed to update sku: {e}")
 

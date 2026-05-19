@@ -32,6 +32,10 @@ class ProductAlreadyDeleted(Exception):
     pass
 
 
+class ProductNotFound(Exception):
+    pass
+
+
 def get_seller_products(
     search: str | None,
     status: ProductStatus | None,
@@ -144,7 +148,7 @@ def update_product(data: Dict[str, Any], seller: Seller):
             raise HardBlockerProduct("Product is hard-blocked")
 
         if product.seller != seller:
-            raise AccessDenied("Access Denied")
+            raise AccessDenied("Product does not belong to the authenticated seller")
 
         if data.get("title") is not None:
             product.title = data["title"]
@@ -198,14 +202,14 @@ def update_product(data: Dict[str, Any], seller: Seller):
 
         return ProductSerializer(product).data
 
-    except AccessDenied:
-        raise HardBlockerProduct(
-            "failed to update product: You are not product's owner"
-        )
+    except ProductNotFound as e:
+        raise e
+    except AccessDenied as e:
+        raise e
     except HardBlockerProduct:
         raise HardBlockerProduct("failed to update product: Product is hard-blocked")
-    except Product.DoesNotExist:
-        raise Exception(f"Product with id {data.get('id')} not found")
+    except Product.DoesNotExist as e:
+        raise e
     except Exception as e:
         raise Exception(f"failed to update product: {e}")
 
