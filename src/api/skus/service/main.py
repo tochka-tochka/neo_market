@@ -34,13 +34,11 @@ def create_sku(data: Dict[str, Any], seller):
     if isinstance(chars, str):
         try:
             chars = json.loads(chars)
-            for char in chars:
-                char["id"] = uuid.uuid4()
         except json.JSONDecodeError:
             chars = {}
-
-
     try:
+        for char in chars:
+            char["id"] = str(uuid.uuid4())
         product = Product.objects.filter(id=data.get("product_id")).first()
 
         if product is None:

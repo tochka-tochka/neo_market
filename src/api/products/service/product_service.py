@@ -103,6 +103,8 @@ def create_product(data: Dict[str, Any], seller: Seller):
             raise InvalidCategoryId(f"Category with id {category_id} does not exist")
 
     try:
+        for char in chars:
+            char["id"] = str(uuid.uuid4())
         product = Product.objects.create(
             id=product_id,
             title=data.get("title"),
