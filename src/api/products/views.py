@@ -26,6 +26,7 @@ from .service.product_service import (
     HardBlockerProduct,
     InvalidCategoryId,
     ProductAlreadyDeleted,
+    ProductNotFound
 )
 from .service.public_product_service import WrongSortParam
 

@@ -20,6 +20,9 @@ class AccessDenied(Exception):
 class SKUNotFound(Exception):
     pass
 
+class ProductNotFound(Exception):
+    pass
+
 class SKUGotActiveReserbes(Exception):
     pass
 
@@ -36,11 +39,14 @@ def create_sku(data: Dict[str, Any], seller):
             chars = json.loads(chars)
         except json.JSONDecodeError:
             chars = {}
-
     try:
+        for char in chars:
+            char["id"] = str(uuid.uuid4())
         product = Product.objects.filter(id=data.get("product_id")).first()
+
         if product is None:
-            raise ProductNotFound()
+            raise ProductNotFound("Product not found")
+            
         if product.status == ProductStatus.HARD_BLOCKED:
             raise BlockedProductException("This product hard-blocked")
 
