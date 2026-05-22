@@ -26,6 +26,9 @@ class ProductNotFound(Exception):
 class SKUGotActiveReserbes(Exception):
     pass
 
+class ProductNotFound(Exception):
+    pass
+
 
 @transaction.atomic
 def create_sku(data: Dict[str, Any], seller):

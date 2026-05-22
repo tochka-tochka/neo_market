@@ -14,6 +14,9 @@ class ProductNotModerated(Exception):
 class AccessDenied(Exception):
     pass
 
+class SKUNotFound(Exception):
+    pass
+
 
 @transaction.atomic
 def get_all_invoices(seller):
@@ -30,7 +33,9 @@ def create_invoice(data, seller):
     try:
         invoice = Invoice.objects.create(created_at=datetime.now(), seller=seller)
         for item in data["items"]:
-            sku = SKU.objects.get(id=item["sku_id"])
+            sku = SKU.objects.filter(id=item["sku_id"]).first()
+            if sku is None:
+                raise SKUNotFound()
             product = Product.objects.get(id=sku.product.id)
             if product.status != ProductStatus.MODERATED:
                 raise ProductNotModerated(

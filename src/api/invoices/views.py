@@ -1,14 +1,14 @@
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import FormParser, JSONParser, MultiPartParser
+from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from src.api.invoices.service.main import (
     AccessDenied,
     ProductNotModerated,
-    accept_invoice,
+    SKUNotFound,
     create_invoice,
     delete_invoice,
     get_all_invoices,
@@ -25,7 +25,7 @@ class InvoicesView(APIView):
         try:
             invoices = get_all_invoices(request.user)
         except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
+            return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
         return JsonResponse({"invoices": invoices})
 
@@ -33,17 +33,35 @@ class InvoicesView(APIView):
         items = request.data.get("items")
         if not items or len(items) == 0:
             return JsonResponse(
-                {"message": "At least one item is required"}, status=400
+                {"code": "INVALID_REQUEST", "message": "At least one item is required"},
+                status=400,
             )
 
         try:
             invoice = create_invoice({"items": items}, request.user)
-        except AccessDenied as e:
-            return JsonResponse({"message": str(e)}, status=403)
-        except ProductNotModerated as e:
-            return JsonResponse({"message": str(e)}, status=400)
+        except SKUNotFound:
+            return JsonResponse(
+                {"code": "NOT_FOUND", "message": "SKU not found"},
+                status=404,
+            )
+        except AccessDenied:
+            return JsonResponse(
+                {
+                    "code": "NOT_OWNER",
+                    "message": "One or more SKUs do not belong to the authenticated seller",
+                },
+                status=403,
+            )
+        except ProductNotModerated:
+            return JsonResponse(
+                {
+                    "code": "INVALID_REQUEST",
+                    "message": "Invoice can only be created for MODERATED products",
+                },
+                status=400,
+            )
         except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
+            return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
         return JsonResponse(invoice, status=201)
 
@@ -51,7 +69,6 @@ class InvoicesView(APIView):
         try:
             delete_invoice(id, request.user)
         except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
+            return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
         return JsonResponse({"message": "success"}, status=200)
-
