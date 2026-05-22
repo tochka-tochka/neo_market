@@ -26,7 +26,6 @@ from .service.product_service import (
     HardBlockerProduct,
     InvalidCategoryId,
     ProductAlreadyDeleted,
-    ProductNotFound
 )
 from .service.public_product_service import WrongSortParam
 
@@ -49,9 +48,11 @@ class ProductDetailView(APIView):
             else:
                 product = get_product(id, request.user)
         except Product.DoesNotExist:
-            return JsonResponse({"message": "Product not found"}, status=404)
+            return JsonResponse(
+                {"code": "NOT_FOUND", "message": "Product not found"}, status=404
+            )
         except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
+            return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
         return JsonResponse({"product": product})
 
@@ -63,7 +64,13 @@ class ProductDetailView(APIView):
 
         images = request.data.get("images")
         if len(images) == 0:
-            return JsonResponse({"errors": "images required"}, status=422)
+            return JsonResponse(
+                {
+                    "code": "INVALID_REQUEST",
+                    "message": "At least one image is required",
+                },
+                status=422,
+            )
 
         data = {
             "id": id,
@@ -76,18 +83,31 @@ class ProductDetailView(APIView):
 
         serializer = ProductSerializer(data=data)
         if not serializer.is_valid():
-            return JsonResponse({"errors": serializer.errors}, status=422)
+            return JsonResponse(
+                {"code": "INVALID_REQUEST", "message": serializer.errors}, status=422
+            )
 
         try:
             updated_product = update_product(data, request.user)
         except Product.DoesNotExist:
-            return JsonResponse({"message": "Product not found"}, status=404)
-        except AccessDenied as e:
-            return JsonResponse({"message": str(e)}, status=403)
-        except HardBlockerProduct as e:
-            return JsonResponse({"message": str(e)}, status=403)
+            return JsonResponse(
+                {"code": "NOT_FOUND", "message": "Product not found"}, status=404
+            )
+        except AccessDenied:
+            return JsonResponse(
+                {
+                    "code": "NOT_OWNER",
+                    "message": "Product does not belong to the authenticated seller",
+                },
+                status=403,
+            )
+        except HardBlockerProduct:
+            return JsonResponse(
+                {"code": "FORBIDDEN", "message": "Cannot edit hard-blocked product"},
+                status=403,
+            )
         except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
+            return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
         return JsonResponse(updated_product, status=200)
 
@@ -95,13 +115,29 @@ class ProductDetailView(APIView):
         try:
             delete_product(id, request.user)
         except Product.DoesNotExist:
-            return JsonResponse({"message": "product not found"}, status=404)
-        except ProductAlreadyDeleted as e:
-            return JsonResponse({"message": str(e)}, status=400)
+            return JsonResponse(
+                {"code": "NOT_FOUND", "message": "Product not found"}, status=404
+            )
+        except AccessDenied:
+            return JsonResponse(
+                {
+                    "code": "NOT_OWNER",
+                    "message": "Product does not belong to the authenticated seller",
+                },
+                status=403,
+            )
+        except ProductAlreadyDeleted:
+            return JsonResponse(
+                {"code": "INVALID_REQUEST", "message": "Product already deleted"},
+                status=400,
+            )
         except HardBlockerProduct as e:
-            return JsonResponse({"message": str(e)}, status=403)
+            return JsonResponse(
+                {"code": "FORBIDDEN", "message": "Cannot edit hard-blocked product"},
+                status=403,
+            )
         except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
+            return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
         return JsonResponse({"message": "success"}, status=204)
 
@@ -146,7 +182,7 @@ class ProductsView(APIView):
                     limit=request.query_params.get("limit"),
                     offset=request.query_params.get("offset"),
                     seller=request.user,
-                    deleted=request.query_params.get("deleted")
+                    deleted=request.query_params.get("deleted"),
                 )
             return JsonResponse(
                 {
@@ -157,10 +193,10 @@ class ProductsView(APIView):
                 },
                 status=200,
             )
-        except WrongSortParam as e:
-            return JsonResponse({"message": str(e)}, status=400)
+        except WrongSortParam:
+            return JsonResponse({"code": "INVALID_REQUEST", "message": "wrong sort param"}, status=422)
         except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
+            return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
     def post(self, request):
 
@@ -170,15 +206,22 @@ class ProductsView(APIView):
 
         category = request.data.get("category")
         if not category:
-            return JsonResponse({"errors": "category required"}, status=422)
+            return JsonResponse(
+                {"code": "INVALID_REQUEST", "message": "category required"}, status=422
+            )
 
         characteristics = request.data.get("characteristics")
         if characteristics is None:
-            return JsonResponse({"errors": "characteristics required"}, status=422)
+            return JsonResponse(
+                {"code": "INVALID_REQUEST", "message": "characteristics required"},
+                status=422,
+            )
 
         images = request.data.get("images")
         if images is None or len(images) == 0:
-            return JsonResponse({"errors": "images required"}, status=422)
+            return JsonResponse(
+                {"code": "INVALID_REQUEST", "message": "images required"}, status=422
+            )
 
         data = {
             "title": title,
@@ -191,13 +234,17 @@ class ProductsView(APIView):
 
         serializer = ProductSerializer(data=data)
         if not serializer.is_valid():
-            return JsonResponse({"errors": serializer.errors}, status=422)
+            return JsonResponse(
+                {"code": "INVALID_REQUEST", "message": serializer.errors}, status=422
+            )
 
         try:
             product = create_product(data, request.user)
         except InvalidCategoryId:
-            return JsonResponse({"message": "category doesnt exists"}, status=422)
+            return JsonResponse(
+                {"code": "INVALID_REQUEST", "message": "Category not found"}, status=422
+            )
         except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
+            return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
         return JsonResponse(product, status=201, safe=False)

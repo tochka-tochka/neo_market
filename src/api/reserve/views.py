@@ -47,7 +47,7 @@ class UnreserveView(APIView):
             result = unreserve(request.data.get("order_id"), request.data.get("items"))
             return JsonResponse(result, status=200)
         except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
+            return JsonResponse({"code":"SERVER_ERROR", "message": str(e)}, status=500)
 
 @method_decorator(csrf_exempt, name="dispatch")
 class FullifyView(APIView):
@@ -58,7 +58,7 @@ class FullifyView(APIView):
         try:
             result = fullify(request.data.get("order_id"), request.data.get("items"))
             return JsonResponse(result, status=200)
-        except OrderNotFound as e:
-            return JsonResponse({"message": str(e)}, status=404)
+        except OrderNotFound:
+            return JsonResponse({"code": "NOT_FOUND", "message": "order not found"}, status=404)
         except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
+            return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)

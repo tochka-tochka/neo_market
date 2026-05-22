@@ -210,6 +210,7 @@ def update_product(data: Dict[str, Any], seller: Seller):
         raise Exception(f"failed to update product: {e}")
 
 
+@transaction.atomic
 def delete_product(id: str, seller: Seller):
     try:
         product = Product.objects.get(id=id)
