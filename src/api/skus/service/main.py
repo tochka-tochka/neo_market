@@ -78,10 +78,10 @@ def create_sku(data: Dict[str, Any], seller):
             product=product,
         )
 
-        images = data["images"]
-
+        images = data.get("images")
+        print(images)
         if images:
-            for index, image in enumerate(images):
+            for image in images:
                 SKUImage.objects.create(
                     sku=sku, url=image["url"], ordering=image["ordering"]
                 )
@@ -132,8 +132,8 @@ def update_sku(data: Dict[str, Any], seller):
         images = data.get("images")
         if images:
             SKUImage.objects.filter(sku=sku).delete()
-            for index, image in enumerate(images):
-                SKUImage.objects.create(sku=sku, url=image.url, order=index)
+            for image in images:
+                SKUImage.objects.create(sku=sku, url=image["url"], ordering=image["ordering"])
 
         sku.save()
         product = Product.objects.get(id=sku.product.id)
