@@ -1,3 +1,4 @@
+from django.db.models import CASCADE, SET_NULL
 from src.models.user import Seller
 from datetime import datetime
 from uuid import uuid4
@@ -222,17 +223,31 @@ class ReserveOperations(models.Model):
     class Meta:
         db_table = "reserve_operations"
 
-
-class FullifiedOrders(models.Model):
-    order_id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = "fullified_orders"
-
-
 class ModerationDecisions(models.Model):
     idempotency_key = models.UUIDField(primary_key=True, default=uuid4, editable=False)
 
     class Meta:
         db_table = "moderation_decisions"
+
+class OrderStatus(models.TextChoices):
+    RESERVED = "RESERVED"
+    UNRESERVED = "UNRESERVED"
+    FULLIFIED = "FULLIFIED"
+
+class Order(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    status = models.TextField(choices=OrderStatus.choices)
+    created_at = models.DateTimeField(auto_now_add=True)
+    fullified_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "orders"
+
+class OrderItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    order = models.ForeignKey(Order, on_delete=CASCADE, related_name="items")
+    sku = models.ForeignKey(SKU, on_delete=SET_NULL, null=True)
+    quantity = models.IntegerField(validators=[MinValueValidator(0)])
+
+    class Meta:
+        db_table = "order_items"

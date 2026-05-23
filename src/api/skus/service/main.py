@@ -1,9 +1,9 @@
+from src.serializers.product_serializers import ProductSerializer
 import json
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any, Dict
 
-from django.core.files.uploadedfile import UploadedFile
 from django.db import transaction
 
 from interservice_queues.producers import services_channel_producer
@@ -14,8 +14,19 @@ from src.serializers.skus_serializers import SKUSerializer
 class BlockedProductException(Exception):
     pass
 
-
 class AccessDenied(Exception):
+    pass
+
+class SKUNotFound(Exception):
+    pass
+
+class ProductNotFound(Exception):
+    pass
+
+class SKUGotActiveReserbes(Exception):
+    pass
+
+class ProductNotFound(Exception):
     pass
 
 
@@ -28,10 +39,14 @@ def create_sku(data: Dict[str, Any], seller):
             chars = json.loads(chars)
         except json.JSONDecodeError:
             chars = {}
-
-    product = Product.objects.get(id=data.get("product_id"))
-
     try:
+        for char in chars:
+            char["id"] = str(uuid.uuid4())
+        product = Product.objects.filter(id=data.get("product_id")).first()
+
+        if product is None:
+            raise ProductNotFound("Product not found")
+            
         if product.status == ProductStatus.HARD_BLOCKED:
             raise BlockedProductException("This product hard-blocked")
 
@@ -63,13 +78,15 @@ def create_sku(data: Dict[str, Any], seller):
             product=product,
         )
 
-        images = data["images"]
-
+        images = data.get("images")
+        print(images)
         if images:
-            for index, image in enumerate(images):
+            for image in images:
                 SKUImage.objects.create(
                     sku=sku, url=image["url"], ordering=image["ordering"]
                 )
+    except ProductNotFound as e:
+        raise e
     except AccessDenied as e:
         raise e
     except BlockedProductException as e:
@@ -88,71 +105,120 @@ def update_sku(data: Dict[str, Any], seller):
         if product.status == ProductStatus.HARD_BLOCKED:
             raise BlockedProductException("This product hard-blocked")
 
-        if sku.product.seller == seller:
-            if data.get("name") is not None:
-                sku.name = data["name"]
+        if sku.product.seller != seller:
+            raise AccessDenied("Product does not belong to the authenticated seller")
+            
+        if data.get("name") is not None:
+            sku.name = data["name"]
 
-            if data.get("price") is not None:
-                sku.price = int(data["price"])
+        if data.get("price") is not None:
+            sku.price = int(data["price"])
 
-            if data.get("cost_price") is not None:
-                sku.cost_price = int(data["cost_price"])
+        if data.get("cost_price") is not None:
+            sku.cost_price = int(data["cost_price"])
 
-            if data.get("discount") is not None:
-                sku.discount = int(data["discount"])
+        if data.get("discount") is not None:
+            sku.discount = int(data["discount"])
 
-            if data.get("active_quantity") is not None:
-                sku.active_quantity = int(data["active_quantity"])
+        if data.get("active_quantity") is not None:
+            sku.active_quantity = int(data["active_quantity"])
 
-            if data.get("characteristics") is not None:
-                chars = data["characteristics"]
-                if isinstance(chars, str):
-                    chars = json.loads(chars)
-                sku.characteristics = chars
+        if data.get("characteristics") is not None:
+            chars = data["characteristics"]
+            if isinstance(chars, str):
+                chars = json.loads(chars)
+            sku.characteristics = chars
 
-            images = data.get("images")
-            if images:
-                SKUImage.objects.filter(sku=sku).delete()
-                for index, image in enumerate(images):
-                    SKUImage.objects.create(sku=sku, url=image.url, order=index)
+        images = data.get("images")
+        if images:
+            SKUImage.objects.filter(sku=sku).delete()
+            for image in images:
+                SKUImage.objects.create(sku=sku, url=image["url"], ordering=image["ordering"])
 
-            sku.save()
-            product = Product.objects.get(id=sku.product.id)
-            product.status = ProductStatus.ON_MODERATION
-            product.save()
+        sku.save()
+        product = Product.objects.get(id=sku.product.id)
+        product.status = ProductStatus.ON_MODERATION
+        product.save()
 
-            services_channel_producer.product_moder_notification(
-                data={
-                    "idempotency_key": str(uuid.uuid4()),
-                    "product_id": str(product.id),
-                    "seller_id": str(seller.id),
-                    "event": "EDITED",
-                    "date": str(datetime.now()),
-                },
-                corrected=True,
-            )
+        services_channel_producer.product_moder_notification(
+            data={
+                "idempotency_key": str(uuid.uuid4()),
+                "product_id": str(product.id),
+                "seller_id": str(seller.id),
+                "event": "EDITED",
+                "date": str(datetime.now()),
+            },
+            corrected=True,
+        )
 
-            return SKUSerializer(sku).data
-        else:
-            raise AccessDenied("Access Denied")
+        return SKUSerializer(sku).data
+    except SKU.DoesNotExist as e:
+        raise e
     except AccessDenied as e:
         raise e
     except BlockedProductException as e:
         raise e
-    except SKU.DoesNotExist:
-        raise Exception(f"SKU with id {data.get('id')} not found")
     except Exception as e:
         raise Exception(f"failed to update sku: {e}")
 
 
 @transaction.atomic
 def delete_sku(id, seller):
-    sku = SKU.objects.get(id=id)
+    try:
+        sku = SKU.objects.filter(id=id).first()
+        if sku is None:
+            raise SKUNotFound("SKU not found")
 
-    if sku.product.seller == seller:
-        try:
-            sku.delete()
-        except Exception as e:
-            raise Exception(f"failed to delete sku: {e}")
-    else:
-        raise Exception("Access Denied")
+        product = sku.product
+        if product.seller != seller:
+            raise AccessDenied("SKU does not belong to the authenticated seller")
+
+        if product.status == ProductStatus.HARD_BLOCKED:
+            raise BlockedProductException("SKU does not belong to the authenticated seller")
+
+        if sku.reserved_quantity > 0:
+            raise SKUGotActiveReserbes("Cannot delete SKU with active reserves")
+
+        sku_id = sku.id
+        sku.delete()
+
+        if product.status == ProductStatus.ON_MODERATION:
+            services_channel_producer.product_moder_notification(
+                data={
+                    "idempotency_key": str(uuid.uuid4()),
+                    "product_id": str(product.id),
+                    "sku_id": str(sku_id),
+                    "seller_id": str(seller.id),
+                    "event": "DELETED",
+                    "date": str(datetime.now()),
+                },
+                corrected=True,
+            )
+
+        if sku.active_quantity > 0:
+            services_channel_producer.product_b2c_notification(
+                data={
+                    "idempotency_key": str(uuid.uuid4()),
+                    "product_id": str(product.id),
+                    "sku_id": str(sku_id),
+                    "event": "SKU_OUT_OF_STOCK",
+                    "date": str(datetime.now()),
+                },
+                corrected=True,
+            )
+
+        product_serializer = ProductSerializer(product).data
+        if len(product_serializer["skus"]) == 0:
+            product.status = ProductStatus.CREATED
+        product.save()
+
+    except SKUNotFound as e:
+        raise e
+    except BlockedProductException as e:
+        raise e
+    except AccessDenied as e:
+        raise e
+    except SKUGotActiveReserbes as e:
+        raise e
+    except Exception as e:
+        raise Exception(f"failed to delete sku: {e}")
