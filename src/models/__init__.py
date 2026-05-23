@@ -12,3 +12,4 @@ from .product import (
     OrderItem
 )
 from .user import Seller
+from .outbox import InterserviceOutbox
