@@ -55,7 +55,7 @@ class ProductDetailView(APIView):
         except Exception as e:
             return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
-        return JsonResponse({"product": product})
+        return JsonResponse(product, status=200)
 
     def patch(self, request, id):
         title = request.data.get("title")
