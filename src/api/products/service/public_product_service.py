@@ -1,6 +1,6 @@
 from django.db.models import Sum, Q, Min
 
-from src.api.products.service.product_utils import filter_query
+from src.api.products.service.product_utils import product_filter_query
 from src.models.product import Product, ProductStatus
 from src.serializers.product_serializers import PublicProductSerializer, PublicCatalogProductSerializer
 
@@ -55,7 +55,7 @@ def get_products_for_catalog(search, category, ids, limit, offset, sort, filters
         raise WrongSortParam("worng sort param")
 
     if filters:
-        query &= filter_query(filters)
+        query &= product_filter_query(filters)
 
     order_by_map = {
         "price_asc": "+price",

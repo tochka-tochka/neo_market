@@ -7,7 +7,7 @@ from django.db import transaction
 from django.db.models import Q
 
 from interservice_queues.producers import services_channel_producer
-from src.api.products.service.product_utils import filter_query
+from src.api.products.service.product_utils import product_filter_query
 from src.models import Category
 from src.models.product import Product, ProductImage, ProductStatus, ProductCharacteristics
 from src.models.user import Seller
@@ -61,7 +61,7 @@ def get_seller_products(
             offset = 0
 
         if filters:
-            query &= filter_query(filters)
+            query &= product_filter_query(filters)
 
         products = Product.objects.select_related("category").filter(query)[
             offset : offset + limit

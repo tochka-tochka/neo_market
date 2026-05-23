@@ -1,12 +1,13 @@
 import uuid
+from collections import defaultdict
 from typing import Literal
 
-from django.db.models import Q
+from django.db.models import Q, Count
 
 from src.api.products.service.category_service import get_category
+from src.api.products.service.product_utils import product_filter_query
 from src.models import Category, Product
 from src.models.category import CategorySEOKeyword, CategoryMetaTag, CategoryFilter
-from src.models.product import ProductCharacteristics
 
 
 # TODO: lang support
@@ -82,5 +83,21 @@ def category_products_queryset(category_id: uuid.UUID, applied_filters: list[tup
     return Product.objects.filter(characteristics_filter, category_id=category_id)
 
 
-def get_category_facet(category_id: uuid.UUID, applied_filters: list[tuple[str, str]]):
-    raise NotImplementedError
+def get_category_facet(category_id: str, filters: dict[str, list[str]]) -> list:
+    filter_query = product_filter_query(filters)
+    product_query = Q(category_id=category_id)
+    queryset = (Product.objects.filter(product_query & filter_query)
+                .values('characteristics__name', 'characteristics__value')
+                .annotate(count=Count('id')))
+
+    joined_facets = defaultdict(list)
+    for raw_facet_item in queryset:
+        joined_facets[raw_facet_item["characteristics__name"]].append({
+            "value": raw_facet_item['characteristics__value'],
+            "count": raw_facet_item['count']
+        })
+
+    return [
+        {"name": fname, "values": fvalues}
+        for fname, fvalues in joined_facets.items()
+    ]

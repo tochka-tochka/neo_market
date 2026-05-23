@@ -15,7 +15,7 @@ def parse_query_filters(filter_param_name: str, query_dict: QueryDict) -> dict[s
     return result
 
 
-def filter_query(filters: dict[str, list[str]]) -> Q:
+def product_filter_query(filters: dict[str, list[str]]) -> Q:
     filters_query = Q()
     for filter_name, filter_values in filters.items():
         filter_query = Q()

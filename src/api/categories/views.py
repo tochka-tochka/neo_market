@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from src.api.categories.services import get_full_category, get_category_filters,get_category_facet
 from src.api.products.service.category_service import get_categories
+from src.api.products.service.product_utils import parse_query_filters
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -46,7 +47,14 @@ class CategoryFilterView(APIView):
 
 class CatalogFacets(APIView):
     def get(self, request: HttpRequest):
-        category_id = request.GET.get('category_id')
-        applied_filters = request.GET.get('filters')
-        print(applied_filters)
-        return JsonResponse(get_category_facet(uuid.UUID(category_id), applied_filters), safe=False)
+        category_id = request.GET.get("category_id")
+        filters = parse_query_filters("filters", request.GET)
+        facets = get_category_facet(category_id, filters)
+        return JsonResponse(
+            {
+                "category_id": category_id,
+                "facets": facets
+            },
+            status=200,
+            safe=False
+        )
