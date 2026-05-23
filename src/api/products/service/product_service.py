@@ -7,6 +7,7 @@ from django.db import transaction
 from django.db.models import Q
 
 from interservice_queues.producers import services_channel_producer
+from src.api.products.service.product_utils import filter_query
 from src.models import Category
 from src.models.product import Product, ProductImage, ProductStatus, ProductCharacteristics
 from src.models.user import Seller
@@ -33,12 +34,13 @@ class ProductAlreadyDeleted(Exception):
 
 
 def get_seller_products(
-    search: str | None,
-    status: ProductStatus | None,
-    limit: int | None,
-    offset: int | None,
-    seller: Seller,
-    deleted: bool | None,
+        search: str | None,
+        status: ProductStatus | None,
+        limit: int | None,
+        offset: int | None,
+        seller: Seller,
+        deleted: bool | None,
+        filters: dict[str, list[str]]
 ):
     try:
         query = Q(seller=seller)
@@ -57,6 +59,9 @@ def get_seller_products(
 
         if offset is None:
             offset = 0
+
+        if filters:
+            query &= filter_query(filters)
 
         products = Product.objects.select_related("category").filter(query)[
             offset : offset + limit

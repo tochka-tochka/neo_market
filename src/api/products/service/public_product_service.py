@@ -1,5 +1,6 @@
 from django.db.models import Sum, Q, Min
 
+from src.api.products.service.product_utils import filter_query
 from src.models.product import Product, ProductStatus
 from src.serializers.product_serializers import PublicProductSerializer, PublicCatalogProductSerializer
 
@@ -29,7 +30,7 @@ def get_product_public(id: str):
         raise Exception(f"failed to get product: {e}")
 
 
-def get_products_for_catalog(search, category, ids, limit, offset, sort):
+def get_products_for_catalog(search, category, ids, limit, offset, sort, filters: dict[str, list[str]]):
     query = Q(deleted=False, status=ProductStatus.MODERATED)
     
     if ids and len(ids) > 0:
@@ -52,6 +53,9 @@ def get_products_for_catalog(search, category, ids, limit, offset, sort):
 
     if sort not in ["price_asc", "price_desc", "date_desc"]:
         raise WrongSortParam("worng sort param")
+
+    if filters:
+        query &= filter_query(filters)
 
     order_by_map = {
         "price_asc": "+price",

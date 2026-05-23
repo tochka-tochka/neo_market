@@ -29,6 +29,7 @@ from .service.product_service import (
     InvalidCategoryId,
     ProductAlreadyDeleted,
 )
+from .service.product_utils import parse_query_filters
 from .service.public_product_service import WrongSortParam
 
 
@@ -128,6 +129,7 @@ class ProductsView(APIView):
                     sort=request.query_params.get("sort"),
                     limit=request.query_params.get("limit"),
                     offset=request.query_params.get("offset"),
+                    filters=parse_query_filters("filters", request.query_params),
                 )
                 return JsonResponse(
                     {
@@ -145,7 +147,8 @@ class ProductsView(APIView):
                     limit=request.query_params.get("limit"),
                     offset=request.query_params.get("offset"),
                     seller=request.user,
-                    deleted=request.query_params.get("deleted")
+                    deleted=request.query_params.get("deleted"),
+                    filters=parse_query_filters("filters", request.query_params),
                 )
             return JsonResponse(
                 {
