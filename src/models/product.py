@@ -203,7 +203,7 @@ class InvoiceItem(models.Model):
 
 
 class ReserveOperations(models.Model):
-    idempotency_key = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    idempotency_key = models.UUIDField(primary_key=True)
     result = models.JSONField(default=None, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

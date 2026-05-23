@@ -15,19 +15,25 @@ class NotEnoughQunatity(Exception):
         self.requested = requested
         self.available = available
 
+class NegativeQuantity(Exception):
+    pass
+
 class OrderNotFound(Exception):
     pass
 
 
 @transaction.atomic
-def reserve(idempotency_key, reserved_items):
+def reserve(idempotency_key, order_id, reserved_items):
     reserve = ReserveOperations.objects.filter(idempotency_key=idempotency_key).first()
     if reserve is not None:
         return json.loads(reserve.result)
     try:
-        order = Order.objects.create(status = OrderStatus.RESERVED)
+        order = Order.objects.create(id = order_id, status = OrderStatus.RESERVED)
         for item in reserved_items:
-            sku = SKU.objects.get(id=item["sku_id"])
+            if item["quantity"] < 0:
+                raise NegativeQuantity("negative quantity")
+                
+            sku = SKU.objects.select_for_update().get(id=item["sku_id"])
 
             if sku.active_quantity - item["quantity"] < 0:
                 raise NotEnoughQunatity(
@@ -66,6 +72,9 @@ def reserve(idempotency_key, reserved_items):
 @transaction.atomic
 def unreserve(order_id, reserved_items):
     try:
+        unreserve = ReserveOperations.objects.filter(idempotency_key=order_id).first()
+        if unreserve is not None:
+            return unreserve.result
         for item in reserved_items:
             sku = SKU.objects.get(id=item["sku_id"])
             sku.active_quantity += item["quantity"]
@@ -75,8 +84,9 @@ def unreserve(order_id, reserved_items):
         result = {
             "order_id": str(order_id),
             "status": "UNRESERVED",
-            "unreserved_at": str(datetime.now())
+            "processed_at": str(datetime.now())
         }
+        ReserveOperations.objects.create(idempotency_key=order_id, result=result)
         return result
     except Exception as e:
         raise Exception(f"failed to reserve sku: {e}")
@@ -91,7 +101,7 @@ def fullify(order_id, fullifed_items):
         result = {
             "order_id": str(order_id),
             "status": "FULLIFIED",
-            "fullified_at": str(order.fullified_at)
+            "processed_at": str(order.fullified_at)
         }
         return result
     try:
