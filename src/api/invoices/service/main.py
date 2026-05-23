@@ -29,11 +29,15 @@ def get_all_invoices(seller, limit, offset, status):
 
         if offset is None:
             offset = 0
+            
         if limit is None:
             limit = 20
+
+        total_count = Invoice.objects.filter(query).count()
+            
         invoices = Invoice.objects.filter(query)[offset:offset + limit]
         serializer = InvoiceSerializer(invoices, many=True)
-        return serializer.data, limit, offset
+        return serializer.data, total_count, limit, offset
     except Exception as e:
         raise Exception(f"failed to get invoices: {e}")
 
