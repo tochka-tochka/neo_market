@@ -2,7 +2,7 @@ import json
 from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.parsers import JSONParser, MultiPartParser
+from rest_framework.parsers import JSONParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
 from src.api.reserve.service.main import NotEnoughQunatity, reserve, unreserve, fullify, OrderNotFound
@@ -16,7 +16,7 @@ class ReserveView(APIView):
 
     def post(self, request: Request):
         try:
-            result = reserve(request.data.get("idempotency_key"), request.data.get("items"))
+            result = reserve(request.data.get("idempotency_key"), request.data.get("order_id"), request.data.get("items"))
             return JsonResponse(result, status=200)
         except NotEnoughQunatity as e:
             return JsonResponse(
