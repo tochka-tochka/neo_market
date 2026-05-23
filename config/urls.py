@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from src.api.products.views import ProductsView, ProductDetailView
+from src.api.products.views import ProductsView, ProductDetailView, PublicProductsView
 from src.api.categories.views import CategoriesView, CategoryView, CategoryFilterView
 from src.api.skus.views import SkusView
 from src.api.invoices.views import InvoicesView
@@ -48,4 +48,6 @@ urlpatterns = [
 
     path('api/v1/invoices', InvoicesView.as_view(), name="invoices"),
     path('api/v1/invoices/<uuid:id>', InvoicesView.as_view()),
+
+    path('api/v1/public/products', PublicProductsView.as_view(), name='public-products')
 ]
