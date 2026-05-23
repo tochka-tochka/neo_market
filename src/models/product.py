@@ -21,7 +21,8 @@ class ProductStatus(models.TextChoices):
 
 class BlockingReason(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    reason = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
+    comment = models.TextField()
 
     class Meta:
         db_table = "blocking_reasons"
@@ -139,6 +140,7 @@ class SKUImage(models.Model):
 
 
 class ProductFieldReport(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False) 
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, name="product", related_name="field_reports"
     )
@@ -150,7 +152,7 @@ class ProductFieldReport(models.Model):
         blank=True,
         null=True,
     )
-    field = models.CharField(max_length=255)
+    field_name = models.CharField(max_length=255)
     comment = models.CharField(max_length=255)
 
     class Meta:

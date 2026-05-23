@@ -65,7 +65,10 @@ class PublicSKUSerializer(serializers.ModelSerializer):
             "product_id",
             "name",
             "price",
+            "discount",
+            "stock_quantity",
             "active_quantity",
+            "article",
             "images",
             "characteristics",
         ]
