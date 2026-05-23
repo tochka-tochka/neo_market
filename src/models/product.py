@@ -160,7 +160,7 @@ class ProductFieldReport(models.Model):
 
 
 class InvoiceStatus(models.TextChoices):
-    PENDING = "PENDING"
+    CREATED = "CREATED"
     ACCEPTED = "ACCEPTED"
     PARTIALLY_ACCEPTED = "PARTIALLY_ACCEPTED"
     REJECTED = "REJECTED"
@@ -169,7 +169,7 @@ class InvoiceStatus(models.TextChoices):
 class Invoice(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     status = models.TextField(
-        choices=InvoiceStatus.choices, default=InvoiceStatus.PENDING
+        choices=InvoiceStatus.choices, default=InvoiceStatus.CREATED
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)

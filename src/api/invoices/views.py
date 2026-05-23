@@ -23,11 +23,16 @@ class InvoicesView(APIView):
 
     def get(self, request):
         try:
-            invoices = get_all_invoices(request.user)
+            invoices, limit, offset = get_all_invoices(
+                request.user,
+                request.query_params.get("limit"),
+                request.query_params.get("offset"),
+                request.query_params.get("status"),
+            )
         except Exception as e:
             return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
-        return JsonResponse({"invoices": invoices})
+        return JsonResponse({"items": invoices, "total_count": len(invoices), "limit": limit, "offset": offset})
 
     def post(self, request):
         items = request.data.get("items")
