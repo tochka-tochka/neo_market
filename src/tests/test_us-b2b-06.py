@@ -36,7 +36,7 @@ class TestInvoiceCreation(BaseTestUtil):
         response = jwt_client.post(url, data=payload, format="json")
 
         assert response.status_code == status.HTTP_201_CREATED
-        assert response.json()["status"] == "PENDING"
+        assert response.json()["status"] == "CREATED"
 
     def test_empty_items_returns_400(self, jwt_client):
         payload = {
