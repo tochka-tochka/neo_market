@@ -23,7 +23,7 @@ class SKUNotFound(Exception):
 class ProductNotFound(Exception):
     pass
 
-class SKUGotActiveReserbes(Exception):
+class SKUGotActiveReserves(Exception):
     pass
 
 class ProductNotFound(Exception):
@@ -165,7 +165,7 @@ def update_sku(data: Dict[str, Any], seller):
 @transaction.atomic
 def delete_sku(id, seller):
     try:
-        sku = SKU.objects.filter(id=id).first()
+        sku = SKU.objects.select_for_update().filter(id=id).first()
         if sku is None:
             raise SKUNotFound("SKU not found")
 
@@ -177,7 +177,7 @@ def delete_sku(id, seller):
             raise BlockedProductException("SKU does not belong to the authenticated seller")
 
         if sku.reserved_quantity > 0:
-            raise SKUGotActiveReserbes("Cannot delete SKU with active reserves")
+            raise SKUGotActiveReserves("Cannot delete SKU with active reserves")
 
         sku_id = sku.id
         sku.delete()
@@ -218,7 +218,7 @@ def delete_sku(id, seller):
         raise e
     except AccessDenied as e:
         raise e
-    except SKUGotActiveReserbes as e:
+    except SKUGotActiveReserves as e:
         raise e
     except Exception as e:
         raise Exception(f"failed to delete sku: {e}")

@@ -1,14 +1,16 @@
-import uuid
+import queue
+import threading
 
 import pytest
 from django.urls import reverse
 from rest_framework import status
+from rest_framework.test import APIClient
 
-from src.models.product import SKU, Product, ProductStatus
+from src.models.product import SKU, ProductStatus
 from src.tests.fixtures import BaseTestUtil, product_factory, test_category
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 class TestDeleteSKU(BaseTestUtil):
     def test_delete_sku_succeeds(self, jwt_client, product_factory, test_category):
         product = product_factory(
@@ -26,7 +28,7 @@ class TestDeleteSKU(BaseTestUtil):
         response = jwt_client.delete(url)
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
-        
+
         moder_msg = self.get_rabbitmq_message("moder", timeout=0.1)
         assert moder_msg is None
 
@@ -125,3 +127,44 @@ class TestDeleteSKU(BaseTestUtil):
         assert b2c_msg["sku_id"] == str(sku.id)
         assert b2c_msg["product_id"] == str(product.id)
 
+    def test_parallel_delete_operations(
+        self, jwt_client, product_factory, test_category
+    ):
+        product = product_factory(
+            status=ProductStatus.MODERATED, category=test_category
+        )
+        sku = SKU.objects.create(
+            product=product,
+            name="OOS SKU",
+            price=100,
+            cost_price=80,
+            active_quantity=5,
+        )
+
+        self._clear_queues()
+        url = reverse("specific-sku", args=[sku.id])
+
+        auth_header = jwt_client._credentials.get("HTTP_AUTHORIZATION")
+
+        q = queue.Queue()
+
+        def worker(url, auth_header):
+            thread_client = APIClient()
+            if auth_header:
+                thread_client.credentials(HTTP_AUTHORIZATION=auth_header)
+
+            response = thread_client.delete(url)
+            q.put(response)
+
+        t1 = threading.Thread(target=worker, args=(url, auth_header))
+        t2 = threading.Thread(target=worker, args=(url, auth_header))
+
+        t1.start()
+        t2.start()
+
+        t1.join()
+        t2.join()
+
+        res1 = q.get()
+        res2 = q.get()
+        assert (res1.status_code == status.HTTP_204_NO_CONTENT) ^ (res2.status_code == status.HTTP_204_NO_CONTENT)
