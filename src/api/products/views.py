@@ -26,7 +26,8 @@ from .service.product_service import (
     HardBlockerProduct,
     InvalidCategoryId,
     ProductAlreadyDeleted,
-    ProductNotFound
+    ProductNotFound,
+    InvalidPaginationParam
 )
 from .service.public_product_service import WrongSortParam
 
@@ -150,7 +151,7 @@ class ProductsView(APIView):
 
     def get(self, request: Request):
         try:
-            products, limit, offset = get_seller_products(
+            products, total_count, limit, offset = get_seller_products(
                 search=request.query_params.get("search"),
                 status=request.query_params.get("status"),
                 limit=request.query_params.get("limit"),
@@ -161,12 +162,14 @@ class ProductsView(APIView):
             return JsonResponse(
                 {
                     "items": products,
-                    "total_count": len(products),
+                    "total_count": total_count,
                     "limit": limit,
                     "offset": offset,
                 },
                 status=200,
             )
+        except InvalidPaginationParam as e:
+            return JsonResponse({"code": "INVALID_REQUEST", "message": str(e)}, status=422)
         except Exception as e:
             return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
