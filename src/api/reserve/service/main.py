@@ -2,6 +2,7 @@ from datetime import datetime
 import json
 
 from django.db import transaction
+from django.utils import timezone
 
 from interservice_queues.producers import services_channel_producer
 from src.models.product import SKU, ReserveOperations, Order, OrderItem, OrderStatus
@@ -93,7 +94,7 @@ def unreserve(order_id, reserved_items):
 
 
 @transaction.atomic
-def fullify(order_id, fullifed_items):
+def fulfill(order_id, fullifed_items):
     order = Order.objects.filter(id=order_id).first()
     if order is None:
         raise OrderNotFound("order not found")
@@ -101,7 +102,7 @@ def fullify(order_id, fullifed_items):
         result = {
             "order_id": str(order_id),
             "status": "FULLIFIED",
-            "processed_at": str(order.fullified_at)
+            "processed_at": str(order.processed_at)
         }
         return result
     try:
@@ -118,11 +119,12 @@ def fullify(order_id, fullifed_items):
             sku.reserved_quantity -= item["quantity"]
             sku.save()
         order.status = OrderStatus.FULLIFIED
+        order.processed_at = timezone.now()
         order.save()
         result = {
             "order_id": str(order_id),
             "status": "FULLIFIED",
-            "fullified_at": str(datetime.now())
+            "processed_at": str(order.processed_at)
         }
         return result
     except OrderNotFound as e:
