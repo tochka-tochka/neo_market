@@ -1,32 +1,34 @@
-from src.serializers.product_serializers import ProductSerializer
 import json
 import uuid
 from datetime import datetime
+from functools import partial
 from typing import Any, Dict
 
 from django.db import transaction
 
 from interservice_queues.producers import services_channel_producer
 from src.models.product import SKU, Product, ProductStatus, SKUImage
+from src.serializers.product_serializers import ProductSerializer
 from src.serializers.skus_serializers import SKUSerializer
 
 
 class BlockedProductException(Exception):
     pass
 
+
 class AccessDenied(Exception):
     pass
+
 
 class SKUNotFound(Exception):
     pass
 
+
 class ProductNotFound(Exception):
     pass
+
 
 class SKUGotActiveReserves(Exception):
-    pass
-
-class ProductNotFound(Exception):
     pass
 
 
@@ -46,7 +48,7 @@ def create_sku(data: Dict[str, Any], seller):
 
         if product is None:
             raise ProductNotFound("Product not found")
-            
+
         if product.status == ProductStatus.HARD_BLOCKED:
             raise BlockedProductException("This product hard-blocked")
 
@@ -55,18 +57,38 @@ def create_sku(data: Dict[str, Any], seller):
 
         if not SKU.objects.filter(product=product).exists():
             idempotency_key = str(uuid.uuid4())
-            services_channel_producer.product_moder_notification(
-                data={
-                    "idempotency_key": idempotency_key,
-                    "product_id": str(product.id),
-                    "seller_id": str(seller.id),
-                    "event": "CREATED",
-                    "date": str(datetime.now()),
-                },
-                corrected=False,
+            print("FIRST SKU CREATED EVENT")
+            transaction.on_commit(
+                partial(
+                    services_channel_producer.product_moder_notification,
+                    data={
+                        "idempotency_key": idempotency_key,
+                        "product_id": str(product.id),
+                        "seller_id": str(seller.id),
+                        "event": "CREATED",
+                        "date": str(datetime.now()),
+                    },
+                    corrected=False,
+                )
             )
-            product.status = ProductStatus.ON_MODERATION
-            product.save()
+        else:
+            idempotency_key = str(uuid.uuid4())
+            print("ONE MORE SKU EDITED EVENT")
+            transaction.on_commit(
+                partial(
+                    services_channel_producer.product_moder_notification,
+                    data={
+                        "idempotency_key": idempotency_key,
+                        "product_id": str(product.id),
+                        "seller_id": str(seller.id),
+                        "event": "EDITED",
+                        "date": str(datetime.now()),
+                    },
+                    corrected=False,
+                )
+            )
+        product.status = ProductStatus.ON_MODERATION
+        product.save()
 
         sku = SKU.objects.create(
             name=data["name"],
@@ -79,7 +101,6 @@ def create_sku(data: Dict[str, Any], seller):
         )
 
         images = data.get("images")
-        print(images)
         if images:
             for image in images:
                 SKUImage.objects.create(
@@ -102,12 +123,12 @@ def update_sku(data: Dict[str, Any], seller):
     try:
         sku = SKU.objects.get(id=data.get("id"))
         product = Product.objects.get(id=sku.product.id)
+        if sku.product.seller != seller:
+            raise AccessDenied("Product does not belong to the authenticated seller")
+
         if product.status == ProductStatus.HARD_BLOCKED:
             raise BlockedProductException("This product hard-blocked")
 
-        if sku.product.seller != seller:
-            raise AccessDenied("Product does not belong to the authenticated seller")
-            
         if data.get("name") is not None:
             sku.name = data["name"]
 
@@ -133,7 +154,9 @@ def update_sku(data: Dict[str, Any], seller):
         if images:
             SKUImage.objects.filter(sku=sku).delete()
             for image in images:
-                SKUImage.objects.create(sku=sku, url=image["url"], ordering=image["ordering"])
+                SKUImage.objects.create(
+                    sku=sku, url=image["url"], ordering=image["ordering"]
+                )
 
         sku.save()
         product = Product.objects.get(id=sku.product.id)
@@ -174,7 +197,9 @@ def delete_sku(id, seller):
             raise AccessDenied("SKU does not belong to the authenticated seller")
 
         if product.status == ProductStatus.HARD_BLOCKED:
-            raise BlockedProductException("SKU does not belong to the authenticated seller")
+            raise BlockedProductException(
+                "SKU does not belong to the authenticated seller"
+            )
 
         if sku.reserved_quantity > 0:
             raise SKUGotActiveReserves("Cannot delete SKU with active reserves")

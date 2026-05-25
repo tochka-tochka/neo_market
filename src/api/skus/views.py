@@ -86,7 +86,7 @@ class SkusView(APIView):
                 {"code": "NOT_FOUND", "message": "Product not found"}, status=404
             )
         except AccessDenied as e:
-            return JsonResponse({"code": "FORBIDDEN", "message": str(e)}, status=403)
+            return JsonResponse({"code": "NOT_OWNER", "message": str(e)}, status=403)
         except BlockedProductException:
             return JsonResponse(
                 {
