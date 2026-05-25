@@ -25,7 +25,7 @@ from src.tests.fixtures import (
 
 @pytest.fixture
 def blocking_reason():
-    r = BlockingReason.objects.create(reason="test")
+    r = BlockingReason.objects.create(title="test", comment="test")
     return r
 
 
@@ -51,9 +51,9 @@ def blocked_product_with_skus(product_factory, blocking_reason):
     sku1 = SKU.objects.create(
         product=p, name="sku1", price=100, cost_price=80, active_quantity=10
     )
-    ProductFieldReport.objects.create(product=p, field="title", comment="wrong title")
+    ProductFieldReport.objects.create(product=p, field_name="title", comment="wrong title")
     ProductFieldReport.objects.create(
-        product=p, sku=sku1, field="images", comment="wrong images"
+        product=p, sku=sku1, field_name="images", comment="wrong images"
     )
     return p
 
@@ -68,10 +68,10 @@ class TestCheckStatus(BaseTestUtil):
         response = jwt_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()["product"]["status"] == ProductStatus.MODERATED
-        assert response.json()["product"]["blocking_reason_id"] is None
-        for i in range(len(response.json()["product"]["skus"])):
-            assert response.json()["product"]["skus"][i]["cost_price"] is not None
+        assert response.json()["status"] == ProductStatus.MODERATED
+        assert response.json()["blocking_reason"] is None
+        for i in range(len(response.json()["skus"])):
+            assert response.json()["skus"][i]["cost_price"] is not None
 
     def test_get_blocked_product_returns_blocking_reason_and_field_reports(
         self, jwt_client, blocked_product_with_skus, product_factory, blocking_reason
@@ -81,9 +81,10 @@ class TestCheckStatus(BaseTestUtil):
         response = jwt_client.get(url)
 
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()["product"]["status"] == ProductStatus.BLOCKED
-        assert response.json()["product"]["blocking_reason_id"] is not None
-        assert len(response.json()["product"]["field_reports"]) > 0
+        assert response.json()["status"] == ProductStatus.BLOCKED
+        assert response.json()["blocking_reason"]["title"] == blocking_reason.title
+        assert response.json()["blocking_reason"]["comment"] == blocking_reason.comment
+        assert len(response.json()["field_reports"]) > 0
 
     def test_get_others_product_returns_404(
         self, jwt_client, product_factory, test_category

@@ -40,7 +40,7 @@ def two_skus(product_factory):
 
 
 @pytest.mark.django_db
-class TestFullifyOperations(BaseTestUtil):
+class TestfulfillOperations(BaseTestUtil):
     def test_fulfill_decreases_reserved_quantity_and_active_quantity_unchanged(
         self, service_client, two_skus
     ):
@@ -68,16 +68,16 @@ class TestFullifyOperations(BaseTestUtil):
         assert initial_active_quantity == 10 - reserve_quantity
         assert initial_reserved_quantity == reserve_quantity
 
-        fullify_url = reverse("fullify")
+        fulfill_url = reverse("fulfill")
         fulfill_quantity = 3
-        fullify_payload = {
+        fulfill_payload = {
             "order_id": reserve_response.json()["order_id"],
             "items": [{"sku_id": str(sku1.id), "quantity": fulfill_quantity}],
         }
 
         response = service_client.post(
-            fullify_url,
-            data=fullify_payload,
+            fulfill_url,
+            data=fulfill_payload,
             format="json",
             content_type="application/json",
         )
@@ -114,16 +114,16 @@ class TestFullifyOperations(BaseTestUtil):
         initial_active_after_reserve = sku1.active_quantity
         initial_reserved_after_reserve = sku1.reserved_quantity
 
-        fullify_url = reverse("fullify")
+        fulfill_url = reverse("fulfill")
         fulfill_quantity = 2
-        fullify_payload = {
+        fulfill_payload = {
             "order_id": reserve_response.json()["order_id"],
             "items": [{"sku_id": str(sku1.id), "quantity": fulfill_quantity}],
         }
 
         first_response = service_client.post(
-            fullify_url,
-            data=fullify_payload,
+            fulfill_url,
+            data=fulfill_payload,
             format="json",
             content_type="application/json",
         )
@@ -142,8 +142,8 @@ class TestFullifyOperations(BaseTestUtil):
         assert sku1.reserved_quantity == expected_reserved_quantity
 
         second_response = service_client.post(
-            fullify_url,
-            data=fullify_payload,
+            fulfill_url,
+            data=fulfill_payload,
             format="json",
             content_type="application/json",
         )

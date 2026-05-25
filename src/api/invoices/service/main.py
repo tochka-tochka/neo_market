@@ -1,3 +1,4 @@
+from django.db.models import Q
 from datetime import datetime
 from uuid import UUID
 
@@ -19,11 +20,24 @@ class SKUNotFound(Exception):
 
 
 @transaction.atomic
-def get_all_invoices(seller):
+def get_all_invoices(seller, limit, offset, status):
     try:
-        invoices = Invoice.objects.filter(seller=seller)
+        query = Q(seller=seller)
+        
+        if status is not None:
+            query &= Q(status=status)
+
+        if offset is None:
+            offset = 0
+            
+        if limit is None:
+            limit = 20
+
+        total_count = Invoice.objects.filter(query).count()
+            
+        invoices = Invoice.objects.filter(query)[offset:offset + limit]
         serializer = InvoiceSerializer(invoices, many=True)
-        return serializer.data
+        return serializer.data, total_count, limit, offset
     except Exception as e:
         raise Exception(f"failed to get invoices: {e}")
 

@@ -36,6 +36,9 @@ class ProductAlreadyDeleted(Exception):
 class ProductNotFound(Exception):
     pass
 
+class InvalidPaginationParam(Exception):
+    pass
+
 
 def get_seller_products(
         search: str | None,
@@ -60,18 +63,26 @@ def get_seller_products(
 
         if limit is None:
             limit = 20
+        if int(limit) <= 0:
+            raise InvalidPaginationParam("limit must be greater 0")
 
         if offset is None:
             offset = 0
+        if int(offset) < 0:
+            raise InvalidPaginationParam("offset must be greater or equal 0")
+
+        total_count = Product.objects.select_related("category").filter(query).count()
 
         if filters:
             query &= product_filter_query(filters)
 
         products = Product.objects.select_related("category").filter(query)[
-            offset : offset + limit
+            int(offset) : int(offset) + int(limit)
         ]
         serializer = ProductListSerializer(products, many=True)
-        return serializer.data, limit, offset
+        return serializer.data, total_count, limit, offset
+    except InvalidPaginationParam as e:
+        raise e
     except Exception as e:
         raise Exception(f"failed to get products: {e}")
 

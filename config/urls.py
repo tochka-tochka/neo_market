@@ -16,12 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from src.api.products.views import ProductsView, ProductDetailView
+from src.api.products.views import ProductsView, ProductDetailView, PublicProductsView
 from src.api.categories.views import CategoriesView, CategoryView, CategoryFilterView, CatalogFacets
 from src.api.skus.views import SkusView
 from src.api.invoices.views import InvoicesView
 from src.api.auth.views import RegisterView
-from src.api.reserve.views import ReserveView, UnreserveView, FullifyView
+from src.api.reserve.views import ReserveView, UnreserveView, FullfillView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
@@ -45,8 +45,10 @@ urlpatterns = [
 
     path('api/v1/inventory/reserve', ReserveView.as_view(), name="reserve"),
     path('api/v1/inventory/unreserve', UnreserveView.as_view(), name="unreserve"),
-    path('api/v1/inventory/fullify', FullifyView.as_view(), name="fullify"),
+    path('api/v1/inventory/fulfill', FullfillView.as_view(), name="fulfill"),
 
     path('api/v1/invoices', InvoicesView.as_view(), name="invoices"),
     path('api/v1/invoices/<uuid:id>', InvoicesView.as_view()),
+
+    path('api/v1/public/products', PublicProductsView.as_view(), name='public-products')
 ]

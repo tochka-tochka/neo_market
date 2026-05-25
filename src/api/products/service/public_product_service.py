@@ -32,7 +32,7 @@ def get_product_public(id: str):
 
 def get_products_for_catalog(search, category, ids, limit, offset, sort, filters: dict[str, list[str]]):
     query = Q(deleted=False, status=ProductStatus.MODERATED)
-    
+
     if ids and len(ids) > 0:
         query &= Q(id__in=ids)
 
@@ -63,6 +63,15 @@ def get_products_for_catalog(search, category, ids, limit, offset, sort, filters
         "date_desc": "-created_at",
     }
     try:
+        total_count = (
+            Product.objects.annotate(
+                price=Min("skus__price"),
+                total_qty=Sum('skus__active_quantity')
+            )
+            .select_related("category")
+            .filter(query, deleted=False, status=ProductStatus.MODERATED, total_qty__gt=0)
+            .count()
+        )
         products = (
             Product.objects.annotate(
                 price=Min("skus__price"),
@@ -72,8 +81,9 @@ def get_products_for_catalog(search, category, ids, limit, offset, sort, filters
             .filter(query, deleted=False, status=ProductStatus.MODERATED, total_qty__gt=0)
             .order_by(order_by_map[sort])[offset : offset + limit]
         )
+        print(str(products.query))
         serializer = PublicCatalogProductSerializer(products, many=True)
-        return serializer.data, limit, offset
+        return serializer.data, total_count, limit, offset
     except WrongSortParam as e:
         raise e
     except Exception as e:

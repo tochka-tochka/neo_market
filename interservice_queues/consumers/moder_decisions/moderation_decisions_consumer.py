@@ -91,7 +91,7 @@ class ModerationConsumer:
                     for report in data["field_reports"]:
                         ProductFieldReport.objects.create(
                             product=product,
-                            field=report["field_name"],
+                            field_name=report["field_name"],
                             sku=report["sku_id"],
                             comment=report["comment"],
                         )

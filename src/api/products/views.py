@@ -28,7 +28,8 @@ from .service.product_service import (
     HardBlockerProduct,
     InvalidCategoryId,
     ProductAlreadyDeleted,
-    ProductNotFound
+    ProductNotFound,
+    InvalidPaginationParam
 )
 from .service.product_utils import parse_query_filters
 from .service.public_product_service import WrongSortParam
@@ -58,7 +59,7 @@ class ProductDetailView(APIView):
         except Exception as e:
             return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
-        return JsonResponse({"product": product})
+        return JsonResponse(product, status=200)
 
     def patch(self, request, id):
         title = request.data.get("title")
@@ -151,56 +152,28 @@ class ProductsView(APIView):
     permission_classes = [IsAuthenticated]
     parser_classes = [JSONParser]
 
-    def get_permissions(self):
-        if self.request.method == "GET":
-            return [OR(IsAuthenticated(), IsService())]
-        return [IsAuthenticated()]
-
     def get(self, request: Request):
         try:
-            is_service = getattr(request, "is_from_service", False)
-            if is_service:
-                ids_param = request.query_params.get("ids", "")
-                ids = ids_param.split(",") if ids_param else []
-                products, limit, offset = get_products_for_catalog(
-                    search=request.query_params.get("search"),
-                    category=request.query_params.get("category"),
-                    ids=ids,
-                    sort=request.query_params.get("sort"),
-                    limit=request.query_params.get("limit"),
-                    offset=request.query_params.get("offset"),
-                    filters=parse_query_filters("filters", request.query_params),
-                )
-                return JsonResponse(
-                    {
-                        "items": products,
-                        "total_count": len(products),
-                        "limit": limit,
-                        "offset": offset,
-                    },
-                    status=200,
-                )
-            else:
-                products, limit, offset = get_seller_products(
-                    search=request.query_params.get("search"),
-                    status=request.query_params.get("status"),
-                    limit=request.query_params.get("limit"),
-                    offset=request.query_params.get("offset"),
-                    seller=request.user,
-                    deleted=request.query_params.get("deleted"),
-                    filters=parse_query_filters("filters", request.query_params),
-                )
+            products, total_count, limit, offset = get_seller_products(
+                search=request.query_params.get("search"),
+                status=request.query_params.get("status"),
+                limit=request.query_params.get("limit"),
+                offset=request.query_params.get("offset"),
+                seller=request.user,
+                deleted=request.query_params.get("deleted"),
+                filters=parse_query_filters("filters", request.query_params),
+            )
             return JsonResponse(
                 {
                     "items": products,
-                    "total_count": len(products),
+                    "total_count": total_count,
                     "limit": limit,
                     "offset": offset,
                 },
                 status=200,
             )
-        except WrongSortParam:
-            return JsonResponse({"code": "INVALID_REQUEST", "message": "wrong sort param"}, status=422)
+        except InvalidPaginationParam as e:
+            return JsonResponse({"code": "INVALID_REQUEST", "message": str(e)}, status=422)
         except Exception as e:
             return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
@@ -255,3 +228,34 @@ class ProductsView(APIView):
             return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
         return JsonResponse(product, status=201, safe=False)
+
+@method_decorator(csrf_exempt, name="dispatch")
+class PublicProductsView(APIView):
+    permission_classes = [IsService]
+    parser_classes = [JSONParser]
+    def get(self, request: Request):
+        try:
+            ids_param = request.query_params.get("ids", "")
+            ids = ids_param.split(",") if ids_param else []
+            products, total_count, limit, offset = get_products_for_catalog(
+                search=request.query_params.get("search"),
+                category=request.query_params.get("category"),
+                ids=ids,
+                sort=request.query_params.get("sort"),
+                limit=request.query_params.get("limit"),
+                offset=request.query_params.get("offset"),
+                filters=parse_query_filters("filters", request.query_params),
+            )
+            return JsonResponse(
+                {
+                    "items": products,
+                    "total_count": total_count,
+                    "limit": limit,
+                    "offset": offset,
+                },
+                status=200,
+            )
+        except WrongSortParam:
+            return JsonResponse({"code": "INVALID_REQUEST", "message": "wrong sort param"}, status=422)
+        except Exception as e:
+            return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)

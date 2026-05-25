@@ -14,7 +14,7 @@ from .service.main import (
     AccessDenied,
     BlockedProductException,
     ProductNotFound,
-    SKUGotActiveReserbes,
+    SKUGotActiveReserves,
     SKUNotFound,
 )
 
@@ -86,7 +86,7 @@ class SkusView(APIView):
                 {"code": "NOT_FOUND", "message": "Product not found"}, status=404
             )
         except AccessDenied as e:
-            return JsonResponse({"code": "FORBIDDEN", "message": str(e)}, status=403)
+            return JsonResponse({"code": "NOT_OWNER", "message": str(e)}, status=403)
         except BlockedProductException:
             return JsonResponse(
                 {
@@ -157,7 +157,7 @@ class SkusView(APIView):
             return JsonResponse(
                 {"code": "NOT_FOUND", "message": "SKU not found"}, status=404
             )
-        except SKUGotActiveReserbes:
+        except SKUGotActiveReserves:
             return JsonResponse(
                 {
                     "code": "CONFLICT",
@@ -165,7 +165,7 @@ class SkusView(APIView):
                 },
                 status=409,
             )
-        except AccessDenied as e:
+        except AccessDenied:
             return JsonResponse(
                 {
                     "code": "NOT_OWNER",

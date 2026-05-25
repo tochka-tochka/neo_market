@@ -21,7 +21,8 @@ class ProductStatus(models.TextChoices):
 
 class BlockingReason(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    reason = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
+    comment = models.TextField()
 
     class Meta:
         db_table = "blocking_reasons"
@@ -154,6 +155,7 @@ class SKUImage(models.Model):
 
 
 class ProductFieldReport(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False) 
     product = models.ForeignKey(
         Product, on_delete=models.CASCADE, name="product", related_name="field_reports"
     )
@@ -165,7 +167,7 @@ class ProductFieldReport(models.Model):
         blank=True,
         null=True,
     )
-    field = models.CharField(max_length=255)
+    field_name = models.CharField(max_length=255)
     comment = models.CharField(max_length=255)
 
     class Meta:
@@ -173,7 +175,7 @@ class ProductFieldReport(models.Model):
 
 
 class InvoiceStatus(models.TextChoices):
-    PENDING = "PENDING"
+    CREATED = "CREATED"
     ACCEPTED = "ACCEPTED"
     PARTIALLY_ACCEPTED = "PARTIALLY_ACCEPTED"
     REJECTED = "REJECTED"
@@ -182,7 +184,7 @@ class InvoiceStatus(models.TextChoices):
 class Invoice(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     status = models.TextField(
-        choices=InvoiceStatus.choices, default=InvoiceStatus.PENDING
+        choices=InvoiceStatus.choices, default=InvoiceStatus.CREATED
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
@@ -216,7 +218,7 @@ class InvoiceItem(models.Model):
 
 
 class ReserveOperations(models.Model):
-    idempotency_key = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    idempotency_key = models.UUIDField(primary_key=True)
     result = models.JSONField(default=None, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -238,7 +240,7 @@ class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     status = models.TextField(choices=OrderStatus.choices)
     created_at = models.DateTimeField(auto_now_add=True)
-    fullified_at = models.DateTimeField(null=True, blank=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = "orders"

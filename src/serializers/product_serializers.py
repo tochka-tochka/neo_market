@@ -11,7 +11,7 @@ from src.validators.main import validate_characteristics
 class BlockingReasonSerializer(serializers.ModelSerializer):
     class Meta:
         model = BlockingReason
-        fields = ["id", "reason"]
+        fields = ["id", "title", "comment"]
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -21,9 +21,14 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 
 class ProductFieldReportSerializer(serializers.ModelSerializer):
+    sku_id = serializers.SerializerMethodField()
+
     class Meta:
         model = ProductFieldReport
-        fields = ["sku", "field", "comment"]
+        fields = ["sku_id", "field_name", "comment"]
+
+    def get_sku_id(self, obj):
+        return obj.sku.id if obj.sku else None
 
 
 class SellerListSerializer(serializers.ModelSerializer):
@@ -130,6 +135,7 @@ class ProductCharacteristicSerializer(serializers.ModelSerializer):
 
 class PublicProductSerializer(serializers.ModelSerializer):
     category_id = serializers.UUIDField(source="category.id", read_only=True)
+    seller_id = serializers.UUIDField(source="seller.id", read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
     skus = PublicSKUSerializer(many=True, read_only=True)
     characteristics = ProductCharacteristicSerializer(many=True, read_only=True)
@@ -138,13 +144,17 @@ class PublicProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             "id",
+            "seller_id",
+            "category_id",
             "title",
+            "slug",
             "description",
             "status",
             "images",
             "characteristics",
-            "category_id",
             "skus",
+            "created_at",
+            "updated_at"
         ]
 
 
@@ -154,7 +164,7 @@ class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     skus = SKUSerializer(many=True, read_only=True)
     characteristics = ProductCharacteristicSerializer(many=True, read_only=True)
-    blocking_reason_id = serializers.SerializerMethodField()
+    blocking_reason = BlockingReasonSerializer(read_only=True)
     field_reports = ProductFieldReportSerializer(many=True, read_only=True)
 
     class Meta:
@@ -168,7 +178,7 @@ class ProductSerializer(serializers.ModelSerializer):
             "description",
             "status",
             "deleted",
-            "blocking_reason_id",
+            "blocking_reason",
             "field_reports",
             "moderator_comment",
             "blocked",

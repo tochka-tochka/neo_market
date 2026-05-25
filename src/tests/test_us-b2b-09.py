@@ -3,13 +3,9 @@ import time
 import uuid
 
 import pytest
-from django import db
 from django.urls import reverse
 from rest_framework import status
 
-from interservice_queues.consumers.moder_decisions.moderation_decisions_consumer import (
-    ModerationConsumer,
-)
 from src.models.product import SKU, BlockingReason, ProductFieldReport, ProductStatus
 from src.serializers.product_serializers import ProductSerializer
 from src.tests.fixtures import (
@@ -25,12 +21,16 @@ from src.tests.fixtures import (
 
 @pytest.fixture
 def blocking_reason():
-    r = BlockingReason.objects.create(reason="test")
+    r = BlockingReason.objects.create(title="test", comment="test")
     return r
+
 
 
 @pytest.fixture
 def moderation_worker():
+    from interservice_queues.consumers.moder_decisions.moderation_decisions_consumer import (
+        ModerationConsumer,
+    )
     consumer_instance = ModerationConsumer()
     consumer_thread = threading.Thread(target=consumer_instance.start, daemon=True)
     consumer_thread.start()
@@ -54,7 +54,7 @@ class TestModerDecisionApply(BaseTestUtil):
             status=ProductStatus.ON_MODERATION, blocking_reason_id=blocking_reason.id
         )
         ProductFieldReport.objects.create(
-            product=product, field="title", comment="test"
+            product=product, field_name="title", comment="test"
         )
 
         msg_data = {
@@ -137,7 +137,7 @@ class TestModerDecisionApply(BaseTestUtil):
             status=ProductStatus.ON_MODERATION, blocking_reason_id=blocking_reason.id
         )
         ProductFieldReport.objects.create(
-            product=product, field="title", comment="test"
+            product=product, field_name="title", comment="test"
         )
 
         idempotency_key = str(uuid.uuid4())

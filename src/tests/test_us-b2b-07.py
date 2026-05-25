@@ -19,7 +19,7 @@ from src.tests.fixtures import (
 @pytest.mark.django_db
 class TestCatalogProducts(BaseTestUtil):
     
-    url_name = "products" 
+    url_name = "public-products" 
 
     def test_catalog_returns_moderated_in_stock_products(self, service_client, catalog_products):
         url = reverse(self.url_name)
