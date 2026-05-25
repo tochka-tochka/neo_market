@@ -13,7 +13,7 @@ from src.tests.fixtures import (
     product_factory,
     test_category,
 )
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 class TestCreateSKU(BaseTestUtil):
 
     def test_first_sku_transitions_product_to_moderation(self, jwt_client, test_user, test_category, sku_payload):
@@ -39,17 +39,20 @@ class TestCreateSKU(BaseTestUtil):
         assert msg["event"] == "CREATED", msg
         assert "idempotency_key" in msg
 
-    def test_adding_sku_to_moderated_product_keeps_status(self, jwt_client, test_user, test_category, sku_payload, product_with_skus):
+    def test_adding_sku_to_moderated_re_moderates_product(self, jwt_client, test_user, test_category, sku_payload, product_with_skus):
             sku_payload["product_id"] = product_with_skus.id
             
             response = jwt_client.post(reverse("skus"), sku_payload, format="json")
             
             product_with_skus.refresh_from_db()
             assert response.status_code == status.HTTP_201_CREATED, response.json()
-            assert product_with_skus.status == ProductStatus.MODERATED
+            assert product_with_skus.status == ProductStatus.ON_MODERATION
             
             msg = self.get_rabbitmq_message(queue_name="moder")
-            assert msg is None, "Adding SKU to moderated product should not trigger moderation event"
+            assert msg is not None
+            assert msg["product_id"] == str(product_with_skus.id), msg
+            assert msg["event"] == "EDITED", msg
+            assert "idempotency_key" in msg
 
     def test_cannot_add_sku_to_blocked_product(self, jwt_client, test_user, test_category, sku_payload):
         product = Product.objects.create(title="T", category=test_category, seller=test_user, status=ProductStatus.HARD_BLOCKED)
