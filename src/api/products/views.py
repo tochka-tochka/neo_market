@@ -160,7 +160,7 @@ class ProductsView(APIView):
                 limit=request.query_params.get("limit"),
                 offset=request.query_params.get("offset"),
                 seller=request.user,
-                deleted=request.query_params.get("deleted"),
+                deleted=request.query_params.get("include_deleted"),
                 filters=parse_query_filters("filters", request.query_params),
             )
             return JsonResponse(
