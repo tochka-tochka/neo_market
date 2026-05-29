@@ -40,37 +40,22 @@ class SkusView(APIView):
             )
 
         cost_price = request.data.get("cost_price")
-        if not cost_price:
-            return JsonResponse(
-                {"code": "INVALID_REQUEST", "message": "cost price is required"},
-                status=422,
-            )
 
         article = request.data.get("article")
-        if not article:
-            return JsonResponse(
-                {"code": "INVALID_REQUEST", "message": "article is required"},
-                status=422,
-            )
 
         discount = request.data.get("discount")
         characteristics = request.data.get("characteristics")
-
         images = request.data.get("images")
-        if not images:
-            return JsonResponse(
-                {"code": "INVALID_REQUEST", "message": "image is required"}, status=422
-            )
 
         data = {
             "name": name,
             "price": int(price),
-            "cost_price": int(cost_price),
+            "cost_price": int(cost_price) if cost_price is not None else None,
             "article": article,
             "discount": int(discount or 0),
             "characteristics": characteristics,
             "product_id": product_id,
-            "images": images,
+            "images": images or [],
         }
 
         serializer = SKUSerializer(data=data)

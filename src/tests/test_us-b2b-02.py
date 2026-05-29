@@ -60,3 +60,26 @@ class TestCreateSKU(BaseTestUtil):
         
         response = jwt_client.post(reverse("skus"), sku_payload, format="json")
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_create_sku_accepts_minimal_required_fields(self, jwt_client, test_user, test_category, sku_payload):
+        product = Product.objects.create(title="T", category=test_category, seller=test_user, status=ProductStatus.CREATED)
+        sku_payload["product_id"] = product.id
+
+        del sku_payload["cost_price"]
+        del sku_payload["article"]
+        del sku_payload["images"]
+        
+        response = jwt_client.post(reverse("skus"), sku_payload, format="json", content="application/json")
+        _ = self.get_rabbitmq_message(queue_name="moder")
+        
+        product.refresh_from_db()
+        assert response.status_code == status.HTTP_201_CREATED, response.json()
+        assert product.status == ProductStatus.ON_MODERATION
+        
+        sku = response.json()
+        assert sku["product_id"] == str(product.id)
+        assert sku["name"] == sku_payload["name"]
+        assert sku["price"] == sku_payload["price"]
+        assert sku["cost_price"] is None
+        assert sku["article"] is None
+        assert sku["images"] == []
