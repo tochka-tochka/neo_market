@@ -32,6 +32,7 @@ class SKUSerializer(serializers.ModelSerializer):
     price = serializers.IntegerField(validators=[MinValueValidator(0)])
     images = SKUImageSerializer(many=True, read_only=True)
     characteristics = SkuCharacteristicSerializer(many=True, read_only=True)
+    active_quantity = serializers.SerializerMethodField()
 
     class Meta:
         model = SKU
@@ -51,6 +52,9 @@ class SKUSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at"
         ]
+
+    def get_active_quantity(self, obj):
+        return obj.stock_quantity-obj.reserved_quantity
 
 class PublicSKUSerializer(serializers.ModelSerializer):
     product_id = serializers.UUIDField(source="product.id", read_only=True)
