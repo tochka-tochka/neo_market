@@ -21,13 +21,13 @@ class TestDeleteSKU(BaseTestUtil):
             name="Test SKU",
             price=100,
             cost_price=80,
-            active_quantity=10,
+            stock_quantity=10,
         )
 
         url = reverse("specific-sku", args=[sku.id])
         response = jwt_client.delete(url)
 
-        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
 
         moder_msg = self.get_rabbitmq_message("moder", timeout=0.1)
         assert moder_msg is None
@@ -43,7 +43,7 @@ class TestDeleteSKU(BaseTestUtil):
             name="Test SKU",
             price=100,
             cost_price=80,
-            active_quantity=10,
+            stock_quantity=10,
             reserved_quantity=5,
         )
 
@@ -63,7 +63,7 @@ class TestDeleteSKU(BaseTestUtil):
             name="Last SKU",
             price=100,
             cost_price=80,
-            active_quantity=10,
+            stock_quantity=10,
         )
 
         self._clear_queues()
@@ -92,7 +92,7 @@ class TestDeleteSKU(BaseTestUtil):
             name="Blocked SKU",
             price=100,
             cost_price=80,
-            active_quantity=10,
+            stock_quantity=10,
         )
 
         url = reverse("specific-sku", args=[sku.id])
@@ -111,7 +111,7 @@ class TestDeleteSKU(BaseTestUtil):
             name="OOS SKU",
             price=100,
             cost_price=80,
-            active_quantity=5,
+            stock_quantity=5
         )
 
         self._clear_queues()
@@ -138,7 +138,7 @@ class TestDeleteSKU(BaseTestUtil):
             name="OOS SKU",
             price=100,
             cost_price=80,
-            active_quantity=5,
+            stock_quantity=5,
         )
 
         self._clear_queues()
@@ -167,4 +167,6 @@ class TestDeleteSKU(BaseTestUtil):
 
         res1 = q.get()
         res2 = q.get()
-        assert (res1.status_code == status.HTTP_204_NO_CONTENT) ^ (res2.status_code == status.HTTP_204_NO_CONTENT)
+        assert (res1.status_code == status.HTTP_204_NO_CONTENT) ^ (
+            res2.status_code == status.HTTP_204_NO_CONTENT
+        )
