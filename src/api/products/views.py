@@ -65,7 +65,7 @@ class ProductDetailView(APIView):
         title = request.data.get("title")
         description = request.data.get("description")
         category = request.data.get("category")
-        characteristics = json.loads(request.data.get("characteristics") or "[]")
+        characteristics = request.data.get("characteristics")
 
         images = request.data.get("images")
         if len(images) == 0:
@@ -194,7 +194,6 @@ class ProductsView(APIView):
                 {"code": "INVALID_REQUEST", "message": "characteristics required"},
                 status=422,
             )
-        characteristics = json.loads(characteristics)
 
 
         images = request.data.get("images")

@@ -20,7 +20,7 @@ class TestCreateSKU(BaseTestUtil):
         product = Product.objects.create(title="T", category=test_category, seller=test_user, status=ProductStatus.CREATED)
         sku_payload["product_id"] = product.id
         
-        response = jwt_client.post(reverse("skus"), sku_payload, format="json")
+        response = jwt_client.post(reverse("skus"), sku_payload, format="json", content="application/json")
         _ = self.get_rabbitmq_message(queue_name="moder")
         
         product.refresh_from_db()

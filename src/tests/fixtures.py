@@ -99,7 +99,7 @@ def product_with_skus(product_factory):
 class BaseTestUtil:
     def get_rabbitmq_message(self, queue_name, timeout=5):
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(RABBITMQ_HOST, 5672)
+            pika.ConnectionParameters(host=RABBITMQ_HOST or "localhost", port=5672)
         )
         channel = connection.channel()
         channel.queue_declare(
@@ -128,7 +128,7 @@ class BaseTestUtil:
         Используется для имитации ответа от сервиса модерации в тестах.
         """
         connection = pika.BlockingConnection(
-            pika.ConnectionParameters(RABBITMQ_HOST, 5672)
+            pika.ConnectionParameters(host=RABBITMQ_HOST or "localhost", port=5672)
         )
         try:
             channel = connection.channel()

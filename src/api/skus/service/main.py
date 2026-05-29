@@ -7,7 +7,7 @@ from typing import Any, Dict
 from django.db import transaction
 
 from interservice_queues.producers import services_channel_producer
-from src.models.product import SKU, Product, ProductStatus, SKUImage
+from src.models.product import SKU, Product, ProductStatus, SKUImage, SkuCharacteristics
 from src.serializers.product_serializers import ProductSerializer
 from src.serializers.skus_serializers import SKUSerializer
 
@@ -57,7 +57,6 @@ def create_sku(data: Dict[str, Any], seller):
 
         if not SKU.objects.filter(product=product).exists():
             idempotency_key = str(uuid.uuid4())
-            print("FIRST SKU CREATED EVENT")
             transaction.on_commit(
                 partial(
                     services_channel_producer.product_moder_notification,
@@ -73,7 +72,6 @@ def create_sku(data: Dict[str, Any], seller):
             )
         else:
             idempotency_key = str(uuid.uuid4())
-            print("ONE MORE SKU EDITED EVENT")
             transaction.on_commit(
                 partial(
                     services_channel_producer.product_moder_notification,
@@ -96,7 +94,6 @@ def create_sku(data: Dict[str, Any], seller):
             cost_price=data["cost_price"],
             article=data["article"],
             discount=data["discount"],
-            characteristics=chars,
             product=product,
         )
 
@@ -106,6 +103,10 @@ def create_sku(data: Dict[str, Any], seller):
                 SKUImage.objects.create(
                     sku=sku, url=image["url"], ordering=image["ordering"]
                 )
+
+        sku.characteristics.set([
+            SkuCharacteristics.objects.create(**chr, sku_id=sku) for chr in chars
+        ])
     except ProductNotFound as e:
         raise e
     except AccessDenied as e:
@@ -144,11 +145,8 @@ def update_sku(data: Dict[str, Any], seller):
         if data.get("active_quantity") is not None:
             sku.active_quantity = int(data["active_quantity"])
 
-        if data.get("characteristics") is not None:
-            chars = data["characteristics"]
-            if isinstance(chars, str):
-                chars = json.loads(chars)
-            sku.characteristics = chars
+        
+        chars = data["characteristics"]
 
         images = data.get("images")
         if images:
@@ -157,6 +155,11 @@ def update_sku(data: Dict[str, Any], seller):
                 SKUImage.objects.create(
                     sku=sku, url=image["url"], ordering=image["ordering"]
                 )
+
+        sku.characteristics.all().delete()
+        sku.characteristics.set([
+            SkuCharacteristics.objects.create(**chr, sku_id=sku) for chr in chars
+        ])
 
         sku.save()
         product = Product.objects.get(id=sku.product.id)

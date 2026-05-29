@@ -31,7 +31,7 @@ class SKUSerializer(serializers.ModelSerializer):
     product_id = serializers.UUIDField(source="product.id", read_only=True)
     price = serializers.IntegerField(validators=[MinValueValidator(0)])
     images = SKUImageSerializer(many=True, read_only=True)
-    characteristics = SkuCharacteristicSerializer(many=True)
+    characteristics = SkuCharacteristicSerializer(many=True, read_only=True)
 
     class Meta:
         model = SKU

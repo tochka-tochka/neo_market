@@ -43,7 +43,7 @@ class ModerationConsumer:
 
     def _connect(self):
         self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(host=RABBITMQ_HOST, port=5672)
+            pika.ConnectionParameters(host=RABBITMQ_HOST or "localhost", port=5672)
         )
         self.channel = self.connection.channel()
         self.channel.queue_declare(

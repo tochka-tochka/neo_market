@@ -108,7 +108,7 @@ class SKU(models.Model):
 
 class SkuCharacteristics(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    sku_id = models.ForeignKey(SKU, on_delete=models.CASCADE)
+    sku_id = models.ForeignKey(SKU, on_delete=models.CASCADE, related_name="characteristics")
     name = models.CharField(max_length=255)
     value = models.CharField(max_length=255)
 

@@ -18,6 +18,7 @@ class ServicesChannelProducer:
         self._connect()
 
     def resent_messages(self):
+        pass
         unsent_messages = InterserviceOutbox.objects.all()
         for message in unsent_messages:
             try:
@@ -33,7 +34,7 @@ class ServicesChannelProducer:
             
     def _connect(self):
         self.connection = pika.BlockingConnection(
-            pika.ConnectionParameters(RABBITMQ_HOST, 5672)
+            pika.ConnectionParameters(host=RABBITMQ_HOST or "localhost", port=5672)
         )
         self.channel = self.connection.channel()
         self.channel.queue_declare(
