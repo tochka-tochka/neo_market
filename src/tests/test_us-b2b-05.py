@@ -33,10 +33,10 @@ def blocking_reason():
 def moderated_product_with_skus(product_factory):
     p = product_factory(title="Product with SKU", status=ProductStatus.MODERATED)
     SKU.objects.create(
-        product=p, name="sku1", price=100, cost_price=80, active_quantity=10
+        product=p, name="sku1", price=100, cost_price=80
     )
     SKU.objects.create(
-        product=p, name="sku2", price=200, cost_price=150, active_quantity=5
+        product=p, name="sku2", price=200, cost_price=150
     )
     return p
 
@@ -49,7 +49,7 @@ def blocked_product_with_skus(product_factory, blocking_reason):
         blocking_reason_id=blocking_reason.id,
     )
     sku1 = SKU.objects.create(
-        product=p, name="sku1", price=100, cost_price=80, active_quantity=10
+        product=p, name="sku1", price=100, cost_price=80
     )
     ProductFieldReport.objects.create(product=p, field_name="title", comment="wrong title")
     ProductFieldReport.objects.create(

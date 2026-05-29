@@ -60,5 +60,7 @@ class FullfillView(APIView):
             return JsonResponse(result, status=200)
         except OrderNotFound:
             return JsonResponse({"code": "NOT_FOUND", "message": "order not found"}, status=404)
+        except NotEnoughQunatity:
+            return JsonResponse({"code": "INSUFFICIENT_RESERVED", "message": "not enough quantity"})
         except Exception as e:
             return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)

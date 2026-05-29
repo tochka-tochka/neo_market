@@ -68,7 +68,7 @@ class TestCreateSKU(BaseTestUtil):
             title="T", category=test_category, seller=test_user, status=initial_status
         )
         sku = SKU.objects.create(
-            name="Old", price=10, cost_price=5, active_quantity=1, product=product
+            name="Old", price=10, cost_price=5, product=product
         )
 
         url = reverse("specific-sku", args=[sku.id])
@@ -96,7 +96,6 @@ class TestCreateSKU(BaseTestUtil):
             name="Old",
             price=10,
             cost_price=5,
-            active_quantity=5,
             article="Old",
             reserved_quantity=999,
             product=product,
@@ -123,7 +122,7 @@ class TestCreateSKU(BaseTestUtil):
             status=ProductStatus.HARD_BLOCKED,
         )
         sku = SKU.objects.create(
-            name="S", price=10, cost_price=5, active_quantity=1, product=product
+            name="S", price=10, cost_price=5, product=product
         )
 
         url = reverse("specific-sku", args=[sku.id])
@@ -141,7 +140,7 @@ class TestCreateSKU(BaseTestUtil):
             title="Other", category=test_category, seller=another_seller
         )
         sku = SKU.objects.create(
-            name="S", price=10, cost_price=5, active_quantity=1, product=other_product
+            name="S", price=10, cost_price=5, product=other_product
         )
 
         url = reverse("specific-sku", args=[sku.id])

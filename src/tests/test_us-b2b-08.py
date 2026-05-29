@@ -18,8 +18,8 @@ from src.tests.fixtures import (
 @pytest.fixture
 def two_skus(product_factory):
     p = product_factory(status=ProductStatus.MODERATED)
-    sku1 = SKU.objects.create(product=p, name="SKU 1", price=100, cost_price=80, active_quantity=10, reserved_quantity=0)
-    sku2 = SKU.objects.create(product=p, name="SKU 2", price=200, cost_price=80, active_quantity=5, reserved_quantity=0)
+    sku1 = SKU.objects.create(product=p, name="SKU 1", price=100, cost_price=80, stock_quantity=10, reserved_quantity=0)
+    sku2 = SKU.objects.create(product=p, name="SKU 2", price=200, cost_price=80, stock_quantity=5, reserved_quantity=0)
     return sku1, sku2
 
 @pytest.fixture
@@ -49,9 +49,9 @@ class TestReserveOperations(BaseTestUtil):
         sku1.refresh_from_db()
         sku2.refresh_from_db()
         
-        assert sku1.active_quantity == 8
+        assert sku1.stock_quantity == 10
         assert sku1.reserved_quantity == 2
-        assert sku2.active_quantity == 2
+        assert sku2.stock_quantity == 5
         assert sku2.reserved_quantity == 3
 
     def test_partial_insufficient_stock_returns_409_all_rollback(self, service_client, two_skus):
@@ -72,8 +72,8 @@ class TestReserveOperations(BaseTestUtil):
         
         sku1.refresh_from_db()
         sku2.refresh_from_db()
-        assert sku1.active_quantity == 10
-        assert sku2.active_quantity == 5
+        assert sku1.reserved_quantity == 0
+        assert sku2.reserved_quantity == 0
 
     def test_idempotent_reserve_returns_200_without_double_deduction(self, service_client, two_skus):
         sku1, _ = two_skus
@@ -87,13 +87,13 @@ class TestReserveOperations(BaseTestUtil):
 
         service_client.post(url, data=payload, format='json', content_type="application/json")
         sku1.refresh_from_db()
-        assert sku1.active_quantity == 9
+        assert sku1.reserved_quantity == 1
 
         response = service_client.post(url, data=payload, format='json', content_type="application/json")
         
         assert response.status_code == status.HTTP_200_OK, response.json()
         sku1.refresh_from_db()
-        assert sku1.active_quantity == 9
+        assert sku1.reserved_quantity == 1
 
     def test_sku_out_of_stock_event_emitted(self, service_client, two_skus):
         sku1, _ = two_skus
@@ -114,7 +114,7 @@ class TestReserveOperations(BaseTestUtil):
 
     def test_unreserve_restores_quantities(self, service_client, two_skus):
         sku1, sku2 = two_skus
-        sku1.active_quantity = 5
+        sku1.stock_quantity = 10
         sku1.reserved_quantity = 5
         sku1.save()
         order = Order.objects.create(status=OrderStatus.RESERVED)
@@ -130,5 +130,5 @@ class TestReserveOperations(BaseTestUtil):
         assert response.status_code == status.HTTP_200_OK, response.json()
         
         sku1.refresh_from_db()
-        assert sku1.active_quantity == 8
+        assert sku1.stock_quantity == 10
         assert sku1.reserved_quantity == 2

@@ -25,8 +25,7 @@ class TestInvoiceCreation(BaseTestUtil):
             product=product_moderated,
             name="Moderated SKU",
             price=100,
-            cost_price=80,
-            active_quantity=10,
+            cost_price=80
         )
 
         payload = {
@@ -57,8 +56,7 @@ class TestInvoiceCreation(BaseTestUtil):
             product=product_created,
             name="Non-Moderated SKU",
             price=100,
-            cost_price=80,
-            active_quantity=10,
+            cost_price=80
         )
 
         payload = {
@@ -83,8 +81,7 @@ class TestInvoiceCreation(BaseTestUtil):
             product=product_other_seller,
             name="Other Seller SKU",
             price=100,
-            cost_price=80,
-            active_quantity=10,
+            cost_price=80
         )
 
         payload = {

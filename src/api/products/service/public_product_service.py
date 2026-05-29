@@ -66,7 +66,7 @@ def get_products_for_catalog(search, category, ids, limit, offset, sort, filters
         total_count = (
             Product.objects.annotate(
                 price=Min("skus__price"),
-                total_qty=Sum('skus__active_quantity')
+                total_qty=Sum('skus__stock_quantity') - Sum('skus__reserved_quantity')
             )
             .select_related("category")
             .filter(query, deleted=False, status=ProductStatus.MODERATED, total_qty__gt=0)
@@ -75,13 +75,12 @@ def get_products_for_catalog(search, category, ids, limit, offset, sort, filters
         products = (
             Product.objects.annotate(
                 price=Min("skus__price"),
-                total_qty=Sum('skus__active_quantity')
+                total_qty=Sum('skus__stock_quantity') - Sum('skus__reserved_quantity')
             )
             .select_related("category")
             .filter(query, deleted=False, status=ProductStatus.MODERATED, total_qty__gt=0)
             .order_by(order_by_map[sort])[offset : offset + limit]
         )
-        print(str(products.query))
         serializer = PublicCatalogProductSerializer(products, many=True)
         return serializer.data, total_count, limit, offset
     except WrongSortParam as e:

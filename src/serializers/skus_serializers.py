@@ -59,7 +59,7 @@ class SKUSerializer(serializers.ModelSerializer):
 class PublicSKUSerializer(serializers.ModelSerializer):
     product_id = serializers.UUIDField(source="product.id", read_only=True)
     price = serializers.IntegerField(validators=[MinValueValidator(0)])
-    active_quantity = serializers.IntegerField(validators=[MinValueValidator(0)])
+    active_quantity = serializers.SerializerMethodField()
     images = SKUImageSerializer(many=True, read_only=True)
     characteristics = SkuCharacteristicSerializer(many=True)
 
@@ -77,6 +77,9 @@ class PublicSKUSerializer(serializers.ModelSerializer):
             "images",
             "characteristics",
         ]
+
+    def get_active_quantity(self, obj):
+        return obj.stock_quantity-obj.reserved_quantity
 
 class OrderItemSerializer(serializers.ModelSerializer):
     order_id = serializers.UUIDField(source="order.id", read_only=True)

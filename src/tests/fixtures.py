@@ -4,6 +4,7 @@ from io import BytesIO
 import pika
 import pytest
 from PIL import Image
+
 from config.settings import RABBITMQ_HOST
 from src.models.product import SKU, Category, Product, ProductStatus
 
@@ -87,12 +88,8 @@ def sku_payload(test_category, dummy_image):
 @pytest.fixture
 def product_with_skus(product_factory):
     p = product_factory(title="Product with SKU", status=ProductStatus.MODERATED)
-    SKU.objects.create(
-        product=p, name="sku1", price=100, cost_price=80
-    )
-    SKU.objects.create(
-        product=p, name="sku2", price=200, cost_price=150
-    )
+    SKU.objects.create(product=p, name="sku1", price=100, cost_price=80)
+    SKU.objects.create(product=p, name="sku2", price=200, cost_price=150)
     return p
 
 
@@ -164,7 +161,8 @@ def catalog_products(product_factory):
         name="sku_vis_1",
         price=100,
         cost_price=80,
-        active_quantity=10,
+        stock_quantity=10,
+        reserved_quantity=2,
     )
 
     p_visible_2 = product_factory(
@@ -175,7 +173,8 @@ def catalog_products(product_factory):
         name="sku_vis_2",
         price=150,
         cost_price=100,
-        active_quantity=5,
+        stock_quantity=10,
+        reserved_quantity=2,
     )
 
     p_out_of_stock = product_factory(
@@ -186,7 +185,8 @@ def catalog_products(product_factory):
         name="sku_oos",
         price=200,
         cost_price=150,
-        active_quantity=0,
+        stock_quantity=0,
+        reserved_quantity=0,
     )
 
     p_hard_blocked = product_factory(
@@ -197,19 +197,30 @@ def catalog_products(product_factory):
         name="sku_blocked",
         price=300,
         cost_price=200,
-        active_quantity=10,
+        stock_quantity=10,
+        reserved_quantity=2,
     )
 
     p_deleted = product_factory(
         title="Deleted Product", status=ProductStatus.MODERATED, deleted=True
     )
     SKU.objects.create(
-        product=p_deleted, name="sku_del", price=400, cost_price=300, active_quantity=10
+        product=p_deleted,
+        name="sku_del",
+        price=400,
+        cost_price=300,
+        stock_quantity=10,
+        reserved_quantity=2,
     )
 
     p_created = product_factory(title="Created Product", status=ProductStatus.CREATED)
     SKU.objects.create(
-        product=p_created, name="sku_new", price=500, cost_price=400, active_quantity=10
+        product=p_created,
+        name="sku_new",
+        price=500,
+        cost_price=400,
+        stock_quantity=0,
+        reserved_quantity=0,
     )
 
     return {

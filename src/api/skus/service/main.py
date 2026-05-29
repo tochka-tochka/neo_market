@@ -142,9 +142,6 @@ def update_sku(data: Dict[str, Any], seller):
         if data.get("discount") is not None:
             sku.discount = int(data["discount"])
 
-        if data.get("active_quantity") is not None:
-            sku.active_quantity = int(data["active_quantity"])
-
         
         chars = data["characteristics"]
 
@@ -223,7 +220,7 @@ def delete_sku(id, seller):
                 corrected=True,
             )
 
-        if sku.active_quantity > 0:
+        if sku.stock_quantity > 0:
             services_channel_producer.product_b2c_notification(
                 data={
                     "idempotency_key": str(uuid.uuid4()),

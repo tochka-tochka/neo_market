@@ -233,7 +233,7 @@ class ModerationDecisions(models.Model):
 class OrderStatus(models.TextChoices):
     RESERVED = "RESERVED"
     UNRESERVED = "UNRESERVED"
-    FULLIFIED = "FULLIFIED"
+    FULFILLED = "FULFILLED"
 
 class Order(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)

@@ -36,22 +36,21 @@ def reserve(idempotency_key, order_id, reserved_items):
                 
             sku = SKU.objects.select_for_update().get(id=item["sku_id"])
 
-            if sku.active_quantity - item["quantity"] < 0:
+            if sku.stock_quantity - sku.reserved_quantity - item["quantity"] < 0:
                 raise NotEnoughQunatity(
                     "Not enough quantity",
                     str(sku.id),
                     item["quantity"],
-                    sku.active_quantity,
+                    sku.stock_quantity - sku.reserved_quantity,
                 )
 
-            if sku.active_quantity - item["quantity"] == 0:
+            if sku.stock_quantity - sku.reserved_quantity - item["quantity"] == 0:
                 print("MESSAGE SENT\n")
                 services_channel_producer.product_b2c_notification(
                     data={"sku_id": str(sku.id), "event": "SKU_OUT_OF_STOCK"},
                     corrected=False,
                 )
 
-            sku.active_quantity -= item["quantity"]
             sku.reserved_quantity += item["quantity"]
             sku.save()
             OrderItem.objects.create(order=order, sku=sku, quantity=item["quantity"])
@@ -78,7 +77,6 @@ def unreserve(order_id, reserved_items):
             return unreserve.result
         for item in reserved_items:
             sku = SKU.objects.get(id=item["sku_id"])
-            sku.active_quantity += item["quantity"]
             sku.reserved_quantity -= item["quantity"]
             sku.save()
         Order.objects.get(id=order_id).delete()
@@ -98,32 +96,33 @@ def fulfill(order_id, fullifed_items):
     order = Order.objects.filter(id=order_id).first()
     if order is None:
         raise OrderNotFound("order not found")
-    if order.status == OrderStatus.FULLIFIED:
+    if order.status == OrderStatus.FULFILLED:
         result = {
             "order_id": str(order_id),
-            "status": "FULLIFIED",
+            "status": "FULFILLED",
             "processed_at": str(order.processed_at)
         }
         return result
     try:
         for item in fullifed_items:
-            sku = SKU.objects.get(id=item["sku_id"])
-            if sku.active_quantity - item["quantity"] < 0:
+            sku = SKU.objects.select_for_update().get(id=item["sku_id"])
+            if sku.reserved_quantity - item["quantity"] < 0:
                 raise NotEnoughQunatity(
                     "Not enough quantity",
                     str(sku.id),
                     item["quantity"],
-                    sku.active_quantity,
+                    sku.reserved_quantity,
                 )
 
             sku.reserved_quantity -= item["quantity"]
+            sku.stock_quantity -= item["quantity"]
             sku.save()
-        order.status = OrderStatus.FULLIFIED
+        order.status = OrderStatus.FULFILLED
         order.processed_at = timezone.now()
         order.save()
         result = {
             "order_id": str(order_id),
-            "status": "FULLIFIED",
+            "status": "FULFILLED",
             "processed_at": str(order.processed_at)
         }
         return result
