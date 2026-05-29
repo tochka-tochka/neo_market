@@ -88,7 +88,7 @@ class TestSellerProductsView:
             deleted=True,
         )
 
-        response = jwt_client.get(f"{url}?deleted=true")
+        response = jwt_client.get(f"{url}?include_deleted=true")
 
         assert response.status_code == status.HTTP_200_OK, response.json()
         data = response.json()

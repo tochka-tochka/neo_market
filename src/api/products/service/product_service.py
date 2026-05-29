@@ -9,12 +9,14 @@ from django.db.models import Q
 from interservice_queues.producers import services_channel_producer
 from src.api.products.service.product_utils import product_filter_query
 from src.models import Category
-from src.models.product import Product, ProductImage, ProductStatus, ProductCharacteristics
-from src.models.user import Seller
-from src.serializers.product_serializers import (
-    ProductSerializer,
-    ProductListSerializer
+from src.models.product import (
+    Product,
+    ProductCharacteristics,
+    ProductImage,
+    ProductStatus,
 )
+from src.models.user import Seller
+from src.serializers.product_serializers import ProductListSerializer, ProductSerializer
 
 
 class InvalidCategoryId(Exception):
@@ -36,18 +38,19 @@ class ProductAlreadyDeleted(Exception):
 class ProductNotFound(Exception):
     pass
 
+
 class InvalidPaginationParam(Exception):
     pass
 
 
 def get_seller_products(
-        search: str | None,
-        status: ProductStatus | None,
-        limit: int | None,
-        offset: int | None,
-        seller: Seller,
-        deleted: bool | None,
-        filters: dict[str, list[str]]
+    search: str | None,
+    status: ProductStatus | None,
+    limit: int | None,
+    offset: int | None,
+    seller: Seller,
+    deleted: bool | None,
+    filters: dict[str, list[str]],
 ):
     try:
         query = Q(seller=seller)
@@ -63,22 +66,39 @@ def get_seller_products(
 
         if limit is None:
             limit = 20
-        if int(limit) <= 0:
-            raise InvalidPaginationParam("limit must be greater 0")
+        try:
+            if int(limit) <= 0:
+                raise InvalidPaginationParam("limit must be greater 0")
+            if int(limit) > 100:
+                raise InvalidPaginationParam("limit must be less 100")
+        except ValueError:
+            raise InvalidPaginationParam("limit must be a number")
 
         if offset is None:
             offset = 0
-        if int(offset) < 0:
-            raise InvalidPaginationParam("offset must be greater or equal 0")
+        try:
+            if int(offset) < 0:
+                raise InvalidPaginationParam("offset must be greater or equal 0")
+            if int(offset) > 100:
+                raise InvalidPaginationParam("offset must be less 100")
+        except ValueError:
+            raise InvalidPaginationParam("offset must be a number")
 
-        total_count = Product.objects.select_related("category").filter(query).count()
+        total_count = (
+            Product.objects.select_related("category")
+            .prefetch_related("skus", "images")
+            .filter(query)
+            .count()
+        )
 
         if filters:
             query &= product_filter_query(filters)
 
-        products = Product.objects.select_related("category").filter(query)[
-            int(offset) : int(offset) + int(limit)
-        ]
+        products = (
+            Product.objects.select_related("category")
+            .prefetch_related("skus", "images")
+            .filter(query)[int(offset) : int(offset) + int(limit)]
+        )
         serializer = ProductListSerializer(products, many=True)
         return serializer.data, total_count, limit, offset
     except InvalidPaginationParam as e:
@@ -132,7 +152,7 @@ def create_product(data: Dict[str, Any], seller: Seller):
             slug=data.get("slug"),
             category_id=data.get("category"),
             status=ProductStatus.CREATED,
-            seller=seller
+            seller=seller,
         )
 
         images = data.get("images")
@@ -147,9 +167,12 @@ def create_product(data: Dict[str, Any], seller: Seller):
                 )
 
             ProductImage.objects.bulk_create(image_objects)
-        product.characteristics.set([
-            ProductCharacteristics.objects.create(**chr, product_id=product) for chr in data.get("characteristics", [])
-        ])
+        product.characteristics.set(
+            [
+                ProductCharacteristics.objects.create(**chr, product_id=product)
+                for chr in data.get("characteristics", [])
+            ]
+        )
     except Exception as e:
         raise Exception(f"failed to create product: {e}")
 
@@ -186,9 +209,12 @@ def update_product(data: Dict[str, Any], seller: Seller):
                 chars = json.loads(chars)
             product.characteristics.all().delete()
             # set() добавит характеристики к тем, что уже были, поэтому удаляем всё
-            product.characteristics.set([
-                ProductCharacteristics.objects.create(**chr, product_id=product) for chr in (chars or [])
-            ])
+            product.characteristics.set(
+                [
+                    ProductCharacteristics.objects.create(**chr, product_id=product)
+                    for chr in (chars or [])
+                ]
+            )
         images = data.get("images")
         if images is not None:
             try:
@@ -196,7 +222,9 @@ def update_product(data: Dict[str, Any], seller: Seller):
                 image_objects = []
                 for index, image_data in enumerate(images):
                     image_objects.append(
-                        ProductImage(product=product, url=image_data.get("url"), ordering=index)
+                        ProductImage(
+                            product=product, url=image_data.get("url"), ordering=index
+                        )
                     )
 
                 ProductImage.objects.bulk_create(image_objects)
