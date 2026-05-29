@@ -205,22 +205,7 @@ def delete_sku(id, seller):
             raise SKUGotActiveReserves("Cannot delete SKU with active reserves")
 
         sku_id = sku.id
-        sku.delete()
-
-        if product.status == ProductStatus.ON_MODERATION:
-            services_channel_producer.product_moder_notification(
-                data={
-                    "idempotency_key": str(uuid.uuid4()),
-                    "product_id": str(product.id),
-                    "sku_id": str(sku_id),
-                    "seller_id": str(seller.id),
-                    "event": "DELETED",
-                    "date": str(datetime.now()),
-                },
-                corrected=True,
-            )
-
-        if sku.stock_quantity > 0:
+        if sku.stock_quantity > 0 and product.status == ProductStatus.MODERATED:
             services_channel_producer.product_b2c_notification(
                 data={
                     "idempotency_key": str(uuid.uuid4()),
@@ -231,10 +216,23 @@ def delete_sku(id, seller):
                 },
                 corrected=True,
             )
+        sku.delete()
 
-        product_serializer = ProductSerializer(product).data
-        if len(product_serializer["skus"]) == 0:
-            product.status = ProductStatus.CREATED
+        product.refresh_from_db()
+        if len(product.skus.all()) == 0:
+            if product.status == ProductStatus.ON_MODERATION:
+                services_channel_producer.product_moder_notification(
+                    data={
+                        "idempotency_key": str(uuid.uuid4()),
+                        "product_id": str(product.id),
+                        "sku_id": str(sku_id),
+                        "seller_id": str(seller.id),
+                        "event": "DELETED",
+                        "date": str(datetime.now()),
+                    },
+                    corrected=True,
+                )
+                product.status = ProductStatus.CREATED
         product.save()
 
     except SKUNotFound as e:

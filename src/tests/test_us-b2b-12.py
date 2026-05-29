@@ -71,7 +71,7 @@ class TestDeleteSKU(BaseTestUtil):
         url = reverse("specific-sku", args=[sku.id])
         response = jwt_client.delete(url)
 
-        assert response.status_code == status.HTTP_204_NO_CONTENT
+        assert response.status_code == status.HTTP_204_NO_CONTENT, response.json()
 
         product.refresh_from_db()
         assert product.status == ProductStatus.CREATED
