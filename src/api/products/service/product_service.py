@@ -79,8 +79,6 @@ def get_seller_products(
         try:
             if int(offset) < 0:
                 raise InvalidPaginationParam("offset must be greater or equal 0")
-            if int(offset) > 100:
-                raise InvalidPaginationParam("offset must be less 100")
         except ValueError:
             raise InvalidPaginationParam("offset must be a number")
 
