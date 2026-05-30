@@ -4,7 +4,8 @@ import pytest
 from django.urls import reverse
 from rest_framework import status
 
-from src.models.product import SKU, Product, ProductStatus
+from src.models.product import SKU, Product, ProductCharacteristics, ProductStatus
+from src.models.user import Seller
 from src.tests.fixtures import (
     BaseTestUtil,
     base_data,
@@ -56,7 +57,7 @@ class TestCatalogProducts(BaseTestUtil):
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
-    def est_catalog_response_has_no_cost_price(self, service_client, catalog_products):
+    def test_catalog_response_has_no_cost_price(self, service_client, catalog_products):
         url = reverse(self.url_name)
         response = service_client.get(url)
 
@@ -169,7 +170,7 @@ class TestCatalogProducts(BaseTestUtil):
             reserved_quantity=2,
         )
 
-        response = service_client.get(f"{url}?category={str(cat_b_id)}")
+        response = service_client.get(f"{url}?category_id={str(cat_b_id)}")
 
         assert response.status_code == status.HTTP_200_OK, response.json()
         items = response.json().get("items")
@@ -210,6 +211,119 @@ class TestCatalogProducts(BaseTestUtil):
         )
 
         response = service_client.get(f"{url}?search=Smartphone")
+
+        assert response.status_code == status.HTTP_200_OK
+        items = response.json().get("items", [])
+        item_ids = [item["id"] for item in items]
+
+        assert str(p_search.id) in item_ids
+        assert str(p_other.id) not in item_ids
+
+    def test_catalog_filters_by_min_price_max_price(
+        self, service_client, catalog_products
+    ):
+        url = reverse(self.url_name)
+        response = service_client.get(f"{url}?min_price=125&max_price=175")
+
+        assert response.status_code == status.HTTP_200_OK, response.json()
+        data = response.json()
+
+        items = data.get("items", [])
+        item_ids = [item["id"] for item in items]
+
+        assert str(catalog_products["visible_2"].id) in item_ids
+
+        assert str(catalog_products["visible"].id) not in item_ids
+        assert str(catalog_products["out_of_stock"].id) not in item_ids
+        assert str(catalog_products["deleted"].id) not in item_ids
+        assert str(catalog_products["created"].id) not in item_ids
+
+    def test_catalog_filters_by_characteristics(
+        self, service_client, catalog_products, product_factory
+    ):
+        url = reverse(self.url_name)
+
+        p_search = product_factory(
+            title="Unique Smartphone",
+            description="Very unique description containing Smartphone",
+            status=ProductStatus.MODERATED,
+        )
+        SKU.objects.create(
+            product=p_search,
+            name="sku_search",
+            price=100,
+            cost_price=80,
+            stock_quantity=10,
+            reserved_quantity=2,
+        )
+        ProductCharacteristics.objects.create(
+            product_id=p_search, name="brand", value="Apple"
+        )
+
+        p_other = product_factory(
+            title="Standard TV",
+            description="Just a regular television",
+            status=ProductStatus.MODERATED,
+        )
+        SKU.objects.create(
+            product=p_other,
+            name="sku_other",
+            price=100,
+            cost_price=80,
+            stock_quantity=10,
+            reserved_quantity=2,
+        )
+        ProductCharacteristics.objects.create(
+            product_id=p_other, name="brand", value="Samsung"
+        )
+
+        response = service_client.get(f"{url}?filters[brand]=apple")
+
+        assert response.status_code == status.HTTP_200_OK
+        items = response.json().get("items", [])
+        item_ids = [item["id"] for item in items]
+
+        assert str(p_search.id) in item_ids
+        assert str(p_other.id) not in item_ids
+
+    def test_catalog_filters_by_seller_id(
+        self, service_client, catalog_products, product_factory, test_user, test_category
+    ):
+        url = reverse(self.url_name)
+
+        other_seller = Seller.objects.create(username="other", password="password123")
+
+        p_search = product_factory(
+            title="Unique Smartphone",
+            description="Very unique description containing Smartphone",
+            status=ProductStatus.MODERATED,
+        )
+        SKU.objects.create(
+            product=p_search,
+            name="sku_search",
+            price=100,
+            cost_price=80,
+            stock_quantity=10,
+            reserved_quantity=2,
+        )
+
+        p_other = Product.objects.create(
+            title="Standard TV",
+            description="Just a regular television",
+            status=ProductStatus.MODERATED,
+            category=test_category,
+            seller=other_seller
+        )
+        SKU.objects.create(
+            product=p_other,
+            name="sku_other",
+            price=100,
+            cost_price=80,
+            stock_quantity=10,
+            reserved_quantity=2,
+        )
+
+        response = service_client.get(f"{url}?seller_id={test_user.id}")
 
         assert response.status_code == status.HTTP_200_OK
         items = response.json().get("items", [])
