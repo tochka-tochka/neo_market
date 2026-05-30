@@ -1,23 +1,23 @@
-from datetime import datetime
 import json
+from datetime import datetime
 
 from django.db import transaction
 from django.utils import timezone
 
 from interservice_queues.producers import services_channel_producer
-from src.models.product import SKU, ReserveOperations, Order, OrderItem, OrderStatus
+from src.models.product import SKU, Order, OrderItem, OrderStatus, ReserveOperations
 
 
 class NotEnoughQunatity(Exception):
-    def __init__(self, message, sku_id, requested, available):
+    def __init__(self, message, details):
         super().__init__(message)
 
-        self.sku_id = sku_id
-        self.requested = requested
-        self.available = available
+        self.details = details
+
 
 class NegativeQuantity(Exception):
     pass
+
 
 class OrderNotFound(Exception):
     pass
@@ -29,22 +29,36 @@ def reserve(idempotency_key, order_id, reserved_items):
     if reserve is not None:
         return json.loads(reserve.result)
     try:
-        order = Order.objects.create(id = order_id, status = OrderStatus.RESERVED)
+        order = Order.objects.create(id=order_id, status=OrderStatus.RESERVED)
+
+        failed_reserves = []
+
         for item in reserved_items:
             if item["quantity"] < 0:
                 raise NegativeQuantity("negative quantity")
-                
+
             sku = SKU.objects.select_for_update().get(id=item["sku_id"])
 
-            if sku.stock_quantity - sku.reserved_quantity - item["quantity"] < 0:
-                raise NotEnoughQunatity(
-                    "Not enough quantity",
-                    str(sku.id),
-                    item["quantity"],
-                    sku.stock_quantity - sku.reserved_quantity,
+            if sku.stock_quantity - sku.reserved_quantity == 0:
+                failed_reserves.append(
+                    {
+                        "sku_id": str(sku.id),
+                        "requested": item["quantity"],
+                        "available": sku.stock_quantity - sku.reserved_quantity,
+                        "reason": "OUT_OF_STOCK"
+                    }
+                )
+            elif sku.stock_quantity - sku.reserved_quantity - item["quantity"] < 0:
+                failed_reserves.append(
+                    {
+                        "sku_id": str(sku.id),
+                        "requested": item["quantity"],
+                        "available": sku.stock_quantity - sku.reserved_quantity,
+                        "reason": "INSUFFICIENT_STOCK"
+                    }
                 )
 
-            if sku.stock_quantity - sku.reserved_quantity - item["quantity"] == 0:
+            elif sku.stock_quantity - sku.reserved_quantity - item["quantity"] == 0:
                 print("MESSAGE SENT\n")
                 services_channel_producer.product_b2c_notification(
                     data={"sku_id": str(sku.id), "event": "SKU_OUT_OF_STOCK"},
@@ -54,10 +68,13 @@ def reserve(idempotency_key, order_id, reserved_items):
             sku.reserved_quantity += item["quantity"]
             sku.save()
             OrderItem.objects.create(order=order, sku=sku, quantity=item["quantity"])
+
+        if len(failed_reserves) > 0:
+            raise NotEnoughQunatity("Failed to reserve some products", json.dumps(failed_reserves))
         result = {
             "order_id": str(order.id),
             "status": "RESERVED",
-            "reserved_at": str(datetime.now())
+            "reserved_at": str(datetime.now()),
         }
         ReserveOperations.objects.create(
             idempotency_key=idempotency_key, result=json.dumps(result)
@@ -83,7 +100,7 @@ def unreserve(order_id, reserved_items):
         result = {
             "order_id": str(order_id),
             "status": "UNRESERVED",
-            "processed_at": str(datetime.now())
+            "processed_at": str(datetime.now()),
         }
         ReserveOperations.objects.create(idempotency_key=order_id, result=result)
         return result
@@ -100,7 +117,7 @@ def fulfill(order_id, fullifed_items):
         result = {
             "order_id": str(order_id),
             "status": "FULFILLED",
-            "processed_at": str(order.processed_at)
+            "processed_at": str(order.processed_at),
         }
         return result
     try:
@@ -123,7 +140,7 @@ def fulfill(order_id, fullifed_items):
         result = {
             "order_id": str(order_id),
             "status": "FULFILLED",
-            "processed_at": str(order.processed_at)
+            "processed_at": str(order.processed_at),
         }
         return result
     except OrderNotFound as e:

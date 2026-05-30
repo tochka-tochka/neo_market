@@ -68,6 +68,7 @@ class TestReserveOperations(BaseTestUtil):
 
         response = service_client.post(url, data=payload, format='json', content_type="application/json")
 
+        print(response.json())
         assert response.status_code == status.HTTP_409_CONFLICT, response.json()
         
         sku1.refresh_from_db()
@@ -96,6 +97,7 @@ class TestReserveOperations(BaseTestUtil):
         assert sku1.reserved_quantity == 1
 
     def test_sku_out_of_stock_event_emitted(self, service_client, two_skus):
+        self._clear_queues()
         sku1, _ = two_skus
         url = reverse("reserve")
         
@@ -103,7 +105,6 @@ class TestReserveOperations(BaseTestUtil):
             "idempotency_key": str(uuid.uuid4()),
             "items": [{"sku_id": str(sku1.id), "quantity": 10}]
         }
-
         service_client.post(url, data=payload, format='json', content_type="application/json")
         
         message = self.get_rabbitmq_message('b2c', timeout=2)
