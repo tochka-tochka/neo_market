@@ -8,6 +8,9 @@ from src.serializers.product_serializers import PublicProductSerializer, PublicC
 class WrongSortParam(Exception):
     pass
 
+class WrongQueryParam(Exception):
+    pass
+
 
 def get_product_public(id: str):
     try:
@@ -30,20 +33,35 @@ def get_product_public(id: str):
         raise Exception(f"failed to get product: {e}")
 
 
-def get_products_for_catalog(search, category, ids, limit, offset, sort, filters: dict[str, list[str]]):
+def get_products_for_catalog(search, category_id, min_price, max_price, seller_id, ids, limit, offset, sort, filters: dict[str, list[str]]):
     query = Q(deleted=False, status=ProductStatus.MODERATED)
 
     if ids and len(ids) > 0:
         query &= Q(id__in=ids)
 
-    if category is not None:
-        query &= Q(category=category)
+    if category_id is not None:
+        query &= Q(category=category_id)
 
     if search:
         query &= (Q(title__icontains=search) | Q(description__icontains=search))
 
+    if min_price is not None:
+        try:
+            query &= Q(price__gte=int(min_price))
+        except ValueError:
+            raise WrongQueryParam("min_price must be a number")
+
+    if max_price is not None:
+        try:
+            query &= Q(price__lte=int(max_price))
+        except ValueError:
+            raise WrongQueryParam("min_price must be a number")
+
+    if seller_id is not None:
+        query &= Q(seller=seller_id)
+
     if sort is None:
-        sort = "price_desc"
+        sort = "created_desc"
 
     if limit is None:
         limit = 20
@@ -51,7 +69,7 @@ def get_products_for_catalog(search, category, ids, limit, offset, sort, filters
     if offset is None:
         offset = 0
 
-    if sort not in ["price_asc", "price_desc", "date_desc"]:
+    if sort not in ["price_asc", "price_desc", "created_desc", "popular"]:
         raise WrongSortParam("worng sort param")
 
     if filters:
@@ -60,7 +78,8 @@ def get_products_for_catalog(search, category, ids, limit, offset, sort, filters
     order_by_map = {
         "price_asc": "+price",
         "price_desc": "-price",
-        "date_desc": "-created_at",
+        "created_desc": "-created_at",
+        "popular": "-price"
     }
     try:
         total_count = (
@@ -83,6 +102,8 @@ def get_products_for_catalog(search, category, ids, limit, offset, sort, filters
         )
         serializer = PublicCatalogProductSerializer(products, many=True)
         return serializer.data, total_count, limit, offset
+    except WrongQueryParam as e:
+        raise e
     except WrongSortParam as e:
         raise e
     except Exception as e:

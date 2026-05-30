@@ -11,7 +11,6 @@ def parse_query_filters(filter_param_name: str, query_dict: QueryDict) -> dict[s
         r = re.search(filter_param_name + r"\[(\w+)\]", key)
         if r:
             result[r.group(1)].append(query_dict[key])
-    print("parsed", query_dict, result)
     return result
 
 
@@ -20,6 +19,6 @@ def product_filter_query(filters: dict[str, list[str]]) -> Q:
     for filter_name, filter_values in filters.items():
         filter_query = Q()
         for fval in filter_values:
-            filter_query |= Q(characteristics__name=filter_name, characteristics__value=fval)
+            filter_query |= Q(characteristics__name__iexact=filter_name, characteristics__value__iexact=fval)
         filters_query &= filter_query
     return filters_query

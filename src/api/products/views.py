@@ -27,12 +27,12 @@ from .service.product_service import (
     AccessDenied,
     HardBlockerProduct,
     InvalidCategoryId,
+    InvalidPaginationParam,
     ProductAlreadyDeleted,
     ProductNotFound,
-    InvalidPaginationParam
 )
 from .service.product_utils import parse_query_filters
-from .service.public_product_service import WrongSortParam
+from .service.public_product_service import WrongQueryParam, WrongSortParam
 
 
 @method_decorator(csrf_exempt, name="dispatch")
@@ -173,7 +173,9 @@ class ProductsView(APIView):
                 status=200,
             )
         except InvalidPaginationParam as e:
-            return JsonResponse({"code": "INVALID_REQUEST", "message": str(e)}, status=422)
+            return JsonResponse(
+                {"code": "INVALID_REQUEST", "message": str(e)}, status=422
+            )
         except Exception as e:
             return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
@@ -194,7 +196,6 @@ class ProductsView(APIView):
                 {"code": "INVALID_REQUEST", "message": "characteristics required"},
                 status=422,
             )
-
 
         images = request.data.get("images")
         if images is None or len(images) == 0:
@@ -228,18 +229,23 @@ class ProductsView(APIView):
 
         return JsonResponse(product, status=201, safe=False)
 
+
 @method_decorator(csrf_exempt, name="dispatch")
 class PublicProductsView(APIView):
     permission_classes = [IsService]
     parser_classes = [JSONParser]
+
     def get(self, request: Request):
         try:
             ids_param = request.query_params.get("ids", "")
             ids = ids_param.split(",") if ids_param else []
             products, total_count, limit, offset = get_products_for_catalog(
                 search=request.query_params.get("search"),
-                category=request.query_params.get("category"),
+                category_id=request.query_params.get("category_id"),
+                min_price=request.query_params.get("min_price"),
+                max_price=request.query_params.get("max_price"),
                 ids=ids,
+                seller_id=request.query_params.get("seller_id"),
                 sort=request.query_params.get("sort"),
                 limit=request.query_params.get("limit"),
                 offset=request.query_params.get("offset"),
@@ -254,7 +260,13 @@ class PublicProductsView(APIView):
                 },
                 status=200,
             )
+        except WrongQueryParam as e:
+            return JsonResponse(
+                {"code": "INVALID_REQUEST", "message": str(e)}, status=422
+            )
         except WrongSortParam:
-            return JsonResponse({"code": "INVALID_REQUEST", "message": "wrong sort param"}, status=422)
+            return JsonResponse(
+                {"code": "INVALID_REQUEST", "message": "wrong sort param"}, status=422
+            )
         except Exception as e:
             return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
