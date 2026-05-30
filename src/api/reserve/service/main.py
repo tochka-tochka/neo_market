@@ -45,7 +45,7 @@ def reserve(idempotency_key, order_id, reserved_items):
                         "sku_id": str(sku.id),
                         "requested": item["quantity"],
                         "available": sku.stock_quantity - sku.reserved_quantity,
-                        "reason": "OUT_OF_STOCK"
+                        "reason": "OUT_OF_STOCK",
                     }
                 )
             elif sku.stock_quantity - sku.reserved_quantity - item["quantity"] < 0:
@@ -54,7 +54,7 @@ def reserve(idempotency_key, order_id, reserved_items):
                         "sku_id": str(sku.id),
                         "requested": item["quantity"],
                         "available": sku.stock_quantity - sku.reserved_quantity,
-                        "reason": "INSUFFICIENT_STOCK"
+                        "reason": "INSUFFICIENT_STOCK",
                     }
                 )
 
@@ -70,7 +70,9 @@ def reserve(idempotency_key, order_id, reserved_items):
             OrderItem.objects.create(order=order, sku=sku, quantity=item["quantity"])
 
         if len(failed_reserves) > 0:
-            raise NotEnoughQunatity("Failed to reserve some products", json.dumps(failed_reserves))
+            raise NotEnoughQunatity(
+                "Failed to reserve some products", json.dumps(failed_reserves)
+            )
         result = {
             "order_id": str(order.id),
             "status": "RESERVED",
@@ -125,10 +127,15 @@ def fulfill(order_id, fullifed_items):
             sku = SKU.objects.select_for_update().get(id=item["sku_id"])
             if sku.reserved_quantity - item["quantity"] < 0:
                 raise NotEnoughQunatity(
-                    "Not enough quantity",
-                    str(sku.id),
-                    item["quantity"],
-                    sku.reserved_quantity,
+                    "Failed to fulfill order",
+                    [
+                        {
+                            "sku_id": str(sku.id),
+                            "requested": item["quantity"],
+                            "available": sku.reserved_quantity,
+                            "reason": "INSUFFICIENT_STOCK",
+                        }
+                    ],
                 )
 
             sku.reserved_quantity -= item["quantity"]

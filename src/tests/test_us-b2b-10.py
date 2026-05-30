@@ -153,3 +153,56 @@ class TestfulfillOperations(BaseTestUtil):
 
         assert sku1.stock_quantity - sku1.reserved_quantity == expected_active_quantity
         assert sku1.reserved_quantity == expected_reserved_quantity
+
+    def test_fulfill_wrong_payload_returns_409(
+        self, service_client, two_skus
+    ):
+        sku1, _ = two_skus
+
+        reserve_url = reverse("reserve")
+        reserve_quantity = 5
+        reserve_payload = {
+            "idempotency_key": str(uuid.uuid4()),
+            "items": [{"sku_id": str(sku1.id), "quantity": reserve_quantity}],
+        }
+        reserve_response = service_client.post(
+            reserve_url,
+            data=reserve_payload,
+            format="json",
+            content_type="application/json",
+        )
+        assert reserve_response.status_code == status.HTTP_200_OK, (
+            reserve_response.json()
+        )
+
+        sku1.refresh_from_db()
+        initial_reserved_quantity = sku1.reserved_quantity
+        initial_active_quantity = sku1.stock_quantity - sku1.reserved_quantity
+        assert initial_active_quantity == 3
+        assert initial_reserved_quantity == 2 + reserve_quantity
+
+        fulfill_url = reverse("fulfill")
+        fulfill_quantity = 100
+        fulfill_payload = {
+            "order_id": reserve_response.json()["order_id"],
+            "items": [{"sku_id": str(sku1.id), "quantity": fulfill_quantity}],
+        }
+
+        response = service_client.post(
+            fulfill_url,
+            data=fulfill_payload,
+            format="json",
+            content_type="application/json",
+        )
+
+        print(response.json())
+        assert response.status_code == status.HTTP_409_CONFLICT, response.json()
+
+        sku1.refresh_from_db()
+
+        assert sku1.reserved_quantity == initial_reserved_quantity
+
+        assert (
+            Order.objects.get(id=reserve_response.json()["order_id"]).status
+            == OrderStatus.RESERVED
+        )
