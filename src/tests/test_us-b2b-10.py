@@ -195,7 +195,6 @@ class TestfulfillOperations(BaseTestUtil):
             content_type="application/json",
         )
 
-        print(response.json())
         assert response.status_code == status.HTTP_409_CONFLICT, response.json()
 
         sku1.refresh_from_db()
