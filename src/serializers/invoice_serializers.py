@@ -6,8 +6,8 @@ from src.models.product import Invoice, InvoiceItem
 
 class InvoiceItemSerializer(serializers.ModelSerializer):
     sku_id = serializers.UUIDField(source="sku.id", read_only=True)
-    quantity = serializers.IntegerField(validators=[MinValueValidator(1)])
-    accepted_quantity = serializers.IntegerField(validators=[MinValueValidator(1)])
+    quantity = serializers.IntegerField(validators=[MinValueValidator(0)])
+    accepted_quantity = serializers.IntegerField(validators=[MinValueValidator(0)])
 
     class Meta:
         model = InvoiceItem

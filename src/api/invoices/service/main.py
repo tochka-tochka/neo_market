@@ -4,18 +4,20 @@ from uuid import UUID
 
 from django.db import transaction
 
-from src.models.product import SKU, Invoice, InvoiceItem, Product, ProductStatus
+from src.models.product import SKU, Invoice, InvoiceItem, Product, ProductStatus, InvoiceStatus
 from src.serializers.invoice_serializers import InvoiceSerializer
 
 
 class ProductNotModerated(Exception):
     pass
 
-
 class AccessDenied(Exception):
     pass
 
 class SKUNotFound(Exception):
+    pass
+
+class InvoiceAlreadyAccepted(Exception):
     pass
 
 
@@ -67,6 +69,8 @@ def create_invoice(data, seller):
             invoice_item.full_clean()
             invoice_item.save()
         return InvoiceSerializer(invoice).data
+    except SKUNotFound as e:
+        raise e
     except AccessDenied as e:
         raise e
     except ProductNotModerated as e:
@@ -90,6 +94,8 @@ def delete_invoice(id, seller):
 def accept_invoice(id, items, operator):
     try:
         invoice = Invoice.objects.get(id=id)
+        if invoice.status == InvoiceStatus.ACCEPTED or invoice.status == InvoiceStatus.PARTIALLY_ACCEPTED:
+            raise InvoiceAlreadyAccepted()
 
         status = "ACCEPTED"
         count_accepted = 0

@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from src.api.invoices.service.main import (
     AccessDenied,
+    InvoiceAlreadyAccepted,
     ProductNotModerated,
     SKUNotFound,
     create_invoice,
@@ -32,7 +33,14 @@ class InvoicesView(APIView):
         except Exception as e:
             return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
-        return JsonResponse({"items": invoices, "total_count": total_count, "limit": limit, "offset": offset})
+        return JsonResponse(
+            {
+                "items": invoices,
+                "total_count": total_count,
+                "limit": limit,
+                "offset": offset,
+            }
+        )
 
     def post(self, request):
         items = request.data.get("items")
@@ -56,6 +64,14 @@ class InvoicesView(APIView):
                     "message": "One or more SKUs do not belong to the authenticated seller",
                 },
                 status=403,
+            )
+        except InvoiceAlreadyAccepted:
+            return JsonResponse(
+                {
+                    "code": "INVALID_REQUEST",
+                    "message": "This invoice is already accepted",
+                },
+                status=400,
             )
         except ProductNotModerated:
             return JsonResponse(
