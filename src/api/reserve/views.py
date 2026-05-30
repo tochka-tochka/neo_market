@@ -21,20 +21,14 @@ class ReserveView(APIView):
         except NotEnoughQunatity as e:
             return JsonResponse(
                 {
-                    "reserved": False,
-                    "failed_items": [
-                        {
-                            "sku_id": e.sku_id,
-                            "requested": e.requested,
-                            "available": e.available,
-                            "reason": "INSUFFICIENT_STOCK",
-                        }
-                    ],
+                    "code": "RESERVE_CONFLICT",
+                    "message": str(e),
+                    "details": e.details,
                 },
                 status=409,
             )
         except Exception as e:
-            return JsonResponse({"message": str(e)}, status=500)
+            return JsonResponse({"code": "SERVER_ERROR", "message": str(e)}, status=500)
 
 
 @method_decorator(csrf_exempt, name="dispatch")
