@@ -79,7 +79,7 @@ def get_products_for_catalog(search, category_id, min_price, max_price, seller_i
         "price_asc": "+price",
         "price_desc": "-price",
         "created_desc": "-created_at",
-        "popular": "-price"
+        "popular": "-created_at"
     }
     try:
         total_count = (
