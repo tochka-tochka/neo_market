@@ -17,7 +17,7 @@ def get_full_category(_id: uuid.UUID, include_product_count: bool, lang: Literal
         parent_obj = Category.objects.get(id=category.parent_id)
         parent = {
             "id": parent_obj.id,
-            "name": parent_obj.value,
+            "name": parent_obj.name,
             "slug": parent_obj.slug
         }
     else:
@@ -36,7 +36,7 @@ def get_full_category(_id: uuid.UUID, include_product_count: bool, lang: Literal
     meta = {mt.tag: mt.value for mt in meta_tags}
     return {
         "id": category.id,
-        "name": category.value,
+        "name": category.name,
         "slug": category.slug,
         "description": category.description,
         "parent": parent,
@@ -73,6 +73,35 @@ def get_category_filters(category_id: uuid.UUID):
     return {
         "items": [format_category_filter(cf) for cf in filters]
     }
+
+
+def __serialize_breadcrumb_cat(category: Category):
+    return {
+        "id": category.id,
+        "name": category.name,
+        "parent_id": category.parent_id,
+        "level": 0,
+        "path": "",
+        "is_active": category.is_active,
+        "created_at": category.created_at,
+        "slug": category.slug
+    }
+
+
+def get_category_breadcrumbs(category_id: uuid.UUID) -> list:
+    breadcrumbs = [__serialize_breadcrumb_cat(Category.objects.get(id=category_id))]
+
+    while breadcrumbs[0]["parent_id"] is not None:
+        prev = Category.objects.get(id=breadcrumbs[0]["parent_id"])
+        breadcrumbs.insert(0, __serialize_breadcrumb_cat(prev))
+    path = ""
+    for i in range(len(breadcrumbs)):
+        breadcrumbs[i]["level"] = i
+        path += "/" + (breadcrumbs[i]["slug"] or breadcrumbs[i]["name"])
+        breadcrumbs[i]["path"] = path
+        breadcrumbs[i].pop("slug")
+
+    return breadcrumbs
 
 
 def category_products_queryset(category_id: uuid.UUID, applied_filters: list[tuple[str, str]]):

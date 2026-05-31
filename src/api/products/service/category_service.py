@@ -5,7 +5,7 @@ from src.models import Category
 
 def get_categories():
     try:
-        categories = Category.objects.all().values("id", "parent_id", "value")
+        categories = Category.objects.all().values("id", "parent_id", "name")
         return list(categories)
     except Exception as e:
         raise Exception(f"failed to get categories: {e}")

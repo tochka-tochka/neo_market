@@ -1,3 +1,5 @@
+import logging
+import traceback
 import uuid
 
 from django.http import HttpRequest, JsonResponse
@@ -5,7 +7,8 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
 
-from src.api.categories.services import get_full_category, get_category_filters,get_category_facet
+from src.api.categories.services import get_full_category, get_category_filters, get_category_facet, \
+    get_category_breadcrumbs
 from src.api.products.service.category_service import get_categories
 from src.api.products.service.product_utils import parse_query_filters
 
@@ -42,6 +45,18 @@ class CategoryFilterView(APIView):
             json_filters = get_category_filters(id)
             return JsonResponse(json_filters, status=200, safe=False)
         except Exception as e:
+            return JsonResponse({"message": str(e)}, status=500)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class CategoryBreadcrumbsView(APIView):
+    # permission_classes = [IsAuthenticated]
+    def get(self, request: HttpRequest, id: uuid.UUID):
+        try:
+            json_filters = get_category_breadcrumbs(id)
+            return JsonResponse(json_filters, status=200, safe=False)
+        except Exception as e:
+            logging.error(traceback.format_exc())
             return JsonResponse({"message": str(e)}, status=500)
 
 

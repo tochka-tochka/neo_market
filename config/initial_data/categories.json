@@ -4,6 +4,7 @@
     "pk": "686d5c01-0476-40c8-b49d-b8fabf8be130",
     "fields": {
       "name": "Электроника и периферия",
+      "slug": "electronics-and-peripherals",
       "id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "parent_id": null,
       "created_at": "2026-05-19T10:47:28.760249",
@@ -16,6 +17,7 @@
     "pk": "7db94395-f8da-4582-b177-4c24fe586eb6",
     "fields": {
       "name": "Бытовая техника и уход",
+      "slug": "home-appliances-and-care",
       "id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "parent_id": null,
       "created_at": "2026-05-19T10:47:28.760249",
@@ -28,6 +30,7 @@
     "pk": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
     "fields": {
       "name": "Одежда, обувь и аксессуары",
+      "slug": "clothing-footwear-and-accessories",
       "id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "parent_id": null,
       "created_at": "2026-05-19T10:47:28.760249",
@@ -40,6 +43,7 @@
     "pk": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
     "fields": {
       "name": "Мебель и домашний текстиль",
+      "slug": "furniture-and-home-textiles",
       "id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "parent_id": null,
       "created_at": "2026-05-19T10:47:28.760249",
@@ -52,6 +56,7 @@
     "pk": "70bfbdeb-dbde-461c-bf27-46f9b913b558",
     "fields": {
       "name": "Ремонт и инструменты",
+      "slug": "repair-and-tools",
       "id": "70bfbdeb-dbde-461c-bf27-46f9b913b558",
       "parent_id": null,
       "created_at": "2026-05-19T10:47:28.760249",
@@ -64,6 +69,7 @@
     "pk": "b58912c8-dcce-47cb-a26c-79aa7288fc3f",
     "fields": {
       "name": "Зоотовары",
+      "slug": "pet-supplies",
       "id": "b58912c8-dcce-47cb-a26c-79aa7288fc3f",
       "parent_id": null,
       "created_at": "2026-05-19T10:47:28.760249",
@@ -76,6 +82,7 @@
     "pk": "cea14e55-ba0a-435e-83dd-4a6bedd72325",
     "fields": {
       "name": "Детские товары",
+      "slug": "baby-products",
       "id": "cea14e55-ba0a-435e-83dd-4a6bedd72325",
       "parent_id": null,
       "created_at": "2026-05-19T10:47:28.760249",
@@ -88,6 +95,7 @@
     "pk": "d81b8542-4ee0-4564-84b9-675de02ec79a",
     "fields": {
       "name": "Спорт и активный отдых",
+      "slug": "sports-and-outdoors",
       "id": "d81b8542-4ee0-4564-84b9-675de02ec79a",
       "parent_id": null,
       "created_at": "2026-05-19T10:47:28.760249",
@@ -100,6 +108,7 @@
     "pk": "75f31e96-03ea-49e3-96cc-ba06620a03e3",
     "fields": {
       "name": "Смартфоны",
+      "slug": "smartphones",
       "id": "75f31e96-03ea-49e3-96cc-ba06620a03e3",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -112,6 +121,7 @@
     "pk": "b029aeb7-1342-47c0-8b5b-aad1df248099",
     "fields": {
       "name": "Ноутбуки",
+      "slug": "laptops",
       "id": "b029aeb7-1342-47c0-8b5b-aad1df248099",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -124,6 +134,7 @@
     "pk": "fce9baa5-0c6e-423e-96d4-bf093ae231d0",
     "fields": {
       "name": "Наушники",
+      "slug": "headphones",
       "id": "fce9baa5-0c6e-423e-96d4-bf093ae231d0",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -136,6 +147,7 @@
     "pk": "afb4cb42-1143-4f75-adb1-c8ca496987a7",
     "fields": {
       "name": "Часы",
+      "slug": "watches",
       "id": "afb4cb42-1143-4f75-adb1-c8ca496987a7",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -148,6 +160,7 @@
     "pk": "59aa9926-34af-46d2-914e-736155242732",
     "fields": {
       "name": "Планшеты",
+      "slug": "tablets",
       "id": "59aa9926-34af-46d2-914e-736155242732",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -160,6 +173,7 @@
     "pk": "5af0ad32-b43c-4da6-9aa6-f20ef8a2006b",
     "fields": {
       "name": "Клавиатуры",
+      "slug": "keyboards",
       "id": "5af0ad32-b43c-4da6-9aa6-f20ef8a2006b",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -172,6 +186,7 @@
     "pk": "b88d906e-0982-4f49-a3e7-b3c8699ea64b",
     "fields": {
       "name": "Мыши",
+      "slug": "mice",
       "id": "b88d906e-0982-4f49-a3e7-b3c8699ea64b",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -184,6 +199,7 @@
     "pk": "987fc26a-767a-4120-8b5d-ef314afd5a8d",
     "fields": {
       "name": "Мониторы",
+      "slug": "monitors",
       "id": "987fc26a-767a-4120-8b5d-ef314afd5a8d",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -196,6 +212,7 @@
     "pk": "c05594e6-4ad3-407a-bde2-aa1f03e36371",
     "fields": {
       "name": "Принтеры",
+      "slug": "printers",
       "id": "c05594e6-4ad3-407a-bde2-aa1f03e36371",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -208,6 +225,7 @@
     "pk": "0b1a9582-c5cc-4227-ab25-53db63818047",
     "fields": {
       "name": "Камеры",
+      "slug": "cameras",
       "id": "0b1a9582-c5cc-4227-ab25-53db63818047",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -220,6 +238,7 @@
     "pk": "a188e5cd-17d5-44af-b0d7-ce595fec8a9b",
     "fields": {
       "name": "Объективы",
+      "slug": "lenses",
       "id": "a188e5cd-17d5-44af-b0d7-ce595fec8a9b",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -232,6 +251,7 @@
     "pk": "3cfa8963-5a42-45b9-86b8-e1f3561c9df2",
     "fields": {
       "name": "Игровые приставки",
+      "slug": "gaming-consoles",
       "id": "3cfa8963-5a42-45b9-86b8-e1f3561c9df2",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -244,6 +264,7 @@
     "pk": "a09fdccb-9d57-43a5-98ff-96702b041b9b",
     "fields": {
       "name": "Игры",
+      "slug": "games",
       "id": "a09fdccb-9d57-43a5-98ff-96702b041b9b",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -256,6 +277,7 @@
     "pk": "e1b15828-3208-416b-b40b-4948335c2279",
     "fields": {
       "name": "Телевизоры",
+      "slug": "tvs",
       "id": "e1b15828-3208-416b-b40b-4948335c2279",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -268,6 +290,7 @@
     "pk": "d37d1e93-6185-4952-acf9-96e36d1d37f8",
     "fields": {
       "name": "Проекторы",
+      "slug": "projectors",
       "id": "d37d1e93-6185-4952-acf9-96e36d1d37f8",
       "parent_id": "686d5c01-0476-40c8-b49d-b8fabf8be130",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -280,6 +303,7 @@
     "pk": "f6087fe2-3341-43bb-b62a-f3e1d868d0fb",
     "fields": {
       "name": "Холодильники",
+      "slug": "refrigerators",
       "id": "f6087fe2-3341-43bb-b62a-f3e1d868d0fb",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -292,6 +316,7 @@
     "pk": "a813cbc2-c6f8-40d4-8825-aa9e2f42a678",
     "fields": {
       "name": "Плиты",
+      "slug": "stoves",
       "id": "a813cbc2-c6f8-40d4-8825-aa9e2f42a678",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -304,6 +329,7 @@
     "pk": "01c98902-dc4e-4bb1-b90d-2190dcd42b77",
     "fields": {
       "name": "Микроволновки",
+      "slug": "microwaves",
       "id": "01c98902-dc4e-4bb1-b90d-2190dcd42b77",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -316,6 +342,7 @@
     "pk": "92122952-a8ea-4103-a39a-32062997bbaf",
     "fields": {
       "name": "Чайники",
+      "slug": "kettles",
       "id": "92122952-a8ea-4103-a39a-32062997bbaf",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -328,6 +355,7 @@
     "pk": "e7e9c359-65ae-493d-8e41-9bf922b48526",
     "fields": {
       "name": "Кофемашины",
+      "slug": "coffee-machines",
       "id": "e7e9c359-65ae-493d-8e41-9bf922b48526",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -340,6 +368,7 @@
     "pk": "9f912385-d364-42e3-ad65-fe457d19b3e9",
     "fields": {
       "name": "Блендеры",
+      "slug": "blenders",
       "id": "9f912385-d364-42e3-ad65-fe457d19b3e9",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -352,6 +381,7 @@
     "pk": "c08feb5d-b6e5-4a55-9687-75b2c04de1be",
     "fields": {
       "name": "Тостеры",
+      "slug": "toasters",
       "id": "c08feb5d-b6e5-4a55-9687-75b2c04de1be",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -364,6 +394,7 @@
     "pk": "9a6944c6-149f-4b12-b457-ad2991aae4de",
     "fields": {
       "name": "Пылесосы",
+      "slug": "vacuum-cleaners",
       "id": "9a6944c6-149f-4b12-b457-ad2991aae4de",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -376,6 +407,7 @@
     "pk": "5f9785f9-ebab-4024-8a1c-4c3261f3f16b",
     "fields": {
       "name": "Утюги",
+      "slug": "irons",
       "id": "5f9785f9-ebab-4024-8a1c-4c3261f3f16b",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -388,6 +420,7 @@
     "pk": "270271cd-7e3e-4375-9c7c-e1b23b2680fd",
     "fields": {
       "name": "Фены",
+      "slug": "hair-dryers",
       "id": "270271cd-7e3e-4375-9c7c-e1b23b2680fd",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -400,6 +433,7 @@
     "pk": "c2a5cf48-374c-4d44-9513-b1949370a14c",
     "fields": {
       "name": "Эпиляторы",
+      "slug": "epilators",
       "id": "c2a5cf48-374c-4d44-9513-b1949370a14c",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -412,6 +446,7 @@
     "pk": "badea2c8-7d1d-40c7-9745-f42ed7a4430b",
     "fields": {
       "name": "Бритвы",
+      "slug": "razors",
       "id": "badea2c8-7d1d-40c7-9745-f42ed7a4430b",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -424,6 +459,7 @@
     "pk": "23cc8d28-77a8-4759-ab53-ed418662cd0e",
     "fields": {
       "name": "Зубные щетки",
+      "slug": "toothbrushes",
       "id": "23cc8d28-77a8-4759-ab53-ed418662cd0e",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -436,6 +472,7 @@
     "pk": "fc6ba7d8-9799-46e3-a0df-377cd72eb855",
     "fields": {
       "name": "Весы",
+      "slug": "scales",
       "id": "fc6ba7d8-9799-46e3-a0df-377cd72eb855",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -448,6 +485,7 @@
     "pk": "06221efe-c2ca-41fb-b679-040cdcc35e96",
     "fields": {
       "name": "Кондиционеры",
+      "slug": "air-conditioners",
       "id": "06221efe-c2ca-41fb-b679-040cdcc35e96",
       "parent_id": "7db94395-f8da-4582-b177-4c24fe586eb6",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -460,6 +498,7 @@
     "pk": "30cee21b-fddc-49a5-8f46-f6618af30f83",
     "fields": {
       "name": "Платья",
+      "slug": "dresses",
       "id": "30cee21b-fddc-49a5-8f46-f6618af30f83",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -472,6 +511,7 @@
     "pk": "1b0f9413-c3e6-42d4-9a16-24f93ca49577",
     "fields": {
       "name": "Рубашки",
+      "slug": "shirts",
       "id": "1b0f9413-c3e6-42d4-9a16-24f93ca49577",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -484,6 +524,7 @@
     "pk": "f6d33a02-01cd-4255-b3e0-16c0681fe9a1",
     "fields": {
       "name": "Джинсы",
+      "slug": "jeans",
       "id": "f6d33a02-01cd-4255-b3e0-16c0681fe9a1",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -496,6 +537,7 @@
     "pk": "2a60487d-f06a-4980-a901-a791f6117c99",
     "fields": {
       "name": "Брюки",
+      "slug": "trousers",
       "id": "2a60487d-f06a-4980-a901-a791f6117c99",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -508,6 +550,7 @@
     "pk": "e320e63d-8055-4f9e-8973-33c70ae277a9",
     "fields": {
       "name": "Юбки",
+      "slug": "skirts",
       "id": "e320e63d-8055-4f9e-8973-33c70ae277a9",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -520,6 +563,7 @@
     "pk": "50137f62-d0ae-414b-b8d4-343c3e51f8b7",
     "fields": {
       "name": "Костюмы",
+      "slug": "suits",
       "id": "50137f62-d0ae-414b-b8d4-343c3e51f8b7",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -532,6 +576,7 @@
     "pk": "69bc4d33-3ce1-4535-b683-bd154f493f86",
     "fields": {
       "name": "Пальто",
+      "slug": "coats",
       "id": "69bc4d33-3ce1-4535-b683-bd154f493f86",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -544,6 +589,7 @@
     "pk": "d6b41961-7d52-4672-8924-d9b953a9b0de",
     "fields": {
       "name": "Куртки",
+      "slug": "jackets",
       "id": "d6b41961-7d52-4672-8924-d9b953a9b0de",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -556,6 +602,7 @@
     "pk": "8fd3dc12-361f-456d-85ad-9a08c1511c9f",
     "fields": {
       "name": "Свитера",
+      "slug": "sweaters",
       "id": "8fd3dc12-361f-456d-85ad-9a08c1511c9f",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -568,6 +615,7 @@
     "pk": "3e84e2bf-e412-4836-816a-2f488eb2b169",
     "fields": {
       "name": "Футболки",
+      "slug": "t-shirts",
       "id": "3e84e2bf-e412-4836-816a-2f488eb2b169",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -580,6 +628,7 @@
     "pk": "fb8dc8f2-02a7-42f5-b19c-fbc8aa78ad43",
     "fields": {
       "name": "Шорты",
+      "slug": "shorts",
       "id": "fb8dc8f2-02a7-42f5-b19c-fbc8aa78ad43",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -592,6 +641,7 @@
     "pk": "2e802ac5-41fd-4b5e-8f35-c42490d4c198",
     "fields": {
       "name": "Нижнее белье",
+      "slug": "underwear",
       "id": "2e802ac5-41fd-4b5e-8f35-c42490d4c198",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -604,6 +654,7 @@
     "pk": "b343b9b5-1eff-40a8-9eae-c66c62c538b1",
     "fields": {
       "name": "Носки",
+      "slug": "socks",
       "id": "b343b9b5-1eff-40a8-9eae-c66c62c538b1",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -616,6 +667,7 @@
     "pk": "5712bd1a-b8ac-4634-8ba1-d1b31185e619",
     "fields": {
       "name": "Кроссовки",
+      "slug": "sneakers",
       "id": "5712bd1a-b8ac-4634-8ba1-d1b31185e619",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -628,6 +680,7 @@
     "pk": "b908df42-1125-4e71-aad6-161997643959",
     "fields": {
       "name": "Туфли",
+      "slug": "shoes",
       "id": "b908df42-1125-4e71-aad6-161997643959",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -640,6 +693,7 @@
     "pk": "f47cdf34-ff77-44b1-9340-17a3e635e63d",
     "fields": {
       "name": "Ботинки",
+      "slug": "boots",
       "id": "f47cdf34-ff77-44b1-9340-17a3e635e63d",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -652,6 +706,7 @@
     "pk": "d4d0a46b-bc27-4e19-8e06-8c3a4dae9e9f",
     "fields": {
       "name": "Сандалии",
+      "slug": "sandals",
       "id": "d4d0a46b-bc27-4e19-8e06-8c3a4dae9e9f",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -664,6 +719,7 @@
     "pk": "fcba736f-4e32-4b0e-a800-1e37c362c891",
     "fields": {
       "name": "Сумки",
+      "slug": "bags",
       "id": "fcba736f-4e32-4b0e-a800-1e37c362c891",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -676,6 +732,7 @@
     "pk": "29910f90-00bb-4dd6-8c11-7d010cb68bb8",
     "fields": {
       "name": "Рюкзаки",
+      "slug": "backpacks",
       "id": "29910f90-00bb-4dd6-8c11-7d010cb68bb8",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -688,6 +745,7 @@
     "pk": "3ee650a9-e15f-4c2c-a34f-354712a3a0f0",
     "fields": {
       "name": "Кошельки",
+      "slug": "wallets",
       "id": "3ee650a9-e15f-4c2c-a34f-354712a3a0f0",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -700,6 +758,7 @@
     "pk": "ff11f17f-e490-46f8-a44e-365885fc70db",
     "fields": {
       "name": "Ремни",
+      "slug": "belts",
       "id": "ff11f17f-e490-46f8-a44e-365885fc70db",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -712,6 +771,7 @@
     "pk": "62c949f1-1122-4378-a4aa-1bf1fd48cc2b",
     "fields": {
       "name": "Шляпы",
+      "slug": "hats",
       "id": "62c949f1-1122-4378-a4aa-1bf1fd48cc2b",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -724,6 +784,7 @@
     "pk": "3eee5479-a6bd-431c-b5e9-8205ea858704",
     "fields": {
       "name": "Очки",
+      "slug": "glasses",
       "id": "3eee5479-a6bd-431c-b5e9-8205ea858704",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -736,6 +797,7 @@
     "pk": "33bd05aa-b0aa-4707-967c-0f5b9638624a",
     "fields": {
       "name": "Серьги",
+      "slug": "earrings",
       "id": "33bd05aa-b0aa-4707-967c-0f5b9638624a",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -748,6 +810,7 @@
     "pk": "3b70caa7-5afd-4f2f-b8c9-d4d79b969f2b",
     "fields": {
       "name": "Кольца",
+      "slug": "rings",
       "id": "3b70caa7-5afd-4f2f-b8c9-d4d79b969f2b",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -760,6 +823,7 @@
     "pk": "4c71a105-fdcd-498b-a48d-ae5feb7b4b1d",
     "fields": {
       "name": "Браслеты",
+      "slug": "bracelets",
       "id": "4c71a105-fdcd-498b-a48d-ae5feb7b4b1d",
       "parent_id": "d22d94bb-eb3e-4211-b6e0-6cb7a912ba86",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -772,6 +836,7 @@
     "pk": "a9e01c76-14ba-4717-ba82-fac9fa7b939b",
     "fields": {
       "name": "Кровати",
+      "slug": "beds",
       "id": "a9e01c76-14ba-4717-ba82-fac9fa7b939b",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -784,6 +849,7 @@
     "pk": "f276957d-f364-4e0a-8154-256873f33ca1",
     "fields": {
       "name": "Диваны",
+      "slug": "sofas",
       "id": "f276957d-f364-4e0a-8154-256873f33ca1",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -796,6 +862,7 @@
     "pk": "bb20e10e-e653-4308-ba63-a11d649ee9e6",
     "fields": {
       "name": "Столы",
+      "slug": "tables",
       "id": "bb20e10e-e653-4308-ba63-a11d649ee9e6",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -808,6 +875,7 @@
     "pk": "2ed9802a-0a4a-42b8-9944-9c216baae9e8",
     "fields": {
       "name": "Стулья",
+      "slug": "chairs",
       "id": "2ed9802a-0a4a-42b8-9944-9c216baae9e8",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -820,6 +888,7 @@
     "pk": "e986b9cf-23b0-44e3-bbca-50bcf96fe316",
     "fields": {
       "name": "Шкафы",
+      "slug": "wardrobes",
       "id": "e986b9cf-23b0-44e3-bbca-50bcf96fe316",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -832,6 +901,7 @@
     "pk": "92092433-6b18-4da4-a50e-472d1ec1965d",
     "fields": {
       "name": "Комоды",
+      "slug": "dressers",
       "id": "92092433-6b18-4da4-a50e-472d1ec1965d",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -844,6 +914,7 @@
     "pk": "30965a26-75da-49f8-9f61-0a2873fef500",
     "fields": {
       "name": "Полки",
+      "slug": "shelves",
       "id": "30965a26-75da-49f8-9f61-0a2873fef500",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -856,6 +927,7 @@
     "pk": "328596e7-be26-4d3a-8046-cd9cde2dc8a2",
     "fields": {
       "name": "Зеркала",
+      "slug": "mirrors",
       "id": "328596e7-be26-4d3a-8046-cd9cde2dc8a2",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -868,6 +940,7 @@
     "pk": "f07cf236-d0d6-4863-9c9d-3a5f15892c72",
     "fields": {
       "name": "Матрасы",
+      "slug": "mattresses",
       "id": "f07cf236-d0d6-4863-9c9d-3a5f15892c72",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -880,6 +953,7 @@
     "pk": "d4c0c814-a678-4c8c-b66e-8689e4f10bde",
     "fields": {
       "name": "Постельное белье",
+      "slug": "bed-linen",
       "id": "d4c0c814-a678-4c8c-b66e-8689e4f10bde",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -892,6 +966,7 @@
     "pk": "c2ac7c7b-187b-4111-85c4-fe970b8fb2be",
     "fields": {
       "name": "Полотенца",
+      "slug": "towels",
       "id": "c2ac7c7b-187b-4111-85c4-fe970b8fb2be",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -904,6 +979,7 @@
     "pk": "bac6ae9d-e7fa-4be9-be9a-9f3adaaa0db5",
     "fields": {
       "name": "Шторы",
+      "slug": "curtains",
       "id": "bac6ae9d-e7fa-4be9-be9a-9f3adaaa0db5",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -916,6 +992,7 @@
     "pk": "0cdbda8d-03cd-4ff0-ba8d-8cc3fb1bab12",
     "fields": {
       "name": "Посуда",
+      "slug": "dishes",
       "id": "0cdbda8d-03cd-4ff0-ba8d-8cc3fb1bab12",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -928,6 +1005,7 @@
     "pk": "6b43b0fc-bb94-4ac2-ad1a-571c6d672854",
     "fields": {
       "name": "Сковородки",
+      "slug": "frying-pans",
       "id": "6b43b0fc-bb94-4ac2-ad1a-571c6d672854",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -940,6 +1018,7 @@
     "pk": "8bd7efc4-c463-47dc-b2b3-ffd3e01d806f",
     "fields": {
       "name": "Кастрюли",
+      "slug": "pots",
       "id": "8bd7efc4-c463-47dc-b2b3-ffd3e01d806f",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -952,6 +1031,7 @@
     "pk": "304125ba-9046-4a33-aaac-b28d570343e0",
     "fields": {
       "name": "Ножи",
+      "slug": "knives",
       "id": "304125ba-9046-4a33-aaac-b28d570343e0",
       "parent_id": "8f81074a-3eea-42cf-93c2-1ba2c7224824",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -964,6 +1044,7 @@
     "pk": "d48deee3-cb9d-4c25-821c-a13952fb2ba6",
     "fields": {
       "name": "Инструменты",
+      "slug": "tools",
       "id": "d48deee3-cb9d-4c25-821c-a13952fb2ba6",
       "parent_id": "70bfbdeb-dbde-461c-bf27-46f9b913b558",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -976,6 +1057,7 @@
     "pk": "9af4117f-a24d-460b-8659-39420d12c2b4",
     "fields": {
       "name": "Дрели",
+      "slug": "drills",
       "id": "9af4117f-a24d-460b-8659-39420d12c2b4",
       "parent_id": "70bfbdeb-dbde-461c-bf27-46f9b913b558",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -988,6 +1070,7 @@
     "pk": "d7c197dd-f427-4043-95f3-29fccc980836",
     "fields": {
       "name": "Шуруповерты",
+      "slug": "screwdrivers",
       "id": "d7c197dd-f427-4043-95f3-29fccc980836",
       "parent_id": "70bfbdeb-dbde-461c-bf27-46f9b913b558",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1000,6 +1083,7 @@
     "pk": "04ccc1d8-4b9e-4b26-894a-1009a601f2dd",
     "fields": {
       "name": "Молотки",
+      "slug": "hammers",
       "id": "04ccc1d8-4b9e-4b26-894a-1009a601f2dd",
       "parent_id": "70bfbdeb-dbde-461c-bf27-46f9b913b558",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1012,6 +1096,7 @@
     "pk": "27420003-bbea-4ad4-9c21-48c5ba51afe8",
     "fields": {
       "name": "Обои",
+      "slug": "wallpapers",
       "id": "27420003-bbea-4ad4-9c21-48c5ba51afe8",
       "parent_id": "70bfbdeb-dbde-461c-bf27-46f9b913b558",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1024,6 +1109,7 @@
     "pk": "58fc1b2e-cd00-4cd3-9405-e7b259b749bf",
     "fields": {
       "name": "Краски",
+      "slug": "paints",
       "id": "58fc1b2e-cd00-4cd3-9405-e7b259b749bf",
       "parent_id": "70bfbdeb-dbde-461c-bf27-46f9b913b558",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1036,6 +1122,7 @@
     "pk": "0056b000-e406-48f8-b64d-c08ce5ac01d5",
     "fields": {
       "name": "Ламинат",
+      "slug": "laminate",
       "id": "0056b000-e406-48f8-b64d-c08ce5ac01d5",
       "parent_id": "70bfbdeb-dbde-461c-bf27-46f9b913b558",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1048,6 +1135,7 @@
     "pk": "5909deec-545a-43c1-9667-ec212d0ac273",
     "fields": {
       "name": "Плитка",
+      "slug": "tiles",
       "id": "5909deec-545a-43c1-9667-ec212d0ac273",
       "parent_id": "70bfbdeb-dbde-461c-bf27-46f9b913b558",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1060,6 +1148,7 @@
     "pk": "7fc58fe8-447e-4f65-80a3-16b6f56fd120",
     "fields": {
       "name": "Корм для кошек",
+      "slug": "cat-food",
       "id": "7fc58fe8-447e-4f65-80a3-16b6f56fd120",
       "parent_id": "b58912c8-dcce-47cb-a26c-79aa7288fc3f",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1072,6 +1161,7 @@
     "pk": "e63a510f-d17f-4046-9145-0a5122f95bff",
     "fields": {
       "name": "Корм для собак",
+      "slug": "dog-food",
       "id": "e63a510f-d17f-4046-9145-0a5122f95bff",
       "parent_id": "b58912c8-dcce-47cb-a26c-79aa7288fc3f",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1084,6 +1174,7 @@
     "pk": "0e5864e8-c735-4153-8cdd-fda91ee151ae",
     "fields": {
       "name": "Аквариумы",
+      "slug": "aquariums",
       "id": "0e5864e8-c735-4153-8cdd-fda91ee151ae",
       "parent_id": "b58912c8-dcce-47cb-a26c-79aa7288fc3f",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1096,6 +1187,7 @@
     "pk": "bcb82320-f754-4865-8e75-80e69ce348b5",
     "fields": {
       "name": "Клетки",
+      "slug": "cages",
       "id": "bcb82320-f754-4865-8e75-80e69ce348b5",
       "parent_id": "b58912c8-dcce-47cb-a26c-79aa7288fc3f",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1108,6 +1200,7 @@
     "pk": "96e93a00-216f-4f55-a7c8-22a5ddc61329",
     "fields": {
       "name": "Игрушки для животных",
+      "slug": "pet-toys",
       "id": "96e93a00-216f-4f55-a7c8-22a5ddc61329",
       "parent_id": "b58912c8-dcce-47cb-a26c-79aa7288fc3f",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1120,6 +1213,7 @@
     "pk": "6ee1e4bd-8e37-4af5-a575-e7f83b2fd76c",
     "fields": {
       "name": "Детское питание",
+      "slug": "baby-food",
       "id": "6ee1e4bd-8e37-4af5-a575-e7f83b2fd76c",
       "parent_id": "cea14e55-ba0a-435e-83dd-4a6bedd72325",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1132,6 +1226,7 @@
     "pk": "d34fd201-b69f-48f5-a892-f6d7aa4b11af",
     "fields": {
       "name": "Подгузники",
+      "slug": "diapers",
       "id": "d34fd201-b69f-48f5-a892-f6d7aa4b11af",
       "parent_id": "cea14e55-ba0a-435e-83dd-4a6bedd72325",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1144,6 +1239,7 @@
     "pk": "7faf9bee-e722-4611-b804-89140b003c7e",
     "fields": {
       "name": "Коляски",
+      "slug": "strollers",
       "id": "7faf9bee-e722-4611-b804-89140b003c7e",
       "parent_id": "cea14e55-ba0a-435e-83dd-4a6bedd72325",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1156,6 +1252,7 @@
     "pk": "015e171a-876c-49e2-858e-3b0abed44409",
     "fields": {
       "name": "Автокресла",
+      "slug": "car-seats",
       "id": "015e171a-876c-49e2-858e-3b0abed44409",
       "parent_id": "cea14e55-ba0a-435e-83dd-4a6bedd72325",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1168,6 +1265,7 @@
     "pk": "9cf5d8f4-7a93-42d8-ae8e-d728d03dcea6",
     "fields": {
       "name": "Конструкторы",
+      "slug": "building-sets",
       "id": "9cf5d8f4-7a93-42d8-ae8e-d728d03dcea6",
       "parent_id": "cea14e55-ba0a-435e-83dd-4a6bedd72325",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1180,6 +1278,7 @@
     "pk": "b2af07a1-2be8-4754-accf-7710d8cb3413",
     "fields": {
       "name": "Куклы",
+      "slug": "dolls",
       "id": "b2af07a1-2be8-4754-accf-7710d8cb3413",
       "parent_id": "cea14e55-ba0a-435e-83dd-4a6bedd72325",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1192,6 +1291,7 @@
     "pk": "abd5f1fd-2b65-4332-967b-ee16e828edda",
     "fields": {
       "name": "Машинки",
+      "slug": "toy-cars",
       "id": "abd5f1fd-2b65-4332-967b-ee16e828edda",
       "parent_id": "cea14e55-ba0a-435e-83dd-4a6bedd72325",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1204,6 +1304,7 @@
     "pk": "8732f392-e3c1-4525-9b05-364cc3e89e25",
     "fields": {
       "name": "Спортивная одежда",
+      "slug": "sportswear",
       "id": "8732f392-e3c1-4525-9b05-364cc3e89e25",
       "parent_id": "d81b8542-4ee0-4564-84b9-675de02ec79a",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1216,6 +1317,7 @@
     "pk": "4a7afbb8-284d-480c-92ce-a81bb720757b",
     "fields": {
       "name": "Мячи",
+      "slug": "balls",
       "id": "4a7afbb8-284d-480c-92ce-a81bb720757b",
       "parent_id": "d81b8542-4ee0-4564-84b9-675de02ec79a",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1228,6 +1330,7 @@
     "pk": "54893bd0-2cee-4dc5-b624-3561722a7866",
     "fields": {
       "name": "Гантели",
+      "slug": "dumbbells",
       "id": "54893bd0-2cee-4dc5-b624-3561722a7866",
       "parent_id": "d81b8542-4ee0-4564-84b9-675de02ec79a",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1240,6 +1343,7 @@
     "pk": "52b9c6df-6c4c-4ad0-8d61-3427186c5f2c",
     "fields": {
       "name": "Йога",
+      "slug": "yoga",
       "id": "52b9c6df-6c4c-4ad0-8d61-3427186c5f2c",
       "parent_id": "d81b8542-4ee0-4564-84b9-675de02ec79a",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1252,6 +1356,7 @@
     "pk": "ecee0c07-6d60-4200-957a-46ff8d34dc4a",
     "fields": {
       "name": "Туризм",
+      "slug": "camping",
       "id": "ecee0c07-6d60-4200-957a-46ff8d34dc4a",
       "parent_id": "d81b8542-4ee0-4564-84b9-675de02ec79a",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1264,6 +1369,7 @@
     "pk": "08d81b1d-a895-4a9c-bf83-0e571ea7d1ca",
     "fields": {
       "name": "Палатки",
+      "slug": "tents",
       "id": "08d81b1d-a895-4a9c-bf83-0e571ea7d1ca",
       "parent_id": "d81b8542-4ee0-4564-84b9-675de02ec79a",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1276,6 +1382,7 @@
     "pk": "d4060433-8cd0-46a0-ac15-30bdde44a305",
     "fields": {
       "name": "Спальники",
+      "slug": "sleeping-bags",
       "id": "d4060433-8cd0-46a0-ac15-30bdde44a305",
       "parent_id": "d81b8542-4ee0-4564-84b9-675de02ec79a",
       "created_at": "2026-05-19T10:47:28.760249",
@@ -1288,6 +1395,7 @@
     "pk": "b3d22a4e-08c4-4a89-b579-c26d694d1a07",
     "fields": {
       "name": "Фонари",
+      "slug": "flashlights",
       "id": "b3d22a4e-08c4-4a89-b579-c26d694d1a07",
       "parent_id": "d81b8542-4ee0-4564-84b9-675de02ec79a",
       "created_at": "2026-05-19T10:47:28.760249",
