@@ -60,6 +60,7 @@ services:
       - DB_USER=postgres
       - DB_HOST=postgres
       - DB_PORT=5432
+      - RABBITMQ_HOST=mq
       - SECRET_KEY=${SECRET_KEY}
       - AWS_ACCESS_KEY_ID=minioadmin
       - AWS_SECRET_ACCESS_KEY=minioadmin
