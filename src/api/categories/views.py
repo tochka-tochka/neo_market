@@ -11,6 +11,7 @@ from src.api.categories.services import get_full_category, get_category_filters,
     get_category_breadcrumbs
 from src.api.products.service.category_service import get_categories
 from src.api.products.service.product_utils import parse_query_filters
+from src.models import Product
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -54,6 +55,19 @@ class CategoryBreadcrumbsView(APIView):
     def get(self, request: HttpRequest, id: uuid.UUID):
         try:
             json_filters = get_category_breadcrumbs(id)
+            return JsonResponse(json_filters, status=200, safe=False)
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            return JsonResponse({"message": str(e)}, status=500)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ProductBreadcrumbsView(APIView):
+    # permission_classes = [IsAuthenticated]
+    def get(self, request: HttpRequest, id: uuid.UUID):
+        try:
+            product = Product.objects.get(id=id)
+            json_filters = get_category_breadcrumbs(product.category_id)
             return JsonResponse(json_filters, status=200, safe=False)
         except Exception as e:
             logging.error(traceback.format_exc())

@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from src.api.products.views import ProductsView, ProductDetailView, PublicProductsView
 from src.api.categories.views import CategoriesView, CategoryView, CategoryFilterView, CatalogFacets, \
-    CategoryBreadcrumbsView
+    CategoryBreadcrumbsView, ProductBreadcrumbsView
 from src.api.skus.views import SkusView
 from src.api.invoices.views import InvoicesView
 from src.api.auth.views import RegisterView
@@ -41,6 +41,7 @@ urlpatterns = [
 
     path('api/v1/products', ProductsView.as_view(), name='products'),
     path('api/v1/products/<uuid:id>', ProductDetailView.as_view(), name='product-detail'),
+    path('api/v1/products/<uuid:id>/breadcrumbs', ProductBreadcrumbsView.as_view()),
 
     path('api/v1/skus', SkusView.as_view(), name="skus"),
     path('api/v1/skus/<uuid:id>', SkusView.as_view(), name='specific-sku'),
