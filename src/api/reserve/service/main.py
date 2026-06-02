@@ -95,7 +95,9 @@ def unreserve(order_id, reserved_items):
         if unreserve is not None:
             return unreserve.result
         for item in reserved_items:
-            sku = SKU.objects.get(id=item["sku_id"])
+            sku = SKU.objects.select_for_update().get(id=item["sku_id"])
+            if sku.reserved_quantity < item["quantity"]:
+                raise NegativeQuantity()
             sku.reserved_quantity -= item["quantity"]
             sku.save()
         Order.objects.get(id=order_id).delete()
@@ -106,6 +108,8 @@ def unreserve(order_id, reserved_items):
         }
         ReserveOperations.objects.create(idempotency_key=order_id, result=result)
         return result
+    except NegativeQuantity as e:
+        raise e
     except Exception as e:
         raise Exception(f"failed to reserve sku: {e}")
 

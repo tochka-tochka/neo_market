@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
-from src.api.reserve.service.main import NotEnoughQunatity, reserve, unreserve, fulfill, OrderNotFound
+from src.api.reserve.service.main import NotEnoughQunatity, reserve, unreserve, fulfill, OrderNotFound, NegativeQuantity
 from src.permissions import IsService
 
 
@@ -40,6 +40,8 @@ class UnreserveView(APIView):
         try:
             result = unreserve(request.data.get("order_id"), request.data.get("items"))
             return JsonResponse(result, status=200)
+        except NegativeQuantity:
+            return JsonResponse({"code": "UNRESERVE_CONFLICT", "message": "not eunogh reserved quantity"}, status=409)
         except Exception as e:
             return JsonResponse({"code":"SERVER_ERROR", "message": str(e)}, status=500)
 
